@@ -12,6 +12,10 @@ export const nav = [
 		slug: '/info/about',
 	},
 	{
+		title: 'Current Season',
+		slug: '/info/current-season'
+	},
+	{
 		title: 'History',
 		slug: '/history',
 	},
