@@ -4,7 +4,7 @@ import Layout from '../../layouts/Page.astro';
 import { Container } from '@littlesticks/odyssey-theme-components';
 
 const seo = {
-	title: 'Contact | Astro Odyssey Theme',
+	title: 'Contact | Southern Tier Robotics',
 	description: 'Contact Page',
 };
 ---
@@ -29,9 +29,6 @@ const seo = {
 					</p>
 				</div>
 			</div>
-			<div class="col-2__container">
-				<ContactForm />
-			</div>
 		</section>
 	</Container>
 </Layout>
@@ -39,7 +36,7 @@ const seo = {
 <style>
 	.contact-hero__section {
 		margin: var(--section-margin) auto;
-		display: grid;
+		display: block;
 		grid-template-columns: 1fr 1fr;
 		min-height: calc(90vh - var(--navbar-height));
 		gap: 3rem;
