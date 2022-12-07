@@ -3,26 +3,35 @@ import { Container, FeatureCard } from '@littlesticks/odyssey-theme-components';
 
 import Layout from '../layouts/Page.astro';
 import HomeHeroSection from '../components/sections/heros/HomeHeroSection.astro';
+import CoreValue from '../components/cards/CoreValue.astro';
+import ImageTextCard from '../components/cards/ImageTextCard.astro';
 ---
 
 <Layout>
 	<HomeHeroSection />
 	<Container>
 		<section class="feature-card__section">
-			<h2>Landing Pages</h2>
-			<p>
-				Use one of our landing pages to jumpstart your website or ad campaign.
-			</p>
+			<h2>Core Values:</h2>
 			<div class="feature-card__grid">
-				<FeatureCard
-					href="/landing-pages/landing-1"
-					title="Landing Page 1"
-					imgSrc="/assets/images/home/screenshots/landing-1"
+				<ImageTextCard
+					title="Engineering"
+					imgSrc="/assets/images/engineering.jpg"
+					description="Each year we push our robots to a higher level by using advanced software, machining and design techniques using equipment we have in our shop. With access to CNC Mills, Lathes, and other machines, this allows us to design the most optimized parts for our robot easily. "
 				/>
-				<FeatureCard
-					href="/landing-pages/landing-2"
-					title="Landing Page 2"
-					imgSrc="/assets/images/home/screenshots/landing-2"
+				<ImageTextCard
+					title="Learning"
+					imgSrc="/assets/images/learning.jpg"
+					description="Our club is run by mentors from local engineering companies, as well as teachers, and other adults. This allows students to get REAL, PRACTICAL, knowledge about engineering tools. A lot of our students have been inspired about what they want to do after highschool from our organization. "
+				/>
+				<ImageTextCard
+					title="Community"
+					imgSrc="/assets/images/outreach.jpg"
+					description="One of the goals of all FIRST teams is to spread the message of FIRST and promote STEAM throughout the community. We do outreach events such as visiting local elementary and middle schools, doing fundraisers, and STEAM events. "
+				/>
+				<ImageTextCard
+					title="Competition"
+					imgSrc="/assets/images/finger-guns.jpg"
+					description="A huge part of the FIRST organization is competition. We strive to build a better robot than we did last year and win the events we go to. We have consistently placed in the playoff brackets every year we have competed. "
 				/>
 			</div>
 		</section>

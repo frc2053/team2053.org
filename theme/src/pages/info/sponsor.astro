@@ -1,5 +1,6 @@
 ---
 import { TextSection } from '@littlesticks/odyssey-theme-components';
+import ImageTextCard from '../../components/cards/ImageTextCard.astro';
 import Layout from '../../layouts/Page.astro';
 
 const seo = {
@@ -17,5 +18,18 @@ const seo = {
 			do an in-kind donation, please contact us at
 			team2053tigertronics@gmail.com
 		</p>
+
+		<h1>Current Sponsors:</h1>
+		<ImageTextCard
+			title="Falso Industries"
+			imgSrc="/assets/images/sponsor/falsoLogo.png"
+			description=""
+		/>
+		<br />
+		<ImageTextCard
+			title="MasterCAM"
+			imgSrc="/assets/images/sponsor/mastercam-logo.svg"
+			description=""
+		/>
 	</TextSection>
 </Layout>
