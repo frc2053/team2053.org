@@ -3,7 +3,7 @@ import { Container, YouTubeEmbedSection } from '@littlesticks/odyssey-theme-comp
 import RobotCard from '../components/history/RobotCard.astro';
 import Layout from './Page.astro'; 
 
-const {content: {title, description, canonicalURL, featuredImage, robotName, events, awards, wins, losses, gameVidUrl} } = Astro.props;
+const {content: {title, description, canonicalURL, featuredImage, robotName, events, awards, wins, losses, gameVidUrl, gameLogo} } = Astro.props;
 
 const seo = {
 	title,
@@ -23,6 +23,16 @@ const seo = {
     <article id="article">
         <slot></slot>
     </article>
+    <picture>
+			<source srcset={`${gameLogo}`} />
+			<img
+				class="gamelogo-layout__img"
+				src={`${gameLogo}`}
+				alt={title}
+				loading="lazy"
+				decoding="async"
+			/>
+		</picture>
     <p>Below is a video describing the game in more detail:</p>
     <YouTubeEmbedSection url={gameVidUrl}/>
   </Container>
@@ -56,5 +66,12 @@ const seo = {
   .post-layout__date {
     margin-bottom: 1rem;
     opacity: 0.84;
+  }
+  .gamelogo-layout__img {
+    background-color: #fff;
+    margin: 0 auto 1rem auto;
+    width: 100%;
+    height: 100%;
+    border-radius: var(--theme-shape-radius);
   }
 </style>
