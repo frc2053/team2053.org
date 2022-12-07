@@ -1,24 +1,39 @@
 export const footerSocials = [
-  {
-    name: 'Twitter',
-    url: 'https://twitter.com/littlesticksdev',
-    icon: "mdi:twitter",
-  },
-  {
-    name: 'Youtube',
-    url: 'https://youtube.com/c/LittleSticks',
-    icon: "mdi:youtube",
-  },
-  {
-    name: 'Github',
-    url: 'https://github.com/littlesticks',
-    icon: "mdi:github",
-  },
-  {
-    name: 'Discord',
-    url: 'https://littlesticks.dev/discord',
-    icon: "ic:baseline-discord",
-  },
+	{
+		name: 'Twitter',
+		url: 'https://twitter.com/frc2053',
+		icon: "mdi:twitter",
+	},
+	{
+		name: "TikTok",
+		url: 'https://www.tiktok.com/@frc2053?',
+		icon: "ic:baseline-tiktok"
+	},
+	{
+		name: "Instagram",
+		url: 'https://www.instagram.com/frc2053/',
+		icon: "mdi:instagram",
+	},
+	{
+		name: 'Youtube',
+		url: 'https://www.youtube.com/user/Team2053',
+		icon: "mdi:youtube",
+	},
+	{
+		name: 'Github',
+		url: 'https://github.com/frc2053/',
+		icon: "mdi:github",
+	},
+	{
+		name: 'Discord',
+		url: 'https://discord.gg/n5NHE9QMG2',
+		icon: "ic:baseline-discord",
+	},
+	{
+		name: 'Facebook',
+		url: 'https://www.facebook.com/FRC2053/',
+		icon: "ic:baseline-facebook",
+	},
 ]
 
 export const footerLists = [
@@ -33,7 +48,7 @@ export const footerLists = [
 				title: 'Landing Page 2',
 				slug: '/landing-pages/landing-2',
 			},
-      // {
+			// {
 			// 	title: 'Landing Page 3',
 			// 	slug: '/landing-pages/landing-3',
 			// },
@@ -67,14 +82,14 @@ export const footerLists = [
 				title: 'Style Guide',
 				slug: '/theme/style-guide',
 			},
-      {
-        title: 'Theme Setup',
-        slug: '/theme/theme-setup',
-      },
-      {
-        title: 'Customizing Odyssey',
-        slug: '/theme/customizing-odyssey',
-      }
+			{
+				title: 'Theme Setup',
+				slug: '/theme/theme-setup',
+			},
+			{
+				title: 'Customizing Odyssey',
+				slug: '/theme/customizing-odyssey',
+			}
 		],
 	},
 ];
