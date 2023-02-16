@@ -20,6 +20,10 @@ export const nav = [
 		slug: '/history',
 	},
 	{
+		title: 'Merch Store',
+		slug: 'https://shop.team2053.org',
+	},
+	{
 		title: 'Sponsors',
 		slug: '/info/sponsor'
 	},
