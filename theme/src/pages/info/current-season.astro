@@ -1,5 +1,5 @@
 ---
-import { TextSection } from '@littlesticks/odyssey-theme-components';
+import { TextSection, TextCardSection } from '@littlesticks/odyssey-theme-components';
 import Layout from '../../layouts/Page.astro';
 import HeroSection from '../../components/sections/heros/HeroSection.astro';
 
@@ -12,12 +12,12 @@ const seo = {
 <Layout {seo}>
 	<HeroSection>
 		<div slot="text-container">
-			<h1>FIRST: Charged UP</h1>
-			<p>Kickoff on January 7th, 12pm EST at VHS.</p>
+			<h1>FIRST: Crescendo</h1>
+			<p>Kickoff on January 6th, 2024, 12pm EST at VHS.</p>
 		</div>
 		<picture slot="image-container">
 			<img
-				src="/assets/images/charged-up.png"
+				src="/assets/images/crescendo.png"
 				alt="Charged Up Logo"
 				id="current-season-logo"
 			/>
@@ -26,12 +26,15 @@ const seo = {
 	<TextSection narrow>
 		<h3>Good Resources:</h3>
 		<p>
-			<a href="https://forms.gle/fZBtZrikUUdukjh19"
+			<a href="https://docs.google.com/document/d/e/2PACX-1vSdAAFUno1pKlGF523Y2IRHcBvagHEvh29G_MxMm6Ic4P1_NUhEs9IqkGqEHTbD9xfH3f8ZhKjmzw5C/pub">Team Handbook and Rules</a>
+		</p>
+		<p>
+			<!-- <a href="https://forms.gle/fZBtZrikUUdukjh19"
 				>Here is the link to the FRC Game Manual Quiz!</a
-			>
+			> -->
+			<a href="https://info.firstinspires.org/first-in-show">Link to FIRST information page for this season!</a>
 		</p>
 	</TextSection>
-	<br />
 	<TextSection narrow>
 		<h3>More Info:</h3>
 		<p>
@@ -44,13 +47,14 @@ const seo = {
 		</p>
 		<ul>
 			<li>
-				Schedule before January 7th, 2023
+				Schedule before January 6th, 2024
 				<ul>
-					<li>Friday: 5-8pm</li>
+					<li>Tuesday: 5-8pm</li>
+					<li>Thursday: 5-8pm</li>
 				</ul>
 			</li>
 			<li>
-				Schedule after January 7th, 2023
+				Schedule after January 6th, 2024
 				<ul>
 					<li>Monday: 5-8pm</li>
 					<li>Tuesday: 5-8pm</li>
@@ -61,8 +65,8 @@ const seo = {
 				</ul>
 			</li>
 		</ul>
-		<h2>Team Handbook: </h2>
-		<a href="https://docs.google.com/document/d/e/2PACX-1vSdAAFUno1pKlGF523Y2IRHcBvagHEvh29G_MxMm6Ic4P1_NUhEs9IqkGqEHTbD9xfH3f8ZhKjmzw5C/pub">Here!</a>
+	</TextSection>
+	<TextSection narrow>
 		<h2>Meeting Calendar:</h2>
 		<iframe
 			src="https://calendar.google.com/calendar/embed?height=600&wkst=1&bgcolor=%23ffffff&ctz=America%2FNew_York&showTitle=1&showNav=1&showDate=1&showPrint=0&showTabs=0&showCalendars=0&showTz=1&src=NjFjZDcwOTExYjhiMWFjZDI4OWY1NmUzMDZhMjk5MGE5Y2JmYTkxY2ExNGQ0OTI0OTIwNzY2ODVlM2QyZTY5N0Bncm91cC5jYWxlbmRhci5nb29nbGUuY29t&color=%237CB342"
