@@ -34,6 +34,11 @@ export const footerSocials = [
 		url: 'https://www.facebook.com/FRC2053/',
 		icon: "ic:baseline-facebook",
 	},
+	{
+		name: 'LinkedIn',
+		url: 'https://www.linkedin.com/company/southern-tier-robotics/',
+		icon: "mdi:linkedin",
+	},
 ]
 
 export const footerLists = [
