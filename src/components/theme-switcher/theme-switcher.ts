@@ -10,31 +10,31 @@ import {
 } from './icons';
 
 const themes = [
-  {
-    name: 'default',
-    icon: classicThemeIcon,
-    label: 'Classic',
-  },
-  {
-    name: 'dark',
-    icon: darkThemeIcon,
-    label: 'Dark',
-  },
-  {
-    name: 'earth',
-    icon: earthThemeIcon,
-    label: 'Earth',
-  },
-  {
-    name: 'ocean',
-    icon: blueThemeIcon,
-    label: 'Ocean',
-  },
-  {
-    name: 'sand',
-    icon: orangeThemeIcon,
-    label: 'Sand',
-  }
+	{
+		name: 'default',
+		icon: classicThemeIcon,
+		label: 'Classic',
+	},
+	{
+		name: 'dark',
+		icon: darkThemeIcon,
+		label: 'Dark',
+	},
+	{
+		name: 'earth',
+		icon: earthThemeIcon,
+		label: 'Earth',
+	},
+	{
+		name: 'ocean',
+		icon: blueThemeIcon,
+		label: 'Ocean',
+	},
+	{
+		name: 'sand',
+		icon: orangeThemeIcon,
+		label: 'Sand',
+	}
 ]
 
 @customElement('theme-switcher')
@@ -91,46 +91,46 @@ export class ThemeSwitcher extends LitElement {
 		if (localStorageTheme !== null) {
 			this._setTheme(localStorageTheme);
 		} else {
-    	// Set default theme to dark if the operating system specifies this preference
+			// Set default theme to dark if the operating system specifies this preference
 			if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
 				this._setTheme('dark');
-			} else{ // Set to default/light theme if no specification, or light theme is specified
+			} else { // Set to default/light theme if no specification, or light theme is specified
 				this._setTheme('default');
 			}
-    		
-    }
+
+		}
 	}
 
-  firstUpdated() {
-    this._getCurrentTheme();
-  }
+	firstUpdated() {
+		this._getCurrentTheme();
+	}
 
 	private _setTheme(theme) {
 		this._doc.setAttribute('data-theme', theme);
 
-    const _heroImage = document.querySelector('#home-hero-image') as HTMLImageElement;
+		const _heroImage = document.querySelector('#home-hero-image') as HTMLImageElement;
 		if (theme === 'default') {
-			_heroImage.src = '/assets/images/home/classic-hero.jpg';
+			_heroImage.src = '/assets/images/home/classic-hero.webp';
 		}
 		if (theme === 'dark') {
-			_heroImage.src = '/assets/images/home/dark-hero.jpg';
+			_heroImage.src = '/assets/images/home/dark-hero.webp';
 		}
 		if (theme === 'earth') {
-			_heroImage.src = '/assets/images/home/earth-hero.jpg';
+			_heroImage.src = '/assets/images/home/earth-hero.webp';
 		}
 		if (theme === 'ocean') {
-			_heroImage.src = '/assets/images/home/ocean-hero.jpg';
+			_heroImage.src = '/assets/images/home/ocean-hero.webp';
 		}
 		if (theme === 'sand') {
-			_heroImage.src = '/assets/images/home/sand-hero.jpg';
+			_heroImage.src = '/assets/images/home/sand-hero.webp';
 		}
 		localStorage.setItem('theme', theme);
 		this.theme = theme;
 	}
 
 	render() {
-    const themeButtons = html`${themes.map((theme) => {
-      return html`
+		const themeButtons = html`${themes.map((theme) => {
+			return html`
       <div class="theme-select__container">
         <button
           @click=${() => this._setTheme(theme.name)}
@@ -142,7 +142,7 @@ export class ThemeSwitcher extends LitElement {
         <p>${theme.label}</p>
         </div>
       `
-    })}`
+		})}`
 
 		return html`
 			<div class="theme-switcher__container">
