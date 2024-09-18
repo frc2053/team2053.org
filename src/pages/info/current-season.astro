@@ -1,0 +1,87 @@
+---
+import { TextSection, TextCardSection } from '@components/odyssey-theme';
+import Layout from '../../layouts/Page.astro';
+import HeroSection from '../../components/sections/heros/HeroSection.astro';
+
+const seo = {
+	title: 'Current Season | Southern Tier Robotics',
+	description: 'Information about the current season',
+};
+---
+
+<Layout {seo}>
+	<HeroSection>
+		<div slot="text-container">
+			<h1>FIRST: Crescendo</h1>
+			<p>Kickoff on January 6th, 2024, 12pm EST at VHS.</p>
+		</div>
+		<picture slot="image-container">
+			<img
+				src="/assets/images/crescendo.png"
+				alt="Charged Up Logo"
+				id="current-season-logo"
+			/>
+		</picture>
+	</HeroSection>
+	<TextSection narrow>
+		<h3>Good Resources:</h3>
+		<p>
+			<a
+				href="https://docs.google.com/document/d/1bE_2YUtZ2e0jtnDK2_itQkPTz2gczKb6DidZ5INTC1k/pub"
+				>Team Handbook and Rules</a
+			>
+		</p>
+		<p>
+			<!-- <a href="https://forms.gle/fZBtZrikUUdukjh19"
+				>Here is the link to the FRC Game Manual Quiz!</a
+			> -->
+			<a href="https://info.firstinspires.org/first-in-show"
+				>Link to FIRST information page for this season!</a
+			>
+		</p>
+	</TextSection>
+	<TextSection narrow>
+		<h3>More Info:</h3>
+		<p>
+			Here you can find information about meetings, and more information
+			for this year. Please be outside of the front doors of the school at
+			5pm/8am, or you will have to be let in by a mentor later.
+		</p>
+		<p>
+			<b
+				><i>Please check calendar for specific days we will not meet.</i
+				></b
+			>
+		</p>
+		<ul>
+			<li>
+				Schedule before January 6th, 2024
+				<ul>
+					<li>Tuesday: 5-8pm</li>
+					<li>Thursday: 5-8pm</li>
+				</ul>
+			</li>
+			<li>
+				Schedule after January 6th, 2024
+				<ul>
+					<li>Monday: 5-8pm</li>
+					<li>Tuesday: 5-8pm</li>
+					<li>Wesnesday: 5-8pm</li>
+					<li>Thursday: 5-8pm</li>
+					<li>Friday: 5-8pm</li>
+					<li>Saturday: 8am-1pm</li>
+				</ul>
+			</li>
+		</ul>
+	</TextSection>
+	<TextSection narrow>
+		<h2>Meeting Calendar:</h2>
+		<iframe
+			src="https://calendar.google.com/calendar/embed?height=600&wkst=1&bgcolor=%23ffffff&ctz=America%2FNew_York&src=NDFmYzA2ODljMTVmNWM3YWRmNTVlMDgxMjUxZTEzY2E0MWUyMWZlNTk4YzNmZjZiMzE5ODE0MjFjMWZlYjUwZUBncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=NjFjZDcwOTExYjhiMWFjZDI4OWY1NmUzMDZhMjk5MGE5Y2JmYTkxY2ExNGQ0OTI0OTIwNzY2ODVlM2QyZTY5N0Bncm91cC5jYWxlbmRhci5nb29nbGUuY29t&color=%239E69AF&color=%237CB342"
+			style="border-width:0"
+			width="800"
+			height="600"
+			frameborder="0"
+			scrolling="no"></iframe>
+	</TextSection>
+</Layout>

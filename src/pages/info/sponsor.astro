@@ -1,0 +1,67 @@
+---
+import { TextSection } from '@components/odyssey-theme';
+import ImageTextCard from '../../components/cards/ImageTextCard.astro';
+import Layout from '../../layouts/Page.astro';
+
+const seo = {
+	title: `Sponsor Page`,
+	description: `Our current sponsors and information on how to sponsor our team.`,
+};
+---
+
+<Layout {seo}>
+	<TextSection narrow>
+		<h1>Support Us</h1>
+
+		<p>
+			If you are interested in becoming a sponsor of the team, or are looking to
+			do an in-kind donation, please contact us at
+			southerntierrobotics@gmail.com
+		</p>
+
+		<h1>Current Sponsors:</h1>
+		<ImageTextCard
+			title="Vestal Central School District"
+			imgSrc="/assets/images/sponsor/vestal-logo.webp"
+			description=""
+		/>
+		<br />
+		<ImageTextCard
+			title="Frank Jania"
+			imgSrc="/assets/images/sponsor/family.png"
+		/>
+		<br />
+		<ImageTextCard
+			title="BAE Systems"
+			imgSrc="/assets/images/sponsor/BAEsystem.sponsor.png"
+			description=""
+		/>
+		<br />
+		<ImageTextCard
+			title="Lockheed Martin"
+			imgSrc="/assets/images/sponsor/LM-logo.svg"
+			description=""
+		/>
+		<br />
+		<ImageTextCard
+			title="United Dental Services"
+			imgSrc="/assets/images/sponsor/sponsor.uds.png"
+			description=""
+		/>
+		<br />
+		<ImageTextCard
+			title="The McKenzie Family"
+			imgSrc="/assets/images/sponsor/family.png"
+		/>
+		<br />
+		<ImageTextCard
+			title="Endicott Precision Inc."
+			imgSrc="/assets/images/sponsor/EPINC.logo.png"
+			description=""
+		/>
+		<br />
+		<ImageTextCard
+			title="Hatala Orthodontics"
+			imgSrc="/assets/images/sponsor/hatala.logo.png"
+			description=""
+</Layout>

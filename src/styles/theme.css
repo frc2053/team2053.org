@@ -1,0 +1,36 @@
+:root {
+	/* Theme Colors */
+	--theme-primary: #4600AA;
+	--theme-primary-hover: #6a00ff;
+	--theme-on-primary: #fff;
+
+	--theme-bg: #000;
+	--theme-on-bg: #fff;
+
+	--theme-surface-1: #4600AA;
+	--theme-on-surface-1: #fff;
+
+	--theme-surface-2: #DC0000;
+	--theme-on-surface-2: #000;
+
+	/* Theme Shapes */
+	/* Set this to 0 if you want all of the rounded cards, images, etc to be straight edges */
+	--theme-shape-radius: clamp(1rem, 2rem, 3rem);
+	--theme-button-border-radius: 3rem;
+
+	/* Theme Transition */
+	--theme-transition: 0.2s ease-in-out;
+
+	/* Theme Layout */
+	--section-margin: 3rem;
+	--theme-grid-gap: 1rem;
+	--container-max-width: 1440px;
+	--container-max-width-narrow: 960px;
+	--container-padding: 0 1rem;
+
+	--theme-blog-post-header-width: 1200px;
+
+	/* Theme Fonts */
+	--theme-font-family-serif: 'Space Mono', serif;
+	--theme-font-family-sans: 'Space Mono', sans-serif;
+}

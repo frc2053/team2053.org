@@ -1,0 +1,52 @@
+---
+import { parse, isBefore } from 'date-fns';
+import {
+	Container,
+	TextCardSection,
+	BlogPostsList,
+} from '@components/odyssey-theme';
+import Layout from '../../layouts/Page.astro';
+
+const posts = await Astro.glob('./years/*.mdx').then(posts =>
+	posts
+		.map(({ frontmatter, url }) => ({
+			title: frontmatter.title,
+			description: frontmatter.description,
+			robotYear: frontmatter.robotYear,
+			featuredImage: frontmatter.featuredImage,
+			excerpt: frontmatter.excerpt,
+			href: url,
+		}))
+		.sort((a, b) => {
+			if (isBefore(a.robotYear, b.robotYear)) return 1;
+			if (isBefore(b.robotYear, a.robotYear)) return -1;
+			return 0;
+		})
+);
+
+const seo = {
+	title: 'History | Southern Tier Robotics',
+	description: 'Southern Tier Robotics Robot History Page',
+};
+---
+
+<Layout {seo}>
+	<Container>
+		<TextCardSection>
+			<h1>Team History</h1>
+			<p>
+				See information about previous robots and information about past
+				FRC games
+			</p>
+		</TextCardSection>
+		<section class="blog-posts-list__section">
+			<BlogPostsList {posts} />
+		</section>
+	</Container>
+</Layout>
+
+<style>
+	.blog-posts-list__section {
+		margin: var(--section-margin) auto;
+	}
+</style>
