@@ -31,4 +31,8 @@ export const nav = [
 		title: 'Contact',
 		slug: '/info/contact',
 	},
+	{
+		title: 'STRApp',
+		slug: 'https://strapp.team2053.org',
+	},
 ];
