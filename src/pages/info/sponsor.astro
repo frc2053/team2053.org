@@ -4,62 +4,109 @@ import ImageTextCard from '../../components/cards/ImageTextCard.astro';
 import Layout from '../../layouts/Page.astro';
 
 const seo = {
-	title: `Sponsor Page`,
-	description: `Our current sponsors and information on how to sponsor our team.`,
+    title: `Sponsor Page`,
+    description: `Our current sponsors and information on how to sponsor our team.`,
 };
+
+// Style block for the two-column layout
+const styles = `
+    .sponsor-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 1rem;
+    }
+
+    .pdf-section {
+        position: sticky;
+        top: 2rem;
+        height: fit-content;
+    }
+
+    .sponsors-section {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .contact-info {
+        margin: 1.5rem 0;
+    }
+
+    @media (max-width: 768px) {
+        .sponsor-container {
+            grid-template-columns: 1fr;
+        }
+
+        .pdf-section {
+            position: static;
+        }
+
+        embed {
+            height: 500px !important;
+        }
+    }
+`;
 ---
 
 <Layout {seo}>
-	<TextSection narrow>
-		<h1>Support Us</h1>
+    <style set:html={styles}></style>
+    
+    <TextSection>
+        <h1>Support Us</h1>
+        
+        <div class="sponsor-container">
+            <!-- Left Column: PDF -->
+            <div class="pdf-section">
+                <embed src="/assets/SponsorPacket.pdf" width="100%" height="800px" />
+                <p class="contact-info">
+                    If you are interested in becoming a sponsor of the team, or are looking to
+                    do an in-kind donation, please contact us at
+                    southerntierrobotics@gmail.com
+                </p>
+            </div>
 
-		<p>
-			If you are interested in becoming a sponsor of the team, or are looking to
-			do an in-kind donation, please contact us at
-			southerntierrobotics@gmail.com
-		</p>
-
-		<h1>Current Sponsors:</h1>
-		<ImageTextCard
-			title="Vestal Central School District"
-			imgSrc="/assets/images/sponsor/vestal-logo.webp"
-			description=""
-		/>
-		<br />
-		<ImageTextCard
-			title="Gene Haas Foundation"
-			imgSrc="/assets/images/sponsor/haas.webp"
-			description=""
-		/>
-		<br />
-		<ImageTextCard
-			title="BAE Systems"
-			imgSrc="/assets/images/sponsor/BAEsystem.sponsor.webp"
-			description=""
-		/>
-		<br />
-		<ImageTextCard
-			title="CMP Advanced Mechanical Solutions"
-			imgSrc="/assets/images/sponsor/CMP-white-red.png"
-			description=""
-		/>
-		<br />
-		<ImageTextCard
-			title="Binghamton University Athletic Robotics Club"
-			imgSrc="/assets/images/sponsor/acr.jpg"
-			description=""
-		/>
-		<br />
-		<ImageTextCard
-			title="Lockheed Martin"
-			imgSrc="/assets/images/sponsor/LM-logo.svg"
-			description=""
-		/>
-		<br />
-		<ImageTextCard
-			title="State Line Auto Auction"
-			imgSrc="/assets/images/sponsor/slaaLogo.svg"
-			description=""
-		/>
-		<br />
+            <!-- Right Column: Sponsors -->
+            <div class="sponsors-section">
+                <h2>Current Sponsors:</h2>
+                <ImageTextCard
+                    title="Vestal Central School District"
+                    imgSrc="/assets/images/sponsor/vestal-logo.webp"
+                    description=""
+                />
+                <ImageTextCard
+                    title="Gene Haas Foundation"
+                    imgSrc="/assets/images/sponsor/haas.webp"
+                    description=""
+                />
+                <ImageTextCard
+                    title="BAE Systems"
+                    imgSrc="/assets/images/sponsor/BAEsystem.sponsor.webp"
+                    description=""
+                />
+                <ImageTextCard
+                    title="CMP Advanced Mechanical Solutions"
+                    imgSrc="/assets/images/sponsor/CMP-white-red.png"
+                    description=""
+                />
+                <ImageTextCard
+                    title="Binghamton University Athletic Robotics Club"
+                    imgSrc="/assets/images/sponsor/acr.jpg"
+                    description=""
+                />
+                <ImageTextCard
+                    title="Lockheed Martin"
+                    imgSrc="/assets/images/sponsor/LM-logo.svg"
+                    description=""
+                />
+                <ImageTextCard
+                    title="State Line Auto Auction"
+                    imgSrc="/assets/images/sponsor/slaaLogo.svg"
+                    description=""
+                />
+            </div>
+        </div>
+    </TextSection>
 </Layout>
