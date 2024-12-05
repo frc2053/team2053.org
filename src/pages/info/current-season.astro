@@ -2,13 +2,13 @@
 import { TextSection, TextCardSection } from '@components/odyssey-theme';
 import Layout from '../../layouts/Page.astro';
 import HeroSection from '../../components/sections/heros/HeroSection.astro';
+import CountdownSection from '@components/sections/heros/CountdownSection.astro';
 
 const seo = {
 	title: 'Current Season | Southern Tier Robotics',
 	description: 'Information about the current season',
 };
 ---
-
 <Layout {seo}>
 	<HeroSection>
 		<div slot="text-container">
@@ -24,6 +24,7 @@ const seo = {
 			/>
 		</picture>
 	</HeroSection>
+	<CountdownSection targetDate='2025-01-04 12:00:00' title="Kickoff Countdown"></CountdownSection>
 	<TextSection narrow>
 		<h3>Good Resources:</h3>
 		<p>
