@@ -2,20 +2,27 @@
 import { TextSection, TextCardSection } from '@components/odyssey-theme';
 import Layout from '../../layouts/Page.astro';
 import HeroSection from '../../components/sections/heros/HeroSection.astro';
+import CountdownSection from '@components/sections/heros/CountdownSection.astro';
 
 const seo = {
 	title: 'Current Season | Southern Tier Robotics',
 	description: 'Information about the current season',
 };
 ---
-
 <Layout {seo}>
 	<HeroSection>
 		<div slot="text-container">
 			<h1>FIRST: Reefscape</h1>
-			<p>Kickoff on January 4th, 2025, 12pm EST at WSKG Building.</p>
-			<p>601 Gates Rd, Vestal, NY 13850</p>
+			<p>Kickoff on January 4th, 2025, 11:30am EST at Binghamton University Engineering Building Fab Lab</p>
+			<p>Binghamton University, Vestal, NY 13850</p>
 		</div>
+		<picture slot="map-container">
+			<img
+				src="/assets/images/map.png"
+				alt="Charged Up Logo"
+				id="map-to-fab-lab"
+			/>
+		</picture>
 		<picture slot="image-container">
 			<img
 				src="/assets/images/reefscape1.webp"
@@ -24,6 +31,7 @@ const seo = {
 			/>
 		</picture>
 	</HeroSection>
+	<CountdownSection targetDate='2025-01-04 12:00:00' title="Kickoff Countdown"></CountdownSection>
 	<TextSection narrow>
 		<h3>Good Resources:</h3>
 		<p>
