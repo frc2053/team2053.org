@@ -1,0 +1,181 @@
+---
+// FlipCountdown.astro
+interface Props {
+  targetDate: string;
+  title: string;
+}
+
+const { targetDate, title} = Astro.props;
+---
+
+<h1 class="title">{title}</h1>
+<div class="countdown-container">
+  <div class="countdown" data-target-date={targetDate}>
+    <div class="time-section">
+      <span class="label">DAYS</span>
+      <div class="digits">
+        <div class="digit">
+          <div class="card">0</div>
+        </div>
+        <div class="digit">
+          <div class="card">0</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="time-section">
+      <span class="label">HOURS</span>
+      <div class="digits">
+        <div class="digit">
+          <div class="card">0</div>
+        </div>
+        <div class="digit">
+          <div class="card">0</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="time-section">
+      <span class="label">MINUTES</span>
+      <div class="digits">
+        <div class="digit">
+          <div class="card">0</div>
+        </div>
+        <div class="digit">
+          <div class="card">0</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="time-section">
+      <span class="label">SECONDS</span>
+      <div class="digits">
+        <div class="digit">
+          <div class="card">0</div>
+        </div>
+        <div class="digit">
+          <div class="card">0</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .countdown-container {
+    background-color: #000;
+    padding: 2rem;
+    color: white;
+    font-family: monospace;
+  }
+
+  .countdown {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+  }
+
+  .time-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .label {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+    color: #fff;
+  }
+
+  .digits {
+    display: flex;
+    gap: 0.25rem;
+  }
+
+  .title {
+    font-size: 2.5rem;
+    margin: 1.5rem 0;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-align: center;
+    width: 100%;
+  }
+
+  .digit {
+    position: relative;
+    background: white;
+    padding: 0.5rem;
+    border-radius: 4px;
+    width: 3rem;
+    height: 4rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .card {
+    font-size: 3rem;
+    font-weight: bold;
+    color: #e63946;
+    line-height: 1;
+  }
+</style>
+
+<script>
+  function updateDisplay() {
+    const countdown = document.querySelector('.countdown');
+    if (!countdown) return;
+
+    const targetDate = new Date(countdown.getAttribute('data-target-date') || '');
+    const now = new Date().getTime();
+    const distance = targetDate.getTime() - now;
+
+    if (distance < 0) {
+      clearInterval(countdownInterval);
+      return;
+    }
+
+    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+    // Update days
+    const daysDigits = countdown.querySelectorAll('.time-section:nth-child(1) .card');
+    daysDigits[0].textContent = days.toString().padStart(2, '0')[0];
+    daysDigits[1].textContent = days.toString().padStart(2, '0')[1];
+
+    // Update hours
+    const hoursDigits = countdown.querySelectorAll('.time-section:nth-child(2) .card');
+    hoursDigits[0].textContent = hours.toString().padStart(2, '0')[0];
+    hoursDigits[1].textContent = hours.toString().padStart(2, '0')[1];
+
+    // Update minutes
+    const minutesDigits = countdown.querySelectorAll('.time-section:nth-child(3) .card');
+    minutesDigits[0].textContent = minutes.toString().padStart(2, '0')[0];
+    minutesDigits[1].textContent = minutes.toString().padStart(2, '0')[1];
+
+    // Update seconds
+    const secondsDigits = countdown.querySelectorAll('.time-section:nth-child(4) .card');
+    secondsDigits[0].textContent = seconds.toString().padStart(2, '0')[0];
+    secondsDigits[1].textContent = seconds.toString().padStart(2, '0')[1];
+  }
+
+  let countdownInterval: number;
+
+  function initializeCountdown() {
+    updateDisplay();
+    countdownInterval = setInterval(updateDisplay, 1000);
+  }
+
+  // Initialize on page load
+  initializeCountdown();
+
+  // Cleanup on page transitions
+  document.addEventListener('astro:unmount', () => {
+    clearInterval(countdownInterval);
+  });
+
+  // Initialize on page transitions
+  document.addEventListener('astro:page-load', initializeCountdown);
+</script>
