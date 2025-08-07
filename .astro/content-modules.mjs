@@ -1,1 +1,13 @@
-export default new Map();
+
+export default new Map([
+["src/content/blog/2023-preseason.mdx", () => import("astro:content-layer-deferred-module?astro%3Acontent-layer-deferred-module=&fileName=src%2Fcontent%2Fblog%2F2023-preseason.mdx&astroContentModuleFlag=true")],
+["src/content/blog/2024-OffSeason-Build.mdx", () => import("astro:content-layer-deferred-module?astro%3Acontent-layer-deferred-module=&fileName=src%2Fcontent%2Fblog%2F2024-OffSeason-Build.mdx&astroContentModuleFlag=true")],
+["src/content/blog/2023-Offseason-Competition.mdx", () => import("astro:content-layer-deferred-module?astro%3Acontent-layer-deferred-module=&fileName=src%2Fcontent%2Fblog%2F2023-Offseason-Competition.mdx&astroContentModuleFlag=true")],
+["src/content/blog/2024-FRC-Kickoff.mdx", () => import("astro:content-layer-deferred-module?astro%3Acontent-layer-deferred-module=&fileName=src%2Fcontent%2Fblog%2F2024-FRC-Kickoff.mdx&astroContentModuleFlag=true")],
+["src/content/blog/Robot-Build-Underway.mdx", () => import("astro:content-layer-deferred-module?astro%3Acontent-layer-deferred-module=&fileName=src%2Fcontent%2Fblog%2FRobot-Build-Underway.mdx&astroContentModuleFlag=true")],
+["src/content/blog/Building-Bruin.mdx", () => import("astro:content-layer-deferred-module?astro%3Acontent-layer-deferred-module=&fileName=src%2Fcontent%2Fblog%2FBuilding-Bruin.mdx&astroContentModuleFlag=true")],
+["src/content/blog/2025 FRC Kick-Off.mdx", () => import("astro:content-layer-deferred-module?astro%3Acontent-layer-deferred-module=&fileName=src%2Fcontent%2Fblog%2F2025+FRC+Kick-Off.mdx&astroContentModuleFlag=true")],
+["src/content/blog/2024-OffSeason-Competition.mdx", () => import("astro:content-layer-deferred-module?astro%3Acontent-layer-deferred-module=&fileName=src%2Fcontent%2Fblog%2F2024-OffSeason-Competition.mdx&astroContentModuleFlag=true")],
+["src/content/blog/we-moved.mdx", () => import("astro:content-layer-deferred-module?astro%3Acontent-layer-deferred-module=&fileName=src%2Fcontent%2Fblog%2Fwe-moved.mdx&astroContentModuleFlag=true")],
+["src/content/blog/welcome-back-2022.mdx", () => import("astro:content-layer-deferred-module?astro%3Acontent-layer-deferred-module=&fileName=src%2Fcontent%2Fblog%2Fwelcome-back-2022.mdx&astroContentModuleFlag=true")]]);
+		
