@@ -1,0 +1,31 @@
+---
+import { getCollection, type CollectionEntry } from 'astro:content';
+import Layout from '../../layouts/Post.astro';
+
+export async function getStaticPaths() {
+    const posts = await getCollection('blog');
+    return posts.map((post) => ({
+        params: { slug: post.slug },
+        props: post,
+    }));
+}
+
+type Props = CollectionEntry<'blog'>;
+
+const post = Astro.props;
+const { Content } = await post.render();
+
+// Use the publishDate from frontmatter
+const content = {
+    title: post.data.title,
+    description: post.data.description,
+    publishDate: post.data.publishDate.toLocaleDateString(),
+    featuredImage: post.data.featuredImage,
+    tags: post.data.tags,
+    canonicalURL: `/blog/${post.slug}`,
+};
+---
+
+<Layout {content}>
+    <Content />
+</Layout>

@@ -1,59 +1,52 @@
 ---
-import { parse, isBefore } from 'date-fns';
+import { getCollection } from 'astro:content';
 import {
-	Container,
-	TextCardSection,
-	BlogPostsList,
+    Container,
+    TextCardSection,
+    BlogPostsList,
 } from '@components/odyssey-theme';
 import Layout from '../../layouts/Page.astro';
-import NewsletterForm from '../../components/forms/NewsletterForm.astro';
 
-const posts = await Astro.glob('./posts/*.mdx').then(posts =>
-	posts
-		.map(({ frontmatter, url }) => ({
-			title: frontmatter.title,
-			description: frontmatter.description,
-			authors: frontmatter.authors,
-			publishDate: parse(
-				frontmatter.publishDate,
-				'MMMM d, yyyy',
-				new Date()
-			),
-			featuredImage: frontmatter.featuredImage,
-			excerpt: frontmatter.excerpt,
-			href: url,
-		}))
-		.sort((a, b) => {
-			if (isBefore(a.publishDate, b.publishDate)) return 1;
-			if (isBefore(b.publishDate, a.publishDate)) return -1;
-			return 0;
-		})
-);
+const allPosts = await getCollection('blog');
+
+const posts = allPosts
+    .map((post) => {
+        return {
+            title: post.data.title,
+            description: post.data.description,
+            authors: post.data.authors,
+            publishDate: post.data.publishDate, // Use publishDate from frontmatter
+            featuredImage: post.data.featuredImage,
+            excerpt: post.data.excerpt,
+            href: `/blog/${post.slug}`,
+        };
+    })
+    .sort((a, b) => b.publishDate.getTime() - a.publishDate.getTime()); // Newest first
 
 const seo = {
-	title: 'Blog | Southern Tier Robotics',
-	description: 'Southern Tier Robotics Blog Page',
+    title: 'Blog | Southern Tier Robotics',
+    description: 'Southern Tier Robotics Blog Page',
 };
 ---
 
 <Layout {seo}>
-	<Container>
-		<TextCardSection>
-			<h1>STR Blog</h1>
-			<p>
-				With the completion of the 2024 FIRST® Robotics Competition (For Inspiration and Recognition of Science and Technology) we are now preparing for the 2025 competition season.  Over the Summer and into Fall we built another robot to keep the Team engaged.  We entered the off-season competitions at Rochester NY and Albany NY.  More information for the upcoming 2025 competition can be found on the
-				<a href="https://www.firstinspires.org/robotics/frc">FIRST® Robotics Competition Website</a>
-			</p>
-		</TextCardSection>
-		<section class="blog-posts-list__section">
-			<h2>Recent Posts</h2>
-			<BlogPostsList {posts} />
-		</section>
-	</Container>
+    <Container>
+        <TextCardSection>
+            <h1>STR Blog</h1>
+            <p>
+                With the completion of the 2024 FIRST® Robotics Competition (For Inspiration and Recognition of Science and Technology) we are now preparing for the 2025 competition season.  Over the Summer and into Fall we built another robot to keep the Team engaged.  We entered the off-season competitions at Rochester NY and Albany NY.  More information for the upcoming 2025 competition can be found on the
+                <a href="https://www.firstinspires.org/robotics/frc">FIRST® Robotics Competition Website</a>
+            </p>
+        </TextCardSection>
+        <section class="blog-posts-list__section">
+            <h2>Recent Posts</h2>
+            <BlogPostsList {posts} />
+        </section>
+    </Container>
 </Layout>
 
 <style>
-	.blog-posts-list__section {
-		margin: var(--section-margin) auto;
-	}
+    .blog-posts-list__section {
+        margin: var(--section-margin) auto;
+    }
 </style>
