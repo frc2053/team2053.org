@@ -20,6 +20,9 @@ const { targetDate, title} = Astro.props;
         <div class="digit">
           <div class="card">0</div>
         </div>
+        <div class="digit">
+          <div class="card">0</div>
+        </div>
       </div>
     </div>
 
@@ -140,10 +143,12 @@ const { targetDate, title} = Astro.props;
     const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
     const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-    // Update days
+    // Update days (3 digits now)
     const daysDigits = countdown.querySelectorAll('.time-section:nth-child(1) .card');
-    daysDigits[0].textContent = days.toString().padStart(2, '0')[0];
-    daysDigits[1].textContent = days.toString().padStart(2, '0')[1];
+    const daysString = days.toString().padStart(3, '0');
+    daysDigits[0].textContent = daysString[0];
+    daysDigits[1].textContent = daysString[1];
+    daysDigits[2].textContent = daysString[2];
 
     // Update hours
     const hoursDigits = countdown.querySelectorAll('.time-section:nth-child(2) .card');
