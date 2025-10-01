@@ -1,0 +1,290 @@
+---
+title: FRC 2025 Team story
+description:  Summary of the FRC 2025 competition season
+publishDate: 2025-09-28
+featuredImage: '/assets/images/20250303_182808.webp'
+excerpt: '2025 FIRST Robotics Competition Kick-off'
+tags: ['FRC', '2025', 'Summary', 'REEFSCAPE', 'FIRST®', ]
+---
+
+
+This is a summary of our 2025 FIRST® Robotics Competition season.  We worked hard but we also had fun designing, building, testing and competing.
+Firstly, we want to thank the sponsors and contributors without whom we could not have built and competed our robot Rattlesnake.  Their generosity is truly appreciated.
+•	Vestal Central School District
+•	Haas Automation Inc.
+•	BAE Systems
+•	IEEE Binghamton Section
+•	Lockheed Martin Corporation
+•	CMP Mechanical
+•	Williams Auto Group
+•	Law Family
+•	State Line Auto
+•	Binghamton University
+•	Innovation Associates
+•	Endicott Rotary Club
+•	Canaugh Family
+•	The Cat Doctor
+•	Endicott Precision Inc.
+•	Amphenol
+•	And numerous individual personal donations
+
+ 
+![Rattlesnake](/assets/images/Rattlesnake-1.webp)
+
+
+Our activities for the 2025 FIRST® Robotics Competition (FRC) began in the Fall, 2024.  There were many activities including welcoming new students to the club, making repairs to Rattlesnake, preparing the shop, and preparing for and attending for the off-season competitions Ra Cha Cha Ruckus in Rochester NY on October and New York Tech Valley Robot Rumble at Ballston Spa NY in November.
+FRC released the 2025 Reefscape game on January 4th.  With the release our team immediately kicked-off the race to build a competitive robot.  We held our kick-off at the Binghamton University Fabrication Laboratory.
+ ![Team discussion of game](/assets/images/20250104_150719.webp)
+
+As part of the kick-off activities we held multiple mock game plays to better understand game nuances.
+ 
+![Human mock gaming](/assets/images/20250104_162812.webp)
+
+
+ 
+Once we were back at the high school we continued to think about robot requirements, what strategies we should use to maximize scoring, and what the design should be for the various parts of the robot.  “Chalk talk” was a common activity amongst the students and mentors.
+ ![Discussing design ideas](/assets/images/20250108_185711.webp)
+
+For the design we used the CAD tool OnShape.  OnShape is taught in the technology class at the school so the students are familiar with it.  Here we are discussing an aspect of the design.  At the school we have the two work areas: classroom and workshop.  This discussion is held in the classroom area.  Computers, tables, and a large floor area are provided where groups can work on different aspects of the design and build components of the robot.
+
+![Discussing design ideas](/assets/images/20250115_171632.webp)
+
+ 
+As parts of the design come into focus we begin creating prototypes to test our ideas.
+ 
+![Assembling a prototype](/assets/images/20250110_194823.webp)
+
+ 
+![Prototype testing](/assets/images/20250110_195423.webp)
+When the prototypes reveal that the ideas don’t work or we can see how the ideas can be improved we gather students and mentors together to discuss and evaluate ideas on how we should proceed.  
+ 
+![Discussing prototype improvements](/assets/images/20250122_192842.webp)
+
+ 
+Adjacent to the classroom we have a workshop that has our Haas mill and lathe, a tabletop router, spray paint booth, powered and hand woodworking tools, and benches.
+ 
+![Workshop manufacturing and assembling](/assets/images/20250127_174131.webp)
+
+ 
+Student assembling a prototype for testing.
+ 
+![Assembling prototype](/assets/images/Prototyping.webp)
+Student and mentor test the prototype.
+ 
+![Testing prototype](/assets/images/Prototyping-2.webp)
+
+We built a field element that is used to load a game piece onto the robot.  Here we are testing a prototype of the robot mechanism that will accept the game piece.
+ 
+![Using a field element to test coral loader](/assets/images/20250124_192214.webp)
+
+ 
+After all the initial design, prototype building, and testing the design is deemed ready to begin manufacture and assembly to create the competition robot.
+
+The Vestal School District purchased a Haas TM 2P Horizontal Mill and a Haas ST 10Y Lathe.  This is the first season where we made significant use of the machines to manufacture parts of the robot.  Two students are setting up the mill to begin to machine parts for the robot. 
+ 
+![Manufacturing a component on the CNC mill](/assets/images/CNC-20240307_174815.webp)
+
+ 
+Mentor teaching a student how to use the lathe.
+ 
+![Setting up the CNC lathe to manufacture a component](/assets/images/20250203_191739.webp)
+
+
+This is a CAD of part of the elevator carriage that grabs and manipulates the game pieces “coral” and “algae” and some of the resulting manufactured parts.
+ 
+![CAD of assembled component of manipulator](/assets/images/CNC-20250131_180653.webp)
+
+ 
+![Component of manipulator](/assets/images/CNC-20250131_182413.webp)
+
+
+
+
+
+
+![Roller component](/assets/images/CNC-20250131_182306.webp)
+
+This is a broad view of the classroom where discussions, CAD work, and some assembly is performed.  The classroom is connected to the workshop. 
+ 
+![Classroom next to the workshop](/assets/images/Classroom.webp)
+
+
+ 
+Electrical components being mounted and wired in the base of the robot.  The base frame, stiffeners, and bumper mounting plates are made on the Haas mill.
+ 
+![Mounting and wiring the electronics in the base](/assets/images/Base-wiring.webp)
+
+
+Students and mentors working together to mount the elevator carriage onto the elevator superstructure.  The elevator superstructure is made of three tiers of vertical members and can extend to a height of over 9 feet.  
+ 
+![Assembling the elevator to the base](/assets/images/20250205_195223.webp)
+
+Not all of the time was devoted directly to the creation of Rattlesnake.  A mentor is teaching students how to probe and debug electrical circuits.
+ 
+![Lesson on the electronics](/assets/images/20250122_182853.webp)
+
+ 
+The team is nearing final hardware and electrical assembly.
+ 
+![Continued assembly of Rattlesnake](/assets/images/20250210_190919.webp)
+ 
+With all the furious activity in manufacturing components, creating and mounting hardware subsystems, and mounting and wiring the electrical components, the software is quietly working in the background getting ready to load Rattlesnake and bring it to life.
+ 
+![Reviewing software](/assets/images/20250205_185839.webp)
+
+ 
+With everything in place the team starts final integration and testing.  Here we are evaluating the performance on the coral intake subsystem.
+ ![Rattlesnake assembled and under test](/assets/images/20250219_190152-frame.webp)
+
+We are putting Rattlesnake through the paces of grabbing coral to score at the reef and remove algae from the reef.
+ 
+![Testing the completed Rattlesnake](/assets/images/Full-classroom-testing.webp)
+
+
+
+
+ 
+Rattlesnake complete.
+ ![Rattlesnake](/assets/images/20250302_130815.webp)
+
+
+We attended the Hudson Valley Regional competition March 5th – 8th.
+Our cheering section.
+ 
+![Team at Hudson Valley Regional Competition](/assets/images/20250308_160523.webp)
+
+ 
+Rattlesnake in the pits being tended to by the pit crew.
+ 
+![In the Pit working on Rattlesnake](/assets/images/20250306_145824.webp)
+
+Drive Crew is getting ready for the match.
+ 
+![Drive Team](/assets/images/HVR2025-(160 of 704).webp)
+
+
+Rattlesnake scoring a coral on the reef level 3.
+ ![Rattlesnake scoring a coral on level 3](/assets/images/HVR-Scoring.webp)
+
+
+ 
+We attended the Tech Valley Regional competition March 26th-29th.
+ 
+![Team at Tech Valley Regional Competition](/assets/images/20250328_184725.webp)
+
+ 
+Tending to Rattlesnake in the pit.
+ 
+![Preparing Rattlesnake for the competition](/assets/images/TVR-Pit.webp)
+
+Drive Team getting ready for a match.
+ 
+![Drive team](/assets/images/20250328_091136.webp)
+
+Rattlesnake scoring a coral on the reef level 4.
+ 
+![Rattlesnake scoring a coral on level 4](/assets/images/TVR-Scoring.web)
+
+
+ 
+Rattlesnake climbing on the cage under the barge at the end game.
+ 
+![Rattlesnake climbing the cage](/assets/images/TVR-Climbing.webp)
+
+
+ 
+We also attended the off-season competition at Worcester Polytechnic Institute-Battlecry June 7th – 8th.
+ 
+![Team at WPI Battlecry off-season competition](/assets/images/WPI-20250608_080723(0).webp)
+
+
+ 
+We completed some significant repair work prior to our next match.  We’re testing Rattlesnake to see that it’s in competition shape again.
+ 
+![Testing Rattlesnake after a major repair](/assets/images/WPI-20250608_101243.webp)
+
+
+
+Rattlesnake is scoring an alga into the net on the barge.
+ 
+![Rattlesnake scoring an alga into the net](/assets/images/WPI-IMG_5332.webp)
+
+We do out-reach events to both show what the club can do and to excite other students on the possibilities of working with robotics.
+The Vestal Central School District has FIRST® Lego League (FLL) clubs at the elementary schools.  Student members visited several of the clubs to see efforts of the FLL students and to show what kinds of robots STR makes and competes.  In December 2024 STR students visited the Glenwood Elementary School FLL where they demonstrated their robot and we talked about Rattlesnake and how it competes.
+ 
+![Team members visit the Glenwood Elementary School FLL club](/assets/images/20241217_163557.webp)
+
+ 
+![FLL student showing how to program their robot](/assets/images/20241217_164607.webp)
+
+ 
+![Explaining an FRC match](/assets/images/20241217_160711.webp)
+
+In March the Vestal Hills Elementary School FIRST® Lego League (FLL) club came to the high school to see how Rattlesnake is made and to see it in action.
+ 
+![Vestal Hills Elementary School students and parents](/assets/images/20250312_180233.webp)
+ 
+A mentor is explaining how Rattlesnake works to the elementary school students.
+ 
+![Showing how Rattlesnake works](/assets/images/20250312_173331.webp)
+
+ 
+![Showing how Rattlesnake works](/assets/images/20250312_173500.webp)
+Rattlesnake demonstrates how it fetches algae from the reef and deposit it in the net on the barge in competition.
+ 
+![Demonstrating Rattlesnake with an alga](/assets/images/20250312_171911.webp)
+Mentor and student showing how the Haas mill makes parts for Rattlesnake. Student demonstrates the mill in action.
+ 
+![Showing how the CNC lathe makes parts for Rattlesnake](/assets/images/Vestal-Hills-20250312_174141.webp)
+
+ 
+![Demonstrating CNC lathe operation](/assets/images/Vestal-Hills-20250312_174425.webp)
+
+ 
+The Binghamton University Mars Rover Team visited us in May.  The Mars Rover Team builds and competes a robot at the Mars Society’s annual University Rover Challenge.  The team demonstrated their robot and outlined the various tasks their robot must do at the competition.
+ 
+![BU Rover Team demonstrating their Mars robot](/assets/images/20250505_181252.webp)
+
+ 
+Their robot is built to operate outdoors in rough terrain at beyond line of sight.  The robot can accommodate several different modules, each of which performs a specific scientific task.
+ 
+![BU Mars robot](/assets/images/20250505_180813-cropped.webp)
+
+ 
+We demonstrated Rattlesnake to the Rover Team.  
+ 
+![Demonstrating Rattlesnake](/assets/images/20250505_173945-cropped.webp)
+
+
+
+
+
+ 
+	
+We take our robots to other venues for demonstrations to inform the general public about our club.  At the Kopernik Observatory & Science Center in Vestal, NY, the students gave a presentation and demonstration on the FIRST® Robotic Competition.
+ 
+![Presenting FRC and Rattlesnake](/assets/images/Kopernik-20250509_202235.webp)
+
+ 
+![Day in the life of Rattlesnake](/assets/images/20250509_202358.webp)
+
+ 
+The FIRST® Lego League Expo was held in February at the SUNY Broome college.  We were invited to bring and demonstrate our robot.
+ 
+![At FLL at SUNY Broome College](/assets/images/FLL-Expo-Logo.webp)
+
+
+ 
+Also at the Expo was the Binghamton University Athletic Robotics Club (ARC).  STR and ARC are establishing a relationship where ARC students are available to support STR students with additional projects.  The current project is the development of a “demobot”.  The demobot will be a simpler robot that can be easy to transport and operate.  The demobot will support presentations and demonstrations at schools, companies, and public events.  The development of the demobot will be a collaboration of STR and ARC students. 
+![STR and BU ARC members](/assets/images/20250222_104152-cropped.webp)
+
+ 
+We are demonstrating Rattlesnake operations to the parents and students of the FIRST® Lego League clubs.
+ 
+![Demonstrating Rattlesnake](/assets/images/FLL-Expo-Scoring.webp)
+
+ 
+FIRST®
+For Inspiration and Recognition of Science and Technology
+ 
+![Future club members](/assets/images/FLL-IMG_0600.webp)

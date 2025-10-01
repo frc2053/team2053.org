@@ -10,5 +10,5 @@ export default new Map([
 ["src/content/blog/2024-OffSeason-Competition.mdx", () => import("astro:content-layer-deferred-module?astro%3Acontent-layer-deferred-module=&fileName=src%2Fcontent%2Fblog%2F2024-OffSeason-Competition.mdx&astroContentModuleFlag=true")],
 ["src/content/blog/we-moved.mdx", () => import("astro:content-layer-deferred-module?astro%3Acontent-layer-deferred-module=&fileName=src%2Fcontent%2Fblog%2Fwe-moved.mdx&astroContentModuleFlag=true")],
 ["src/content/blog/welcome-back-2022.mdx", () => import("astro:content-layer-deferred-module?astro%3Acontent-layer-deferred-module=&fileName=src%2Fcontent%2Fblog%2Fwelcome-back-2022.mdx&astroContentModuleFlag=true")],
-["src/content/blog/2025-reveal.mdx", () => import("astro:content-layer-deferred-module?astro%3Acontent-layer-deferred-module=&fileName=src%2Fcontent%2Fblog%2F2025-reveal.mdx&astroContentModuleFlag=true")]]);
-		
+["src/content/blog/2025-reveal.mdx", () => import("astro:content-layer-deferred-module?astro%3Acontent-layer-deferred-module=&fileName=src%2Fcontent%2Fblog%2F2025-reveal.mdx&astroContentModuleFlag=true")],
+["src/content/blog/Season-Summary-2025.mdx", () => import("astro:content-layer-deferred-module?astro%3Acontent-layer-deferred-module=&fileName=src%2Fcontent%2Fblog%2FSeason-Summary-2025.mdx&astroContentModuleFlag=true")]]);
