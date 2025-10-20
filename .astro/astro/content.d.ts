@@ -214,6 +214,13 @@ declare module 'astro:content' {
   collection: "blog";
   data: any
 } & { render(): Render[".mdx"] };
+"Season-Summary-2025.mdx": {
+	id: "Season-Summary-2025.mdx";
+  slug: "season-summary-2025";
+  body: string;
+  collection: "blog";
+  data: any
+} & { render(): Render[".mdx"] };
 "we-moved.mdx": {
 	id: "we-moved.mdx";
   slug: "we-moved";
