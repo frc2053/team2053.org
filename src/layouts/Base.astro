@@ -23,23 +23,39 @@ const { seo } = Astro.props;
 			<slot />
 		</main>
 		<slot name="footer" />
-		<script>
-			if (window.netlifyIdentity) {
-				window.netlifyIdentity.on("init", user => {
-					if (!user) {
-						window.netlifyIdentity.on("login", () => {
-							document.location.href = "/admin/";
-						});
-					}
-				});
+		<script is:inline>
+			// Wait for Netlify Identity to load
+			window.addEventListener('load', function() {
+				if (window.netlifyIdentity) {
+					// Initialize identity
+					window.netlifyIdentity.on("init", user => {
+						// Check for tokens in URL hash after initialization
+						const hash = window.location.hash;
+						if (hash && (hash.includes('invite_token') || hash.includes('recovery_token') || hash.includes('confirmation_token'))) {
+							// Open the identity modal to handle the token
+							console.log('Found token in URL, opening Identity widget');
+							window.netlifyIdentity.open();
+						}
 
-				// Handle invite and recovery tokens in URL hash
-				const hash = window.location.hash;
-				if (hash && (hash.includes('invite_token') || hash.includes('recovery_token') || hash.includes('confirmation_token'))) {
-					// Open the identity modal to handle the token
-					window.netlifyIdentity.open();
+						// Handle login event
+						if (!user) {
+							window.netlifyIdentity.on("login", () => {
+								console.log('User logged in, redirecting to admin');
+								document.location.href = "/admin/";
+							});
+						}
+					});
+
+					// Also handle the 'close' event in case user closes modal
+					window.netlifyIdentity.on("close", () => {
+						const hash = window.location.hash;
+						// If there's still a token in URL after closing, user might not have completed setup
+						if (hash && (hash.includes('invite_token') || hash.includes('recovery_token') || hash.includes('confirmation_token'))) {
+							console.log('Identity modal closed with token still in URL');
+						}
+					});
 				}
-			}
+			});
 		</script>
 	</body>
 </html>
