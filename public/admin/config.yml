@@ -1,0 +1,81 @@
+# Decap CMS Configuration for Team 2053
+backend:
+  name: git-gateway
+  branch: main
+
+# Publish mode: editorial workflow for draft/review/publish flow, or simple for immediate publish
+publish_mode: simple
+
+# Media files configuration - using CloudFront for images
+media_folder: "public/assets/images"
+public_folder: "https://d2je6s0jo9muku.cloudfront.net"
+
+# Collections - define all editable content types
+collections:
+  # ==========================================
+  # BLOG POSTS
+  # ==========================================
+  - name: "blog"
+    label: "Blog Posts"
+    label_singular: "Blog Post"
+    folder: "src/content/blog"
+    create: true
+    slug: "{{slug}}"
+    extension: "mdx"
+    format: "frontmatter"
+    editor:
+      preview: true
+    fields:
+      - {label: "Title", name: "title", widget: "string", required: true}
+      - {label: "Description", name: "description", widget: "text", required: true}
+      - {label: "Publish Date", name: "publishDate", widget: "datetime", format: "YYYY-MM-DD", required: true}
+      - {label: "Featured Image", name: "featuredImage", widget: "image", required: true, hint: "Main image for the blog post"}
+      - {label: "Excerpt", name: "excerpt", widget: "text", required: true, hint: "Short summary shown in blog list"}
+      - {label: "Tags", name: "tags", widget: "list", required: true, default: ["FRC"], hint: "Add relevant tags"}
+      - {label: "Body", name: "body", widget: "markdown", required: true, hint: "Main content of the blog post. You can use Markdown formatting."}
+
+  # ==========================================
+  # HISTORY YEAR PAGES
+  # ==========================================
+  - name: "history"
+    label: "History Years"
+    label_singular: "History Year"
+    folder: "src/pages/history/years"
+    create: true
+    slug: "{{robotYear}}"
+    extension: "mdx"
+    format: "frontmatter"
+    identifier_field: "robotYear"
+    editor:
+      preview: false
+    fields:
+      - {label: "Layout", name: "layout", widget: "hidden", default: "../../../layouts/History.astro"}
+      - {label: "Year", name: "robotYear", widget: "number", value_type: "int", min: 2013, max: 2030, step: 1, required: true}
+      - {label: "Game Title", name: "title", widget: "string", required: true, hint: "e.g., '2025 Game: Reefscape'"}
+      - {label: "Description", name: "description", widget: "text", required: true}
+      - {label: "Robot Name", name: "robotName", widget: "string", required: true, hint: "Name of the robot for this year"}
+      - {label: "Wins", name: "wins", widget: "number", value_type: "int", min: 0, required: true}
+      - {label: "Losses", name: "losses", widget: "number", value_type: "int", min: 0, required: true}
+      - {label: "Events", name: "events", widget: "list", required: false, hint: "List of competitions attended"}
+      - {label: "Awards", name: "awards", widget: "list", required: false, hint: "Awards won this year"}
+      - {label: "Featured Image", name: "featuredImage", widget: "image", required: true, hint: "Main robot photo"}
+      - {label: "Game Video URL", name: "gameVidUrl", widget: "string", required: false, hint: "YouTube URL for game reveal"}
+      - {label: "Game Logo", name: "gameLogo", widget: "image", required: false, hint: "Official FRC game logo"}
+      - {label: "Content", name: "body", widget: "markdown", required: true, hint: "Details about the robot and season"}
+
+
+# Editor configuration
+editor:
+  preview: true
+
+# Locale settings
+locale: "en"
+
+# Show preview links
+show_preview_links: true
+
+# Slug configuration
+slug:
+  encoding: "ascii"
+  clean_accents: true
+  sanitize_replacement: "-"

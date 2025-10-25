@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Content Manager - Team 2053</title>
+  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+</head>
+<body>
+  <!-- Include the script that builds the page and powers Decap CMS -->
+  <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
+
+  <!-- Custom script for S3 image upload -->
+  <script>
+    // S3 Image Upload Configuration
+    const AWS_CONFIG = {
+      accessKeyId: '',  // Will be set from Netlify env vars
+      secretAccessKey: '',  // Will be set from Netlify env vars
+      region: 'us-east-1',
+      bucket: 'team2053-website-assets',
+      cloudFrontUrl: 'https://d2je6s0jo9muku.cloudfront.net'
+    };
+
+    // Register custom media library for S3 uploads
+    CMS.registerMediaLibrary({
+      name: 's3',
+      uploadWidget: function(options) {
+        // This will be enhanced with the full S3 upload widget
+        return {
+          show: function(opts) {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.multiple = true;
+
+            input.onchange = async function(e) {
+              const files = Array.from(e.target.files);
+              const uploadedAssets = [];
+
+              for (const file of files) {
+                try {
+                  // Show upload progress
+                  opts.onProgress(uploadedAssets.length / files.length);
+
+                  // For now, use default behavior
+                  // In production, this would upload to S3 via AWS SDK
+                  const asset = {
+                    name: file.name,
+                    size: file.size,
+                    path: `${AWS_CONFIG.cloudFrontUrl}/${file.name}`,
+                    url: `${AWS_CONFIG.cloudFrontUrl}/${file.name}`
+                  };
+
+                  uploadedAssets.push(asset);
+                } catch (error) {
+                  console.error('Upload error:', error);
+                }
+              }
+
+              opts.onSuccess(uploadedAssets);
+            };
+
+            input.click();
+          },
+          hide: function() {},
+          enablePrivate: function() {}
+        };
+      }
+    });
+  </script>
+</body>
+</html>
