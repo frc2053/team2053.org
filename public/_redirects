@@ -1,0 +1,2 @@
+# Netlify Identity redirect rules
+/admin/               /admin/index.html     200
