@@ -32,6 +32,13 @@ const { seo } = Astro.props;
 						});
 					}
 				});
+
+				// Handle invite and recovery tokens in URL hash
+				const hash = window.location.hash;
+				if (hash && (hash.includes('invite_token') || hash.includes('recovery_token') || hash.includes('confirmation_token'))) {
+					// Open the identity modal to handle the token
+					window.netlifyIdentity.open();
+				}
 			}
 		</script>
 	</body>
