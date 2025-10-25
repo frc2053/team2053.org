@@ -11,19 +11,29 @@
 		"start": "astro dev",
 		"build": "astro build",
 		"preview": "astro preview",
-		"format": "npx prettier -w ."
+		"format": "npx prettier -w .",
+		"migrate-images": "node scripts/migrate-images-to-s3.js",
+		"update-image-urls": "node scripts/update-image-urls.js"
 	},
 	"devDependencies": {
 		"@astrojs/lit": "^4.3.0",
 		"@astrojs/mdx": "^4.3.3",
 		"@astrojs/sitemap": "^3.1.6",
+		"@aws-sdk/client-s3": "^3.917.0",
+		"@aws-sdk/lib-storage": "^3.917.0",
 		"@iconify-json/ic": "^1.1.17",
 		"@iconify-json/mdi": "^1.1.64",
 		"@webcomponents/template-shadowroot": "^0.2.1",
 		"astro": "^5.12.8",
 		"astro-icon": "^1.1.0",
 		"date-fns": "^2.28.0",
+		"dotenv": "^17.2.3",
+		"glob": "^11.0.3",
 		"lit": "^3.1.2",
-		"prettier-plugin-astro": "^0.0.12"
+		"prettier-plugin-astro": "^0.0.12",
+		"sharp": "^0.34.4"
+	},
+	"dependencies": {
+		"decap-cms-app": "^3.8.4"
 	}
 }
