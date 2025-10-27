@@ -43,12 +43,25 @@ The editor supports:
 4. Either:
    - **Upload a new image**: Drag and drop or click to browse
    - **Choose existing**: Select from previously uploaded images
-5. Images are automatically optimized and served from CloudFront CDN
+5. The image will be saved and automatically uploaded to S3/CloudFront
+
+**How Image Upload Works**:
+1. When you upload an image, it's saved to the GitHub repository temporarily
+2. A GitHub Action automatically:
+   - Converts images to WebP format (25-35% smaller file size)
+   - Compresses and optimizes (85% quality, looks great!)
+   - Resizes to max 1920px (perfect for web viewing)
+   - Uploads to AWS S3 / CloudFront CDN
+   - Updates your blog post URLs to point to the optimized version
+   - Deletes the original from the repo to keep it small
+3. The whole process takes 2-3 minutes after you click "Publish"
+4. The CMS preview shows the image from the repo while the Action is running
 
 **Image Tips**:
 - Use descriptive file names (e.g., `robot-at-competition.jpg` not `IMG_1234.jpg`)
-- Take landscape photos when possible
-- Don't worry about file size - images are automatically optimized!
+- Take landscape photos when possible (easier to view on different devices)
+- Upload any format: JPG, PNG, GIF (will be converted to WebP automatically)
+- Don't worry about file size - upload the highest quality you have! The Action will optimize it
 
 ### Saving Your Work
 
@@ -87,13 +100,22 @@ The editor supports:
 
 ## Using CloudFront Images
 
-All images are now served from AWS CloudFront CDN for fast loading worldwide. When you upload images through the CMS:
-- They're automatically optimized (compressed, converted to WebP)
-- Stored in AWS S3
-- Delivered via CloudFront for maximum speed
-- The correct URLs are inserted automatically
+All images are automatically optimized and served from AWS CloudFront CDN for fast loading worldwide. When you upload images through the CMS:
+- They're temporarily saved to the GitHub repo (for CMS preview)
+- A GitHub Action automatically optimizes and uploads to AWS S3
+- Images are converted to WebP format (much smaller file size, same quality)
+- Delivered via CloudFront CDN with worldwide edge caching
+- Original images are deleted from the repo to keep it small
+- URLs are automatically updated in your blog posts
 
 **Image URLs will look like**: `https://d2je6s0jo9muku.cloudfront.net/image-name.webp`
+
+**Note**: After publishing, it takes 2-3 minutes for the optimization workflow to complete. During this time:
+- The CMS preview shows your original image
+- The live site initially shows a loading error
+- Once the Action completes, the optimized image appears automatically
+
+**Pro Tip**: You can watch the optimization in real-time! After publishing, go to your GitHub repository's **Actions** tab to see the workflow progress.
 
 ## Best Practices
 
