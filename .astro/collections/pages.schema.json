@@ -1,0 +1,203 @@
+{
+  "$ref": "#/definitions/pages",
+  "definitions": {
+    "pages": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "heroTitle": {
+          "type": "string"
+        },
+        "heroText": {
+          "type": "string"
+        },
+        "heroImage": {
+          "type": "string"
+        },
+        "heroImageAlt": {
+          "type": "string"
+        },
+        "firstHeading": {
+          "type": "string"
+        },
+        "firstContent": {
+          "type": "string"
+        },
+        "frcHeading": {
+          "type": "string"
+        },
+        "frcContent": {
+          "type": "string"
+        },
+        "historyHeading": {
+          "type": "string"
+        },
+        "historyContent": {
+          "type": "string"
+        },
+        "heading": {
+          "type": "string"
+        },
+        "introText": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "pdfPath": {
+          "type": "string"
+        },
+        "contactEmail": {
+          "type": "string"
+        },
+        "contactText": {
+          "type": "string"
+        },
+        "kickoffDate": {
+          "type": "string"
+        },
+        "events": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "date": {
+                "type": "string"
+              },
+              "location": {
+                "type": "string"
+              },
+              "url": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "name",
+              "date",
+              "location"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "resourcesHeading": {
+          "type": "string"
+        },
+        "resources": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "text": {
+                "type": "string"
+              },
+              "url": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "text",
+              "url"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "scheduleHeading": {
+          "type": "string"
+        },
+        "scheduleIntro": {
+          "type": "string"
+        },
+        "scheduleNote": {
+          "type": "string"
+        },
+        "preKickoffSchedule": {
+          "type": "object",
+          "properties": {
+            "label": {
+              "type": "string"
+            },
+            "days": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "day": {
+                    "type": "string"
+                  },
+                  "time": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "day",
+                  "time"
+                ],
+                "additionalProperties": false
+              }
+            }
+          },
+          "required": [
+            "label",
+            "days"
+          ],
+          "additionalProperties": false
+        },
+        "postKickoffSchedule": {
+          "type": "object",
+          "properties": {
+            "label": {
+              "type": "string"
+            },
+            "days": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "day": {
+                    "type": "string"
+                  },
+                  "time": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "day",
+                  "time"
+                ],
+                "additionalProperties": false
+              }
+            }
+          },
+          "required": [
+            "label",
+            "days"
+          ],
+          "additionalProperties": false
+        },
+        "calendarHeading": {
+          "type": "string"
+        },
+        "calendarUrl": {
+          "type": "string"
+        },
+        "$schema": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "title",
+        "description"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}

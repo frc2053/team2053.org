@@ -54,29 +54,25 @@
         const tags = entry.getIn(['data', 'tags']);
         const body = this.props.widgetFor('body');
 
-        // Use getAsset to get the actual blob URL for newly uploaded images
+        // Try to get asset with data option to include file blobs
         let imageUrl = null;
         if (featuredImagePath) {
-          console.log('Featured image path:', featuredImagePath);
-          console.log('Props.getAsset:', this.props.getAsset);
-
-          const asset = this.props.getAsset(featuredImagePath);
-          console.log('Asset from getAsset:', asset);
+          const asset = this.props.getAsset(featuredImagePath, entry);
 
           if (asset) {
-            // getAsset returns an Immutable Map with 'url' or 'path'
-            if (asset.get) {
-              console.log('Asset has .get method');
-              imageUrl = asset.get('url') || asset.get('path') || asset.toString();
+            // Check if it's a draft file with blob data
+            if (asset.fileObj) {
+              imageUrl = URL.createObjectURL(asset.fileObj);
+            } else if (typeof asset === 'string') {
+              imageUrl = asset;
             } else if (asset.url) {
-              console.log('Asset has .url property');
               imageUrl = asset.url;
+            } else if (asset.path) {
+              imageUrl = asset.path;
             } else {
-              console.log('Using asset.toString()');
               imageUrl = asset.toString();
             }
           }
-          console.log('Final imageUrl:', imageUrl);
         }
 
         return h('div', { className: 'preview-container' },
