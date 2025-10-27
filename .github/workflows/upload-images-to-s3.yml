@@ -189,8 +189,9 @@ jobs:
               ];
 
               for (const pattern of patterns) {
-                if (pattern.test(content)) {
-                  content = content.replace(pattern, url);
+                const newContent = content.replace(pattern, url);
+                if (newContent !== content) {
+                  content = newContent;
                   modified = true;
                   totalReplacements++;
                   console.log(`✓ Updated ${originalName} → ${s3Key} in ${path.basename(file)}`);
