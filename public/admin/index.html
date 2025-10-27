@@ -55,9 +55,14 @@
         const body = this.props.widgetFor('body');
 
         // Use getAsset to get the actual blob URL for newly uploaded images
-        // or the URL for existing images
-        const featuredImage = this.props.getAsset(featuredImagePath);
-        const imageUrl = featuredImage ? featuredImage.toString() : null;
+        let imageUrl = null;
+        if (featuredImagePath) {
+          const asset = this.props.getAsset(featuredImagePath);
+          if (asset) {
+            // getAsset returns an Immutable Map with 'url' or 'path'
+            imageUrl = asset.get ? asset.get('url') : asset.toString();
+          }
+        }
 
         return h('div', { className: 'preview-container' },
           h('h1', {}, title),
@@ -96,10 +101,22 @@
         const body = this.props.widgetFor('body');
 
         // Use getAsset to get the actual blob URL for newly uploaded images
-        const featuredImage = this.props.getAsset(featuredImagePath);
-        const gameLogo = this.props.getAsset(gameLogoPath);
-        const robotImageUrl = featuredImage ? featuredImage.toString() : null;
-        const gameLogoUrl = gameLogo ? gameLogo.toString() : null;
+        let robotImageUrl = null;
+        let gameLogoUrl = null;
+
+        if (featuredImagePath) {
+          const asset = this.props.getAsset(featuredImagePath);
+          if (asset) {
+            robotImageUrl = asset.get ? asset.get('url') : asset.toString();
+          }
+        }
+
+        if (gameLogoPath) {
+          const asset = this.props.getAsset(gameLogoPath);
+          if (asset) {
+            gameLogoUrl = asset.get ? asset.get('url') : asset.toString();
+          }
+        }
 
         return h('div', { className: 'preview-container' },
           h('h1', {}, `${robotYear} - ${robotName}`),
