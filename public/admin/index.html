@@ -48,26 +48,16 @@
         const entry = this.props.entry;
         const title = entry.getIn(['data', 'title']);
         const description = entry.getIn(['data', 'description']);
-        const featuredImage = entry.getIn(['data', 'featuredImage']);
+        const featuredImagePath = entry.getIn(['data', 'featuredImage']);
         const publishDate = entry.getIn(['data', 'publishDate']);
         const excerpt = entry.getIn(['data', 'excerpt']);
         const tags = entry.getIn(['data', 'tags']);
         const body = this.props.widgetFor('body');
 
-        // Convert CloudFront URL to local path for preview
-        let imageUrl = featuredImage;
-        if (featuredImage) {
-          if (featuredImage.startsWith('https://d2je6s0jo9muku.cloudfront.net/')) {
-            // Extract filename and create local path
-            const filename = featuredImage.split('/').pop();
-            imageUrl = `/assets/images/${filename}`;
-          } else if (featuredImage.startsWith('/assets/images/')) {
-            imageUrl = featuredImage;
-          } else if (!featuredImage.startsWith('http')) {
-            // If it's already a relative path, ensure it starts with /
-            imageUrl = featuredImage.startsWith('/') ? featuredImage : `/${featuredImage}`;
-          }
-        }
+        // Use getAsset to get the actual blob URL for newly uploaded images
+        // or the URL for existing images
+        const featuredImage = this.props.getAsset(featuredImagePath);
+        const imageUrl = featuredImage ? featuredImage.toString() : null;
 
         return h('div', { className: 'preview-container' },
           h('h1', {}, title),
@@ -99,26 +89,17 @@
         const robotName = entry.getIn(['data', 'robotName']);
         const wins = entry.getIn(['data', 'wins']);
         const losses = entry.getIn(['data', 'losses']);
-        const featuredImage = entry.getIn(['data', 'featuredImage']);
-        const gameLogo = entry.getIn(['data', 'gameLogo']);
+        const featuredImagePath = entry.getIn(['data', 'featuredImage']);
+        const gameLogoPath = entry.getIn(['data', 'gameLogo']);
         const events = entry.getIn(['data', 'events']);
         const awards = entry.getIn(['data', 'awards']);
         const body = this.props.widgetFor('body');
 
-        // Convert CloudFront URLs to local paths for preview
-        const convertImageUrl = (url) => {
-          if (!url) return null;
-          if (url.startsWith('https://d2je6s0jo9muku.cloudfront.net/')) {
-            const filename = url.split('/').pop();
-            return `/assets/images/${filename}`;
-          } else if (!url.startsWith('http') && !url.startsWith('/')) {
-            return `/${url}`;
-          }
-          return url;
-        };
-
-        const robotImageUrl = convertImageUrl(featuredImage);
-        const gameLogoUrl = convertImageUrl(gameLogo);
+        // Use getAsset to get the actual blob URL for newly uploaded images
+        const featuredImage = this.props.getAsset(featuredImagePath);
+        const gameLogo = this.props.getAsset(gameLogoPath);
+        const robotImageUrl = featuredImage ? featuredImage.toString() : null;
+        const gameLogoUrl = gameLogo ? gameLogo.toString() : null;
 
         return h('div', { className: 'preview-container' },
           h('h1', {}, `${robotYear} - ${robotName}`),
