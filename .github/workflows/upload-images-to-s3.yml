@@ -233,13 +233,13 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
 
           if [ -f url_mapping.json ]; then
-            node << 'EOF'
+            node << 'EOF' >> $GITHUB_STEP_SUMMARY
             const mapping = require('./url_mapping.json');
             for (const [original, { s3Key, url }] of Object.entries(mapping)) {
               console.log(`- ✅ \`${original}\` → \`${s3Key}\` ([View](${url}))`);
             }
-            EOF
-          fi >> $GITHUB_STEP_SUMMARY
+          EOF
+          fi
 
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "✨ Images optimized, uploaded to CloudFront, and removed from repo!" >> $GITHUB_STEP_SUMMARY
