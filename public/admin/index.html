@@ -57,11 +57,26 @@
         // Use getAsset to get the actual blob URL for newly uploaded images
         let imageUrl = null;
         if (featuredImagePath) {
+          console.log('Featured image path:', featuredImagePath);
+          console.log('Props.getAsset:', this.props.getAsset);
+
           const asset = this.props.getAsset(featuredImagePath);
+          console.log('Asset from getAsset:', asset);
+
           if (asset) {
             // getAsset returns an Immutable Map with 'url' or 'path'
-            imageUrl = asset.get ? asset.get('url') : asset.toString();
+            if (asset.get) {
+              console.log('Asset has .get method');
+              imageUrl = asset.get('url') || asset.get('path') || asset.toString();
+            } else if (asset.url) {
+              console.log('Asset has .url property');
+              imageUrl = asset.url;
+            } else {
+              console.log('Using asset.toString()');
+              imageUrl = asset.toString();
+            }
           }
+          console.log('Final imageUrl:', imageUrl);
         }
 
         return h('div', { className: 'preview-container' },
