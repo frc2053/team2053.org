@@ -207,6 +207,12 @@ jobs:
           console.log(`\n✅ Updated ${totalReplacements} image references in ${mdxFiles.length} files`);
           EOF
 
+      - name: Stage modified blog posts
+        if: steps.changed-files.outputs.has_changes == 'true'
+        run: |
+          git add src/content/blog/**/*.mdx src/pages/history/years/**/*.mdx || true
+          echo "Staged modified MDX files"
+
       - name: Delete local images from repo
         if: steps.changed-files.outputs.has_changes == 'true'
         run: |
