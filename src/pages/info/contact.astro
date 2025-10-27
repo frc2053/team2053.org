@@ -2,10 +2,14 @@
 import ContactForm from '../../components/forms/ContactForm.astro';
 import Layout from '../../layouts/Page.astro';
 import { Container } from '@components/odyssey-theme';
+import { getEntry } from 'astro:content';
+
+const contactPage = await getEntry('pages', 'contact');
+const { data } = contactPage;
 
 const seo = {
-	title: 'Contact | Southern Tier Robotics',
-	description: 'Contact Page',
+	title: data.title,
+	description: data.description,
 };
 ---
 
@@ -13,17 +17,13 @@ const seo = {
 	<Container>
 		<section class="contact-hero__section">
 			<div class="contact-hero__text-section">
-				<h1>Contact Us</h1>
-				<p>
-					If you have any questions, comments or concerns, please feel
-					free to reach out through the form or through the provided
-					email below.
-				</p>
+				<h1>{data.heading}</h1>
+				<p>{data.introText}</p>
 				<div>
 					<p>
 						<em
-							><a href="mailto:southerntierrobotics@gmail.com"
-								>southerntierrobotics@gmail.com</a
+							><a href={`mailto:${data.email}`}
+								>{data.email}</a
 							></em
 						>
 					</p>

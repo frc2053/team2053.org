@@ -3,115 +3,103 @@ import { TextSection, TextCardSection } from '@components/odyssey-theme';
 import Layout from '../../layouts/Page.astro';
 import HeroSection from '../../components/sections/heros/HeroSection.astro';
 import CountdownSection from '@components/sections/heros/CountdownSection.astro';
+import { getEntry } from 'astro:content';
+
+const currentSeasonPage = await getEntry('pages', 'current-season');
+const { data } = currentSeasonPage;
 
 const seo = {
-	title: 'Current Season | Southern Tier Robotics',
-	description: 'Information about the current season',
+	title: data.title,
+	description: data.description,
 };
 ---
 <Layout {seo}>
 	<HeroSection>
 		<div slot="text-container">
-			<h1>Off Season Competition Schedule</h1>
-			<ul style="list-style: none; padding: 0;">
-				<li style="margin-bottom: 1.5rem;">
-					<strong>Ra Cha Cha Ruckus</strong>
-					<br />
-					<span>September 28th, 2025</span>
-					<br />
-					<em>Nazareth University Golisano Training Center, Rochester, NY</em>
-					<br />
-					<a href="https://ruckus.penfieldrobotics.com/" target="_blank" rel="noopener">Event Website</a>
-				</li>
-				<li>
-					<strong>RoboReplay</strong>
-					<br />
-					<span>October 11th &amp; 12th, 2025</span>
-					<br />
-					<em>John Dewey High School, Brooklyn, NY</em>
-					<br />
-					<a href="https://sites.google.com/nycfirst.org/nyc-robo-replay/home" target="_blank" rel="noopener">Event Website</a>
-				</li>
-				<li>
-					<strong>Robot Rumble</strong>
-					<br />
-					<span>October 25th, 2025</span>
-					<br />
-					<em>Ballston Spa High School, Ballston Spa, NY</em>
-					<br />
-					<a href="https://www.techvalleyfirst.org/robotrumble/" target="_blank" rel="noopener">Event Website</a>
-				</li>
-			</ul>
+			<h1>{data.heroTitle}</h1>
+			{data.events && data.events.length > 0 && (
+				<ul style="list-style: none; padding: 0;">
+					{data.events.map((event, index) => (
+						<li style={index < data.events.length - 1 ? "margin-bottom: 1.5rem;" : ""}>
+							<strong>{event.name}</strong>
+							<br />
+							<span>{event.date}</span>
+							<br />
+							<em>{event.location}</em>
+							<br />
+							{event.url && (
+								<a href={event.url} target="_blank" rel="noopener">Event Website</a>
+							)}
+						</li>
+					))}
+				</ul>
+			)}
 			<hr style="margin: 2rem 0;" />
 		</div>
 		<picture slot="image-container">
 			<img
-				src="https://d2je6s0jo9muku.cloudfront.net/rebuiltlogo.webp"
-				alt="Rebuilt Logo"
+				src={data.heroImage}
+				alt={data.heroImageAlt}
 				id="current-season-logo"
 			/>
 		</picture>
 	</HeroSection>
-	<CountdownSection targetDate='2026-01-10 12:00:00' title="Kickoff Countdown"></CountdownSection>
-	<TextSection narrow>
-		<h3>Good Resources:</h3>
-		<p>
-			<a
-				href="https://docs.google.com/document/d/1bE_2YUtZ2e0jtnDK2_itQkPTz2gczKb6DidZ5INTC1k/pub"
-				>Team Handbook and Rules</a
-			>
-		</p>
-		<p>
-			<!-- <a href="https://forms.gle/fZBtZrikUUdukjh19"
-				>Here is the link to the FRC Game Manual Quiz!</a
-			> -->
-			<a href="https://info.firstinspires.org/first-age"
-				>Link to FIRST information page for this season!</a
-			>
-		</p>
-	</TextSection>
-	<TextSection narrow>
-		<h3>More Info:</h3>
-		<p>
-			Here you can find information about meetings, and more information
-			for this year. Please be outside of the front doors of the school at
-			5pm/8am, or you will have to be let in by a mentor later.
-		</p>
-		<p>
-			<b
-				><i>Please check calendar for specific days we will not meet.</i
-				></b
-			>
-		</p>
-		<ul>
-			<li>
-				Schedule before January 10th, 2026
-				<ul>
-					<li>Monday: 5-8pm</li>
-					<li>Wesnesday: 5-8pm</li>
-					<li>Friday: 5-8pm</li>
-					<li>Saturday: 8am-1pm</li>
-				</ul>
-			</li>
-			<li>
-				Schedule after January 10th, 2026
-				<ul>
-					<li>Monday: 5-8pm</li>
-					<li>Wesnesday: 5-8pm</li>
-					<li>Friday: 5-8pm</li>
-					<li>Saturday: 8am-1pm</li>
-				</ul>
-			</li>
-		</ul>
-	</TextSection>
-	<TextSection narrow>
-		<h2>Meeting Calendar:</h2>
-		<iframe
-			src="https://calendar.google.com/calendar/embed?height=600&wkst=1&ctz=America%2FNew_York&showPrint=0&title=2026%20Events&src=M2E1MmE4NzM2Yjk4NjNiNmQ4Njk2NDgyOTFlYWQ0ZTRhNjMxOWI0NWIwMjJmYWE5YzVmZmJkMDVlZjQwODRiZEBncm91cC5jYWxlbmRhci5nb29nbGUuY29t&color=%230b8043"
-			style="border-width:0"
-			width="800"
-			height="600"
-			frameborder="0"
-			scrolling="no"></iframe>
-	</TextSection>
+	{data.kickoffDate && (
+		<CountdownSection targetDate={data.kickoffDate} title="Kickoff Countdown"></CountdownSection>
+	)}
+	{data.resources && data.resources.length > 0 && (
+		<TextSection narrow>
+			<h3>{data.resourcesHeading || 'Resources:'}</h3>
+			{data.resources.map(resource => (
+				<p>
+					<a href={resource.url}>{resource.text}</a>
+				</p>
+			))}
+		</TextSection>
+	)}
+	{(data.preKickoffSchedule || data.postKickoffSchedule) && (
+		<TextSection narrow>
+			<h3>{data.scheduleHeading || 'Schedule:'}</h3>
+			{data.scheduleIntro && <p>{data.scheduleIntro}</p>}
+			{data.scheduleNote && (
+				<p>
+					<b><i>{data.scheduleNote}</i></b>
+				</p>
+			)}
+			<ul>
+				{data.preKickoffSchedule && (
+					<li>
+						{data.preKickoffSchedule.label}
+						<ul>
+							{data.preKickoffSchedule.days.map(day => (
+								<li>{day.day}: {day.time}</li>
+							))}
+						</ul>
+					</li>
+				)}
+				{data.postKickoffSchedule && (
+					<li>
+						{data.postKickoffSchedule.label}
+						<ul>
+							{data.postKickoffSchedule.days.map(day => (
+								<li>{day.day}: {day.time}</li>
+							))}
+						</ul>
+					</li>
+				)}
+			</ul>
+		</TextSection>
+	)}
+	{data.calendarUrl && (
+		<TextSection narrow>
+			<h2>{data.calendarHeading || 'Calendar:'}</h2>
+			<iframe
+				src={data.calendarUrl}
+				style="border-width:0"
+				width="800"
+				height="600"
+				frameborder="0"
+				scrolling="no"></iframe>
+		</TextSection>
+	)}
 </Layout>

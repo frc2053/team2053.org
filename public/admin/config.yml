@@ -64,6 +64,129 @@ collections:
       - {label: "Game Logo", name: "gameLogo", widget: "image", required: false, hint: "Official FRC game logo"}
       - {label: "Content", name: "body", widget: "markdown", required: true, hint: "Details about the robot and season"}
 
+  # ==========================================
+  # ABOUT PAGE (Singleton)
+  # ==========================================
+  - name: "about"
+    label: "About Page"
+    files:
+      - label: "About Southern Tier Robotics"
+        name: "about"
+        file: "src/content/pages/about.md"
+        fields:
+          - {label: "Title", name: "title", widget: "string", default: "About Southern Tier Robotics", required: true}
+          - {label: "Description", name: "description", widget: "string", default: "About Page", required: true}
+          - {label: "Hero Title", name: "heroTitle", widget: "string", default: "About Southern Tier Robotics", required: true}
+          - {label: "Hero Text", name: "heroText", widget: "text", required: true, hint: "Introduction paragraph in hero section"}
+          - {label: "Hero Image", name: "heroImage", widget: "image", required: true, hint: "Hero section image"}
+          - {label: "Hero Image Alt", name: "heroImageAlt", widget: "string", required: true}
+          - {label: "What is FIRST - Heading", name: "firstHeading", widget: "string", default: "What is FIRST?", required: true}
+          - {label: "What is FIRST - Content", name: "firstContent", widget: "markdown", required: true}
+          - {label: "What is FRC - Heading", name: "frcHeading", widget: "string", default: "What is the FIRST Robotics Competition", required: true}
+          - {label: "What is FRC - Content", name: "frcContent", widget: "markdown", required: true}
+          - {label: "Team History - Heading", name: "historyHeading", widget: "string", default: "Team History", required: true}
+          - {label: "Team History - Content", name: "historyContent", widget: "markdown", required: true}
+
+  # ==========================================
+  # SPONSORS
+  # ==========================================
+  - name: "sponsors"
+    label: "Sponsors"
+    label_singular: "Sponsor"
+    folder: "src/content/sponsors"
+    create: true
+    slug: "{{slug}}"
+    extension: "json"
+    format: "json"
+    editor:
+      preview: false
+    fields:
+      - {label: "Name", name: "name", widget: "string", required: true}
+      - {label: "Logo", name: "logo", widget: "image", required: true}
+      - {label: "Tier", name: "tier", widget: "select", options: ["Platinum", "Gold", "Silver", "Bronze"], required: true}
+      - {label: "Website URL", name: "url", widget: "string", required: false, hint: "Optional link to sponsor's website"}
+      - {label: "Sort Order", name: "sortOrder", widget: "number", value_type: "int", min: 0, default: 0, hint: "Lower numbers appear first"}
+
+  # ==========================================
+  # SPONSOR PAGE CONTENT (Singleton)
+  # ==========================================
+  - name: "sponsorPage"
+    label: "Sponsor Page"
+    files:
+      - label: "Sponsor Page Content"
+        name: "sponsorPage"
+        file: "src/content/pages/sponsor.md"
+        fields:
+          - {label: "Title", name: "title", widget: "string", default: "Support Us", required: true}
+          - {label: "Description", name: "description", widget: "string", default: "Our current sponsors and information on how to sponsor our team.", required: true}
+          - {label: "Intro Text", name: "introText", widget: "text", required: false}
+          - {label: "PDF Path", name: "pdfPath", widget: "string", default: "/assets/SponsorPacket.pdf", required: true}
+          - {label: "Contact Email", name: "contactEmail", widget: "string", default: "southerntierrobotics@gmail.com", required: true}
+          - {label: "Contact Text", name: "contactText", widget: "text", default: "If you are interested in becoming a sponsor of the team, or are looking to do an in-kind donation, please contact us at", required: true}
+
+  # ==========================================
+  # CURRENT SEASON PAGE (Singleton)
+  # ==========================================
+  - name: "currentSeason"
+    label: "Current Season"
+    files:
+      - label: "Current Season Info"
+        name: "currentSeason"
+        file: "src/content/pages/current-season.md"
+        fields:
+          - {label: "Title", name: "title", widget: "string", default: "Current Season", required: true}
+          - {label: "Description", name: "description", widget: "string", default: "Information about the current season", required: true}
+          - {label: "Hero Title", name: "heroTitle", widget: "string", default: "Off Season Competition Schedule", required: true}
+          - {label: "Hero Image", name: "heroImage", widget: "image", required: true}
+          - {label: "Hero Image Alt", name: "heroImageAlt", widget: "string", required: true}
+          - {label: "Kickoff Date", name: "kickoffDate", widget: "datetime", format: "YYYY-MM-DD HH:mm:ss", required: true, hint: "Date for countdown timer"}
+          - {label: "Events", name: "events", widget: "list", required: false, fields: [
+              {label: "Event Name", name: "name", widget: "string", required: true},
+              {label: "Date", name: "date", widget: "string", required: true},
+              {label: "Location", name: "location", widget: "string", required: true},
+              {label: "Website URL", name: "url", widget: "string", required: false}
+            ]}
+          - {label: "Resources Heading", name: "resourcesHeading", widget: "string", default: "Good Resources:", required: false}
+          - {label: "Resources", name: "resources", widget: "list", required: false, fields: [
+              {label: "Link Text", name: "text", widget: "string", required: true},
+              {label: "URL", name: "url", widget: "string", required: true}
+            ]}
+          - {label: "Schedule Info Heading", name: "scheduleHeading", widget: "string", default: "More Info:", required: false}
+          - {label: "Schedule Intro Text", name: "scheduleIntro", widget: "text", required: false}
+          - {label: "Schedule Note", name: "scheduleNote", widget: "string", required: false}
+          - {label: "Pre-Kickoff Schedule", name: "preKickoffSchedule", widget: "object", required: false, fields: [
+              {label: "Label", name: "label", widget: "string", default: "Schedule before kickoff"},
+              {label: "Days", name: "days", widget: "list", fields: [
+                  {label: "Day", name: "day", widget: "string"},
+                  {label: "Time", name: "time", widget: "string"}
+                ]}
+            ]}
+          - {label: "Post-Kickoff Schedule", name: "postKickoffSchedule", widget: "object", required: false, fields: [
+              {label: "Label", name: "label", widget: "string", default: "Schedule after kickoff"},
+              {label: "Days", name: "days", widget: "list", fields: [
+                  {label: "Day", name: "day", widget: "string"},
+                  {label: "Time", name: "time", widget: "string"}
+                ]}
+            ]}
+          - {label: "Calendar Heading", name: "calendarHeading", widget: "string", default: "Meeting Calendar:", required: false}
+          - {label: "Calendar Embed URL", name: "calendarUrl", widget: "string", required: true}
+
+  # ==========================================
+  # CONTACT PAGE (Singleton)
+  # ==========================================
+  - name: "contact"
+    label: "Contact Page"
+    files:
+      - label: "Contact Information"
+        name: "contact"
+        file: "src/content/pages/contact.md"
+        fields:
+          - {label: "Title", name: "title", widget: "string", default: "Contact Us", required: true}
+          - {label: "Description", name: "description", widget: "string", default: "Contact Page", required: true}
+          - {label: "Heading", name: "heading", widget: "string", default: "Contact Us", required: true}
+          - {label: "Intro Text", name: "introText", widget: "text", required: true}
+          - {label: "Email", name: "email", widget: "string", required: true}
+
 
 # Editor configuration
 editor:

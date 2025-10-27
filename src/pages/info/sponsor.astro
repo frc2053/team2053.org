@@ -2,10 +2,25 @@
 import { TextSection } from '@components/odyssey-theme';
 import ImageTextCard from '../../components/cards/ImageTextCardSponsor.astro';
 import Layout from '../../layouts/Page.astro';
+import { getEntry, getCollection } from 'astro:content';
+
+const sponsorPage = await getEntry('pages', 'sponsor');
+const { data } = sponsorPage;
+
+// Get all sponsors and group them by tier
+const allSponsors = await getCollection('sponsors');
+const sortedSponsors = allSponsors.sort((a, b) => a.data.sortOrder - b.data.sortOrder);
+
+const sponsorsByTier = {
+    Platinum: sortedSponsors.filter(s => s.data.tier === 'Platinum'),
+    Gold: sortedSponsors.filter(s => s.data.tier === 'Gold'),
+    Silver: sortedSponsors.filter(s => s.data.tier === 'Silver'),
+    Bronze: sortedSponsors.filter(s => s.data.tier === 'Bronze'),
+};
 
 const seo = {
-    title: `Sponsor Page`,
-    description: `Our current sponsors and information on how to sponsor our team.`,
+    title: data.title,
+    description: data.description,
 };
 
 // Style block for the row layout
@@ -122,124 +137,40 @@ const styles = `
     <style set:html={styles}></style>
     
     <TextSection>
-        <h1>Support Us</h1>
-        
+        <h1>{data.title}</h1>
+        {data.introText && <p>{data.introText}</p>}
+
         <div class="sponsor-container">
             <!-- Sponsors Section -->
             <div class="sponsors-section">
                 <h2>Current Sponsors</h2>
-                
-                <!-- Platinum Sponsors -->
-                <div class="sponsor-tier">
-                    <h3 class="tier-title">Platinum Sponsors:</h3>
-                    <div class="sponsor-row">
-                        <ImageTextCard
-                            title="Vestal Central School District"
-                            imgSrc="https://d2je6s0jo9muku.cloudfront.net/sponsor/vestal-logo.webp"
-                            description=""
-                        />
-                        <ImageTextCard
-                            title="Gene Haas Foundation"
-                            imgSrc="https://d2je6s0jo9muku.cloudfront.net/sponsor/haas.webp"
-                            description=""
-                        />
-                    </div>
-                </div>
 
-                <!-- Gold Sponsors -->
-                <div class="sponsor-tier">
-                    <h3 class="tier-title">Gold Sponsors:</h3>
-                    <div class="sponsor-row">
-                        <ImageTextCard
-                            title="BAE Systems"
-                            imgSrc="https://d2je6s0jo9muku.cloudfront.net/sponsor/BAEsystem.sponsor.webp"
-                            description=""
-                        />
-                        <ImageTextCard
-                            title="CMP Advanced Mechanical Solutions"
-                            imgSrc="https://d2je6s0jo9muku.cloudfront.net/sponsor/CMP-white-red.webp"
-                            description=""
-                        />
-                        <ImageTextCard
-                            title="IEEE Binghamton"
-                            imgSrc="https://d2je6s0jo9muku.cloudfront.net/sponsor/ieee.svg"
-                            description=""
-                        />
-                        <ImageTextCard
-                            title="Lockheed Martin"
-                            imgSrc="https://d2je6s0jo9muku.cloudfront.net/sponsor/LM-logo.svg"
-                            description=""
-                        />
-                        <ImageTextCard
-                            title="Williams Auto"
-                            imgSrc="https://d2je6s0jo9muku.cloudfront.net/sponsor/williamsauto.webp"
-                            description=""
-                        />
-                        <ImageTextCard
-                            title="Endicott Precision"
-                            imgSrc="https://d2je6s0jo9muku.cloudfront.net/sponsor/EpINC.logo.webp"
-                            description=""
-                        />
-                    </div>
-                </div>
+                {['Platinum', 'Gold', 'Silver', 'Bronze'].map(tier => {
+                    const tierSponsors = sponsorsByTier[tier];
+                    if (tierSponsors.length === 0) return null;
 
-                <!-- Silver Sponsors -->
-                <div class="sponsor-tier">
-                    <h3 class="tier-title">Silver Sponsors</h3>
-                    <div class="sponsor-row">
-                        <ImageTextCard
-                            title="Binghamton University Athletic Robotics Club"
-                            imgSrc="https://d2je6s0jo9muku.cloudfront.net/sponsor/acr.webp"
-                            description=""
-                        />
-                        <ImageTextCard
-                            title="Law Family"
-                            imgSrc="https://d2je6s0jo9muku.cloudfront.net/sponsor/family.webp"
-                            description=""
-                        />
-                        <ImageTextCard
-                            title="State Line Auto Auction"
-                            imgSrc="https://d2je6s0jo9muku.cloudfront.net/sponsor/slaaLogo.svg"
-                            description=""
-                        />
-                    </div>
-                </div>
-
-                <!-- Bronze Sponsors -->
-                <div class="sponsor-tier">
-                    <h3 class="tier-title">Bronze Sponsors</h3>
-                    <div class="sponsor-row">
-                        <ImageTextCard
-                            title="Canaugh Family"
-                            imgSrc="https://d2je6s0jo9muku.cloudfront.net/sponsor/family.webp"
-                            description=""
-                        />
-                        <ImageTextCard
-                            title="Endicott Rotary Club"
-                            imgSrc="https://d2je6s0jo9muku.cloudfront.net/sponsor/rotary.webp"
-                            description=""
-                        />
-                        <ImageTextCard
-                            title="iA"
-                            imgSrc="https://d2je6s0jo9muku.cloudfront.net/sponsor/ia.svg"
-                            description=""
-                        />
-                        <ImageTextCard
-                            title="The Cat Doctor"
-                            imgSrc="https://d2je6s0jo9muku.cloudfront.net/sponsor/catdoc.webp"
-                            description=""
-                        />
-                    </div>
-                </div>
+                    return (
+                        <div class="sponsor-tier">
+                            <h3 class="tier-title">{tier} Sponsors:</h3>
+                            <div class="sponsor-row">
+                                {tierSponsors.map(sponsor => (
+                                    <ImageTextCard
+                                        title={sponsor.data.name}
+                                        imgSrc={sponsor.data.logo}
+                                        description=""
+                                    />
+                                ))}
+                            </div>
+                        </div>
+                    );
+                })}
             </div>
 
             <!-- PDF Section -->
             <div class="pdf-section">
-                <embed src="/assets/SponsorPacket.pdf" />
+                <embed src={data.pdfPath} />
                 <p class="contact-info">
-                    If you are interested in becoming a sponsor of the team, or are looking to
-                    do an in-kind donation, please contact us at
-                    southerntierrobotics@gmail.com
+                    {data.contactText} {data.contactEmail}
                 </p>
             </div>
         </div>
