@@ -4,9 +4,148 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Content Manager - Team 2053</title>
+  <style>
+    /* Preview styling */
+    .preview-container {
+      padding: 20px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    }
+    .preview-container img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 8px;
+      margin: 20px 0;
+    }
+    .preview-container h1 {
+      font-size: 2.5em;
+      margin-bottom: 0.5em;
+    }
+    .preview-container .meta {
+      color: #666;
+      margin-bottom: 1em;
+    }
+    .preview-container .tags {
+      margin: 1em 0;
+    }
+    .preview-container .tag {
+      display: inline-block;
+      background: #e0e0e0;
+      padding: 4px 12px;
+      border-radius: 4px;
+      margin-right: 8px;
+      font-size: 0.9em;
+    }
+  </style>
 </head>
 <body>
   <!-- Include the script that builds the page and powers Decap CMS -->
   <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
+
+  <script>
+    // Custom preview template for blog posts
+    const BlogPostPreview = createClass({
+      render() {
+        const entry = this.props.entry;
+        const title = entry.getIn(['data', 'title']);
+        const description = entry.getIn(['data', 'description']);
+        const featuredImage = entry.getIn(['data', 'featuredImage']);
+        const publishDate = entry.getIn(['data', 'publishDate']);
+        const excerpt = entry.getIn(['data', 'excerpt']);
+        const tags = entry.getIn(['data', 'tags']);
+        const body = this.props.widgetFor('body');
+
+        // Convert CloudFront URL to local path for preview
+        let imageUrl = featuredImage;
+        if (featuredImage) {
+          if (featuredImage.startsWith('https://d2je6s0jo9muku.cloudfront.net/')) {
+            // Extract filename and create local path
+            const filename = featuredImage.split('/').pop();
+            imageUrl = `/assets/images/${filename}`;
+          } else if (featuredImage.startsWith('/assets/images/')) {
+            imageUrl = featuredImage;
+          } else if (!featuredImage.startsWith('http')) {
+            // If it's already a relative path, ensure it starts with /
+            imageUrl = featuredImage.startsWith('/') ? featuredImage : `/${featuredImage}`;
+          }
+        }
+
+        return h('div', { className: 'preview-container' },
+          h('h1', {}, title),
+          h('div', { className: 'meta' },
+            publishDate ? new Date(publishDate).toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric'
+            }) : ''
+          ),
+          h('p', { style: { fontStyle: 'italic', color: '#666' } }, description),
+          imageUrl ? h('img', { src: imageUrl, alt: title || 'Featured image' }) : null,
+          h('p', { style: { fontWeight: 'bold' } }, excerpt),
+          tags && tags.size > 0 ? h('div', { className: 'tags' },
+            tags.map(tag => h('span', { className: 'tag', key: tag }, tag))
+          ) : null,
+          h('div', {}, body)
+        );
+      }
+    });
+
+    // Custom preview template for history pages
+    const HistoryPreview = createClass({
+      render() {
+        const entry = this.props.entry;
+        const robotYear = entry.getIn(['data', 'robotYear']);
+        const title = entry.getIn(['data', 'title']);
+        const description = entry.getIn(['data', 'description']);
+        const robotName = entry.getIn(['data', 'robotName']);
+        const wins = entry.getIn(['data', 'wins']);
+        const losses = entry.getIn(['data', 'losses']);
+        const featuredImage = entry.getIn(['data', 'featuredImage']);
+        const gameLogo = entry.getIn(['data', 'gameLogo']);
+        const events = entry.getIn(['data', 'events']);
+        const awards = entry.getIn(['data', 'awards']);
+        const body = this.props.widgetFor('body');
+
+        // Convert CloudFront URLs to local paths for preview
+        const convertImageUrl = (url) => {
+          if (!url) return null;
+          if (url.startsWith('https://d2je6s0jo9muku.cloudfront.net/')) {
+            const filename = url.split('/').pop();
+            return `/assets/images/${filename}`;
+          } else if (!url.startsWith('http') && !url.startsWith('/')) {
+            return `/${url}`;
+          }
+          return url;
+        };
+
+        const robotImageUrl = convertImageUrl(featuredImage);
+        const gameLogoUrl = convertImageUrl(gameLogo);
+
+        return h('div', { className: 'preview-container' },
+          h('h1', {}, `${robotYear} - ${robotName}`),
+          h('h2', {}, title),
+          h('p', {}, description),
+          h('div', { style: { display: 'flex', gap: '20px', margin: '20px 0' } },
+            h('div', {}, `Wins: ${wins || 0}`),
+            h('div', {}, `Losses: ${losses || 0}`)
+          ),
+          robotImageUrl ? h('img', { src: robotImageUrl, alt: robotName || 'Robot' }) : null,
+          gameLogoUrl ? h('img', { src: gameLogoUrl, alt: 'Game Logo', style: { maxWidth: '300px' } }) : null,
+          events && events.size > 0 ? h('div', {},
+            h('h3', {}, 'Events'),
+            h('ul', {}, events.map((event, i) => h('li', { key: i }, event)))
+          ) : null,
+          awards && awards.size > 0 ? h('div', {},
+            h('h3', {}, 'Awards'),
+            h('ul', {}, awards.map((award, i) => h('li', { key: i }, award)))
+          ) : null,
+          h('div', {}, body)
+        );
+      }
+    });
+
+    // Register the preview templates
+    CMS.registerPreviewTemplate('blog', BlogPostPreview);
+    CMS.registerPreviewTemplate('history', HistoryPreview);
+  </script>
 </body>
 </html>
