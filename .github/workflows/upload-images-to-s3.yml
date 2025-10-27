@@ -1,0 +1,255 @@
+name: Optimize and Upload Images to S3
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'public/assets/images/**'
+      - 'src/content/blog/**'
+      - 'src/pages/history/years/**'
+
+jobs:
+  optimize-and-upload:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: |
+          npm install sharp @aws-sdk/client-s3 glob
+
+      - name: Get changed image files
+        id: changed-files
+        run: |
+          # Get list of added/modified image files (exclude README.md and .gitkeep)
+          CHANGED_FILES=$(git diff --name-only --diff-filter=AM HEAD~1 HEAD | \
+            grep '^public/assets/images/' | \
+            grep -v 'README.md' | \
+            grep -v '.gitkeep' || true)
+
+          if [ -z "$CHANGED_FILES" ]; then
+            echo "No new images to upload"
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          else
+            echo "Changed files:"
+            echo "$CHANGED_FILES"
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+            echo "$CHANGED_FILES" > changed_files.txt
+          fi
+
+      - name: Configure AWS credentials
+        if: steps.changed-files.outputs.has_changes == 'true'
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Optimize and upload images to S3
+        if: steps.changed-files.outputs.has_changes == 'true'
+        run: |
+          node << 'EOF'
+          const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
+          const sharp = require('sharp');
+          const fs = require('fs');
+          const path = require('path');
+
+          const s3Client = new S3Client({
+            region: process.env.AWS_REGION,
+            credentials: {
+              accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+              secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+            },
+          });
+
+          const urlMapping = {};
+
+          async function processImage(filePath) {
+            const fileName = path.basename(filePath);
+            const fileExt = path.extname(fileName).toLowerCase();
+
+            console.log(`\n📸 Processing: ${fileName}`);
+
+            try {
+              let fileBuffer;
+              let contentType;
+              let s3Key = fileName;
+
+              // Optimize raster images, keep SVGs as-is
+              if (['.jpg', '.jpeg', '.png', '.gif'].includes(fileExt)) {
+                const webpFileName = fileName.replace(/\.(jpg|jpeg|png|gif)$/i, '.webp');
+                s3Key = webpFileName;
+
+                console.log(`  ⚙️  Converting to WebP and optimizing...`);
+                fileBuffer = await sharp(filePath)
+                  .resize(1920, 1920, { fit: 'inside', withoutEnlargement: true })
+                  .webp({ quality: 85 })
+                  .toBuffer();
+
+                contentType = 'image/webp';
+                console.log(`  ✓ Converted ${fileName} → ${webpFileName}`);
+              } else if (fileExt === '.svg') {
+                fileBuffer = fs.readFileSync(filePath);
+                contentType = 'image/svg+xml';
+                console.log(`  ✓ Using original SVG`);
+              } else {
+                fileBuffer = fs.readFileSync(filePath);
+                contentType = `image/${fileExt.slice(1)}`;
+                console.log(`  ✓ Using original format`);
+              }
+
+              // Upload to S3
+              await s3Client.send(new PutObjectCommand({
+                Bucket: process.env.AWS_S3_BUCKET,
+                Key: s3Key,
+                Body: fileBuffer,
+                ContentType: contentType,
+                CacheControl: 'public, max-age=31536000',
+              }));
+
+              const cloudFrontUrl = `https://${process.env.CLOUDFRONT_DOMAIN}/${s3Key}`;
+              console.log(`  ✅ Uploaded to S3: ${s3Key}`);
+              console.log(`  🌐 URL: ${cloudFrontUrl}`);
+
+              // Store mapping for URL replacement
+              urlMapping[fileName] = { s3Key, url: cloudFrontUrl };
+
+              return { success: true, fileName, s3Key, url: cloudFrontUrl };
+            } catch (error) {
+              console.error(`  ❌ Failed to process ${fileName}:`, error.message);
+              return { success: false, fileName, error: error.message };
+            }
+          }
+
+          async function main() {
+            const changedFiles = fs.readFileSync('changed_files.txt', 'utf-8')
+              .split('\n')
+              .filter(f => f.trim());
+
+            for (const file of changedFiles) {
+              if (fs.existsSync(file)) {
+                await processImage(file);
+              }
+            }
+
+            // Save URL mapping for next step
+            fs.writeFileSync('url_mapping.json', JSON.stringify(urlMapping, null, 2));
+            console.log('\n✅ All images processed successfully!');
+          }
+
+          main().catch(console.error);
+          EOF
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+          CLOUDFRONT_DOMAIN: ${{ secrets.CLOUDFRONT_DOMAIN }}
+
+      - name: Update URLs in blog posts and history pages
+        if: steps.changed-files.outputs.has_changes == 'true'
+        run: |
+          node << 'EOF'
+          const fs = require('fs');
+          const path = require('path');
+          const { globSync } = require('glob');
+
+          const urlMapping = JSON.parse(fs.readFileSync('url_mapping.json', 'utf-8'));
+          let totalReplacements = 0;
+
+          // Find all MDX files in blog and history
+          const mdxFiles = [
+            ...globSync('src/content/blog/**/*.mdx'),
+            ...globSync('src/pages/history/years/**/*.mdx'),
+          ];
+
+          for (const file of mdxFiles) {
+            let content = fs.readFileSync(file, 'utf-8');
+            let modified = false;
+
+            for (const [originalName, { s3Key, url }] of Object.entries(urlMapping)) {
+              // Replace both relative and CloudFront URLs with the new optimized URL
+              const patterns = [
+                new RegExp(`/assets/images/${originalName}`, 'g'),
+                new RegExp(`https://d2je6s0jo9muku\\.cloudfront\\.net/${originalName}`, 'g'),
+              ];
+
+              for (const pattern of patterns) {
+                if (pattern.test(content)) {
+                  content = content.replace(pattern, url);
+                  modified = true;
+                  totalReplacements++;
+                  console.log(`✓ Updated ${originalName} → ${s3Key} in ${path.basename(file)}`);
+                }
+              }
+            }
+
+            if (modified) {
+              fs.writeFileSync(file, content);
+            }
+          }
+
+          console.log(`\n✅ Updated ${totalReplacements} image references in ${mdxFiles.length} files`);
+          EOF
+
+      - name: Delete local images from repo
+        if: steps.changed-files.outputs.has_changes == 'true'
+        run: |
+          while IFS= read -r file; do
+            if [ -f "$file" ] && [ "$file" != "public/assets/images/README.md" ]; then
+              echo "Deleting $file from repo"
+              git rm "$file"
+            fi
+          done < changed_files.txt
+
+      - name: Commit changes
+        if: steps.changed-files.outputs.has_changes == 'true'
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "🤖 Optimize images and update URLs to CloudFront
+
+Images have been:
+- Converted to WebP format
+- Optimized and compressed (85% quality)
+- Resized to max 1920px
+- Uploaded to S3/CloudFront
+- Removed from repo to keep it small
+
+Generated with [Claude Code](https://claude.com/claude-code)
+Co-Authored-By: Claude <noreply@anthropic.com>"
+            git push
+          fi
+
+      - name: Summary
+        if: steps.changed-files.outputs.has_changes == 'true'
+        run: |
+          echo "## 📸 Images Optimized and Uploaded" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ -f url_mapping.json ]; then
+            node << 'EOF'
+            const mapping = require('./url_mapping.json');
+            for (const [original, { s3Key, url }] of Object.entries(mapping)) {
+              console.log(`- ✅ \`${original}\` → \`${s3Key}\` ([View](${url}))`);
+            }
+            EOF
+          fi >> $GITHUB_STEP_SUMMARY
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✨ Images optimized, uploaded to CloudFront, and removed from repo!" >> $GITHUB_STEP_SUMMARY
