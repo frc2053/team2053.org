@@ -222,17 +222,7 @@ jobs:
           if git diff --staged --quiet; then
             echo "No changes to commit"
           else
-            git commit -m "🤖 Optimize images and update URLs to CloudFront
-
-Images have been:
-- Converted to WebP format
-- Optimized and compressed (85% quality)
-- Resized to max 1920px
-- Uploaded to S3/CloudFront
-- Removed from repo to keep it small
-
-Generated with [Claude Code](https://claude.com/claude-code)
-Co-Authored-By: Claude <noreply@anthropic.com>"
+            git commit -m "🤖 Optimize images and update URLs to CloudFront"
             git push
           fi
 
