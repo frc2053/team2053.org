@@ -210,7 +210,7 @@ jobs:
       - name: Stage modified blog posts
         if: steps.changed-files.outputs.has_changes == 'true'
         run: |
-          git add src/content/blog/**/*.mdx src/pages/history/years/**/*.mdx || true
+          git add src/content/blog/ src/pages/history/years/ 2>/dev/null || true
           echo "Staged modified MDX files"
 
       - name: Delete local images from repo
