@@ -1,6 +1,7 @@
 # Decap CMS Configuration for Team 2053
 backend:
-  name: git-gateway
+  name: github
+  repo: frc2053/team2053.org
   branch: main
 
 # Publish mode: editorial workflow for draft/review/publish flow, or simple for immediate publish
