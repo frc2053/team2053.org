@@ -1,0 +1,44 @@
+# The whole site's configuration. Hugo is pinned in .github/workflows/publish.yml;
+# this file deliberately does not restate the version.
+
+baseURL: https://frc2053.github.io/team2053.org/
+locale: en-US
+title: Southern Tier Robotics
+
+# "Last updated" comes from the commit date, never from a field anyone types.
+enableGitInfo: true
+frontmatter:
+  lastmod: [':git']
+
+# The Astro app still owns ./public until it is torn down, so Hugo builds
+# somewhere else. Both the workflow and scripts/check-site.sh read this.
+publishDir: _site
+
+enableRobotsTXT: true
+
+# The content model has no tags and no categories, so their pages should not exist.
+disableKinds: [taxonomy, term]
+
+# The five prose pages live under content/pages/ so the CMS can address them as
+# a fixed file collection, but they serve at the top level: /about/, /contact/.
+permalinks:
+  page:
+    pages: /:slug/
+
+menus:
+  main:
+    - name: Home
+      pageRef: /
+      weight: 10
+
+# Menu membership is supplied here, never by a field in a content file, so no
+# student can strand or dangle a page. An unweighted page sorts to the end.
+cascade:
+  - target:
+      path: /pages/contact
+    menus: main
+    weight: 80
+
+params:
+  contactEmail: southerntierrobotics@gmail.com
+  affiliation: FIRST® Robotics Competition Team 2053 · Vestal, NY

@@ -1,0 +1,84 @@
+/* team2053.org — one shared layout: "Column", hero treatment "focal band".
+   Font and image URLs here are relative to this file, so the stylesheet works
+   unchanged at frc2053.github.io/team2053.org/ and at team2053.org/. */
+
+@font-face{font-family:'Space Mono';font-style:normal;font-weight:400;font-display:swap;
+  src:url(../fonts/spacemono-regular-webfont.woff2) format('woff2'),url(../fonts/spacemono-regular-webfont.woff) format('woff')}
+@font-face{font-family:'Space Mono';font-style:italic;font-weight:400;font-display:swap;
+  src:url(../fonts/spacemono-italic-webfont.woff2) format('woff2'),url(../fonts/spacemono-italic-webfont.woff) format('woff')}
+@font-face{font-family:'Space Mono';font-style:normal;font-weight:700;font-display:swap;
+  src:url(../fonts/spacemono-bold-webfont.woff2) format('woff2'),url(../fonts/spacemono-bold-webfont.woff) format('woff')}
+@font-face{font-family:'Space Mono';font-style:italic;font-weight:700;font-display:swap;
+  src:url(../fonts/spacemono-bolditalic-webfont.woff2) format('woff2'),url(../fonts/spacemono-bolditalic-webfont.woff) format('woff')}
+
+:root{
+  --purple:#4600AA; --red:#DC0000;
+  --bg:#000; --fg:#fff; --dim:#a9a3b5; --line:#2a2432; --panel:#0d0a12;
+  --mono:'Space Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  --measure:68ch;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--bg);color:var(--fg);font-family:var(--mono);font-size:17px;line-height:1.65;-webkit-font-smoothing:antialiased}
+img{max-width:100%;display:block}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--red);outline-offset:3px}
+
+/* ── header ──────────────────────────────────────────────────── */
+.head{border-bottom:1px solid var(--line);padding:1.6rem 1rem 1.1rem;text-align:center}
+.mark{display:block;font-weight:700;letter-spacing:.24em;font-size:.82rem;text-transform:uppercase;text-decoration:none}
+.mark b{color:var(--red)}
+.nav{display:flex;flex-wrap:wrap;justify-content:center;gap:.4rem 1.5rem;margin-top:1rem}
+.nav a{text-decoration:none;font-size:.8rem;letter-spacing:.06em;color:var(--dim);padding:.2rem 0;border-bottom:2px solid transparent}
+.nav a:hover{color:var(--fg)}
+.nav a[aria-current]{color:var(--fg);border-bottom-color:var(--red)}
+
+/* ── hero: focal band ────────────────────────────────────────────
+   Fixed-height full-bleed band. It crops, but object-position biases the
+   crop to the upper third, where faces sit in every team photo. */
+.hero{position:relative;height:min(52vh,460px);overflow:hidden;background:var(--panel)}
+.hero img{width:100%;height:100%;object-fit:cover;object-position:50% 28%}
+.hero-scrim{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.92) 0%,rgba(0,0,0,.35) 55%,transparent 100%)}
+.hero-cap{position:absolute;left:0;right:0;bottom:0;padding:2rem 1rem;max-width:var(--measure);margin:0 auto}
+.hero-cap h1,.noimg h1{font-size:clamp(1.9rem,5vw,3rem);line-height:1.15;font-weight:700;margin:0}
+.hero-cap .updated,.noimg .updated{display:block;margin-top:.7rem}
+
+/* No hero image: a plain title block, never an empty 460px void. */
+.noimg{max-width:var(--measure);margin:0 auto;padding:3.5rem 1rem 0}
+
+.updated{font-size:.72rem;letter-spacing:.09em;text-transform:uppercase;color:var(--dim)}
+
+/* ── body: one 68ch measure ──────────────────────────────────── */
+.body{max-width:var(--measure);margin:0 auto;padding:2.5rem 1rem 0}
+.body>p:first-child{font-size:1.15rem;color:var(--dim);margin-bottom:2rem}
+
+/* Every heading level the rich-text editor can reach is styled. A student can
+   pick any of them and no document will ever have to warn them off one. */
+.body :is(h1,h2,h3,h4,h5,h6){line-height:1.2;font-weight:700}
+.body h1{font-size:1.8rem;margin:3.2rem 0 1rem;padding-top:1rem;border-top:3px solid var(--red)}
+.body h2{font-size:1.45rem;margin:3rem 0 1rem;padding-top:1rem;border-top:3px solid var(--red)}
+.body h3{font-size:1.2rem;margin:2.4rem 0 .8rem}
+.body h4{font-size:1.02rem;margin:2rem 0 .6rem}
+.body h5{font-size:.85rem;margin:1.8rem 0 .5rem;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}
+.body h6{font-size:.75rem;margin:1.6rem 0 .5rem;letter-spacing:.16em;text-transform:uppercase;color:var(--dim)}
+.body :is(h1,h2,h3,h4,h5,h6):first-child{margin-top:0;padding-top:0;border-top:0}
+
+.body p{margin:0 0 1.1em}
+.body :is(ul,ol){margin:0 0 1.2em;padding-left:1.4em}
+.body li{margin:.35em 0}
+.body a{text-decoration:underline;text-decoration-color:var(--red);text-underline-offset:.2em}
+.body img{width:100%;border-radius:.6rem;margin:1.6rem 0}
+.body figure{margin:1.6rem 0}
+.body figcaption{font-size:.72rem;color:var(--dim);margin-top:.5rem}
+.body blockquote{margin:1.6rem 0;padding:.2rem 0 .2rem 1.2rem;border-left:3px solid var(--line);color:var(--dim)}
+.body hr{border:0;border-top:1px solid var(--line);margin:2.5rem 0}
+.body code{font-size:.85em;background:var(--panel);border:1px solid var(--line);border-radius:.3rem;padding:.1em .35em}
+.body pre{background:var(--panel);border:1px solid var(--line);border-radius:.5rem;padding:1rem;overflow-x:auto}
+.body pre code{background:none;border:0;padding:0}
+.body table{width:100%;border-collapse:collapse;margin:1.6rem 0;font-size:.9rem;display:block;overflow-x:auto}
+.body :is(th,td){border:1px solid var(--line);padding:.5rem .7rem;text-align:left}
+.body th{background:var(--panel)}
+
+/* ── footer ──────────────────────────────────────────────────── */
+.foot{max-width:var(--measure);margin:6rem auto 0;padding:2rem 1rem 3rem;border-top:1px solid var(--line);text-align:center}
+.foot small{display:block;margin-top:1.2rem;color:var(--dim);font-size:.72rem;line-height:1.8}

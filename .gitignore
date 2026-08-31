@@ -22,3 +22,7 @@ pnpm-debug.log*
 
 icon.d.ts
 *.cache
+# Hugo build output and caches
+/_site/
+/resources/
+.hugo_build.lock

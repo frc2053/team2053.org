@@ -1,0 +1,3 @@
+{{- /* Same base-path treatment as images. mailto:, tel: and absolute URLs are
+       left exactly as written. */ -}}
+<a href="{{ partial "url.html" .Destination }}"{{ with .Title }} title="{{ . }}"{{ end }}>{{ .Text }}</a>

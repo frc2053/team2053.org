@@ -1,0 +1,3 @@
+{{/* Derived from the commit date via enableGitInfo. Never a typed field, and
+     never `now` — a frozen site must not claim to be fresh. */}}
+{{ if not .Lastmod.IsZero }}<span class="updated">Updated {{ .Lastmod.Format "January 2006" }}</span>{{ end }}

@@ -1,0 +1,138 @@
+#!/usr/bin/env bash
+#
+# Assertions over the site Hugo generated. Shell only, no Node, no npm.
+#
+# This NEVER gates the deploy. It runs as its own job in
+# .github/workflows/publish.yml so that a failure here emails the team and
+# shows red in the Actions tab while the site still publishes. A blocking
+# check would turn one bad image on one page into a site-wide publishing
+# freeze that nobody left here could diagnose.
+#
+# Usage:  scripts/check-site.sh [site-directory]
+# Run from the repository root; the defaults come out of hugo.yaml.
+
+set -uo pipefail
+
+CONFIG=hugo.yaml
+if [ ! -f "$CONFIG" ]; then
+  echo "check-site.sh must be run from the repository root (no $CONFIG here)" >&2
+  exit 2
+fi
+
+read_key() { sed -n "s/^$1:[[:space:]]*//p" "$CONFIG" | head -1 | tr -d "\"' " ; }
+
+SITE="${1:-$(read_key publishDir)}"
+SITE="${SITE:-public}"
+SITE="${SITE%/}"
+
+# The site is staged under a subdirectory (frc2053.github.io/team2053.org/) and
+# moves to the domain root at cutover. Links are checked against whichever the
+# config says, so a reference that only works at one of them is caught here.
+BASE_PATH=$(read_key baseURL | sed -E 's|^[a-z]+://[^/]*||')
+[ -z "$BASE_PATH" ] && BASE_PATH="/"
+case "$BASE_PATH" in */) ;; *) BASE_PATH="$BASE_PATH/" ;; esac
+
+if [ ! -d "$SITE" ]; then
+  echo "no site to check: $SITE does not exist (run hugo first)" >&2
+  exit 2
+fi
+
+failures=0
+pass() { printf 'ok    %s\n' "$1"; }
+fail() { printf 'FAIL  %s\n' "$1"; failures=$((failures + 1)); }
+detail() { printf '        %s\n' "$1"; }
+
+html_files() { find "$SITE" -type f -name '*.html' | sort; }
+
+# ── 1. Nothing is served from CloudFront ──────────────────────────────────
+# The highest-value assertion here: it is the difference between the image
+# repatriation being complete and being 95% complete.
+hits=$(grep -rlI 'cloudfront\.net' "$SITE" 2>/dev/null)
+if [ -n "$hits" ]; then
+  fail "cloudfront.net still referenced"
+  printf '%s\n' "$hits" | while read -r f; do detail "$f"; done
+else
+  pass "no cloudfront.net reference anywhere in $SITE"
+fi
+
+# ── 2. No unrendered template syntax ──────────────────────────────────────
+# Catches MDX and shortcode leftovers that survived migration without
+# breaking the build.
+hits=$(grep -rlIF '{{' --include='*.html' "$SITE" 2>/dev/null)
+if [ -n "$hits" ]; then
+  fail "literal {{ found in rendered HTML"
+  printf '%s\n' "$hits" | while read -r f; do detail "$f"; done
+else
+  pass "no literal {{ in rendered HTML"
+fi
+
+# ── 3. Every local reference resolves to something on disk ────────────────
+# Catches a mistyped image path, a deleted-but-still-referenced image, and a
+# nav entry pointing at a page that no longer exists.
+broken=0
+while IFS= read -r f; do
+  dir=$(dirname "$f")
+  case "$f" in
+    *.html) raw=$(grep -oE '(src|href)=("[^"]*"|[^[:space:]>]+)' "$f" | sed -E 's/^(src|href)=//; s/^"//; s/"$//') ;;
+    *.css)  raw=$(grep -oE 'url\([^)]*\)' "$f" | sed -E 's/^url\(//; s/\)$//; s/^["'"'"']//; s/["'"'"']$//') ;;
+    *)      continue ;;
+  esac
+
+  while IFS= read -r ref; do
+    ref=${ref%%#*}
+    ref=${ref%%\?*}
+    ref=${ref//%20/ }
+    [ -z "$ref" ] && continue
+    # Skip anything with a scheme (http:, mailto:, tel:, data:) and //host refs.
+    case "$ref" in
+      //*) continue ;;
+      *:*) case "$ref" in */*:*) ;; *) continue ;; esac ;;
+    esac
+
+    if [ "${ref#/}" != "$ref" ]; then
+      if [ "${ref#$BASE_PATH}" = "$ref" ] && [ "$BASE_PATH" != "/" ]; then
+        fail "reference outside the site base path $BASE_PATH: $ref"
+        detail "in $f"
+        broken=$((broken + 1))
+        continue
+      fi
+      target="$SITE/${ref#$BASE_PATH}"
+    else
+      target="$dir/$ref"
+    fi
+
+    if [ ! -e "$target" ] && [ ! -e "$target/index.html" ]; then
+      fail "dangling reference: $ref"
+      detail "in $f"
+      broken=$((broken + 1))
+    fi
+  done <<< "$raw"
+done < <(find "$SITE" -type f \( -name '*.html' -o -name '*.css' \) | sort)
+
+[ "$broken" -eq 0 ] && pass "every local src/href/url() resolves to a file in $SITE"
+
+# ── 4. No four-digit year in the footer ───────────────────────────────────
+# A build frozen in 2029 must not print a stale copyright line, which is why
+# getFullYear() was removed. "2053" is the team number, not a year, so it is
+# stripped before the year pattern is applied.
+yearly=0
+while IFS= read -r f; do
+  footer=$(tr '\n' ' ' < "$f" | grep -oE '<footer[^>]*>.*</footer>' | head -1)
+  [ -z "$footer" ] && continue
+  if printf '%s' "${footer//2053/}" | grep -qE '(19|20)[0-9]{2}'; then
+    fail "four-digit year in the footer of $f"
+    yearly=$((yearly + 1))
+  elif printf '%s' "$footer" | grep -qiE '&copy;|©|copyright'; then
+    fail "copyright notice in the footer of $f"
+    yearly=$((yearly + 1))
+  fi
+done < <(html_files)
+
+[ "$yearly" -eq 0 ] && pass "no year and no copyright notice in any footer"
+
+echo
+if [ "$failures" -gt 0 ]; then
+  echo "$failures check(s) failed. The site still deployed; this is a content problem, not an outage."
+  exit 1
+fi
+echo "all checks passed"

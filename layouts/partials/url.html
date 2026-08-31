@@ -1,0 +1,9 @@
+{{- /* Resolve a path written in content or front matter against the site's base
+       path. A leading slash has to be trimmed first: relURL leaves an already-
+       rooted path alone, which would 404 at frc2053.github.io/team2053.org/.
+       Anything with a scheme (http:, mailto:, data:) is returned untouched. */ -}}
+{{- $u := . -}}
+{{- if hasPrefix $u "/" -}}
+  {{- $u = relURL (strings.TrimPrefix "/" $u) -}}
+{{- end -}}
+{{- return $u -}}

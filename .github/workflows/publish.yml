@@ -1,0 +1,88 @@
+# The name matters: GitHub's failure email subject reads
+# "Run failed: Publish the website", which has to mean something to a reader
+# who has never opened this repository.
+name: Publish the website
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+env:
+  # Hugo comes from a pinned GitHub release URL, never a third-party action, so
+  # nothing outside this repository decides which generator builds the site.
+  # Standard edition, not extended: nothing here compiles SCSS.
+  HUGO_VERSION: 0.165.0
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          # Full history, or enableGitInfo stamps every page with the same
+          # "Last updated" date.
+          fetch-depth: 0
+
+      - name: Install Hugo
+        run: |
+          curl -sSLf -o /tmp/hugo.tar.gz \
+            "https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_${HUGO_VERSION}_linux-amd64.tar.gz"
+          tar -xzf /tmp/hugo.tar.gz -C /tmp hugo
+          sudo install /tmp/hugo /usr/local/bin/hugo
+          hugo version
+
+      - name: Build the site
+        run: hugo --gc --minify
+
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: ./_site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5
+
+  # A sibling of deploy, never a dependency of it. A failing check turns this
+  # run red and sends the failure email; it cannot stop the site from
+  # publishing. Blocking would convert one student's broken image into a
+  # permanent, site-wide publishing freeze that nobody left here could
+  # diagnose - strictly the wrong direction.
+  #
+  # It rebuilds rather than reading deploy's artifact so that it depends on
+  # nothing but the pinned Hugo above.
+  check:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Install Hugo
+        run: |
+          curl -sSLf -o /tmp/hugo.tar.gz \
+            "https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_${HUGO_VERSION}_linux-amd64.tar.gz"
+          tar -xzf /tmp/hugo.tar.gz -C /tmp hugo
+          sudo install /tmp/hugo /usr/local/bin/hugo
+
+      - name: Build the site
+        run: hugo --gc --minify
+
+      - name: Check the generated site
+        run: ./scripts/check-site.sh
