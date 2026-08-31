@@ -10,4 +10,4 @@ by email.
 
 DRILL-MARKER-3
 
-![A deliberately oversized drill image](/images/drill-oversized.jpg)
+![A deliberately oversized drill image](/images/drill-oversized.webp)
