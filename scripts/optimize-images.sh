@@ -70,6 +70,19 @@ TOP_QUALITY=${TOP_RUNG##*:}
 # lands outside this directory is reported rather than silently skipped.
 MEDIA_ROOT=static/images
 
+# Where references are rewritten: every tracked text file EXCEPT the committed
+# CMS bundle under static/admin/.
+#
+# This is not the directory allowlist the comment above refuses. It is one
+# denylist entry for 2 MB of minified third-party JavaScript that cannot
+# legitimately reference an image in this repository - and which does contain
+# the literal string `image.png`, about the likeliest name a student's upload
+# could carry. In scope, a single upload called image.png would edit the CMS
+# bundle and report a successful optimization; the alternative outcome, if the
+# edit did not take, is the coverage check aborting every run from then on.
+# Everything a page can actually be written in stays in scope.
+REF_SCOPE=(. ':(exclude)static/admin')
+
 TAB=$(printf '\t')
 
 say()  { printf 'optimize-images: %s\n' "$*"; }
@@ -206,7 +219,7 @@ rewrite_refs() {
 
   # Exit 1 is "no matches"; anything above that is a failure, and treating it
   # as "no matches" would rewrite nothing and report success.
-  git grep -l -I -F -z -e "$old" -- . > "$TMP/hits"
+  git grep -l -I -F -z -e "$old" -- "${REF_SCOPE[@]}" > "$TMP/hits"
   case $? in 0|1) ;; *) return 1 ;; esac
 
   while IFS= read -r -d '' file; do
@@ -320,7 +333,7 @@ while IFS="$TAB" read -r src dst new; do
   [ -e "$src" ] && die "$src is still present alongside $dst"
   # Same three-way status. A `git grep` that errors here and is read as "clean"
   # is the one path in this script that can publish a broken image.
-  git grep -q -I -E -e "$(bounded_pattern "$(basename "$src")")" -- .
+  git grep -q -I -E -e "$(bounded_pattern "$(basename "$src")")" -- "${REF_SCOPE[@]}"
   case $? in
     0) die "references to $(basename "$src") survive; aborting rather than publishing a broken image" ;;
     1) ;;

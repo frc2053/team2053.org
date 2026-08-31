@@ -149,6 +149,14 @@ jobs:
       - name: Check the generated site
         run: ./scripts/check-site.sh
 
+      # The CMS config is checked against the source tree, not the built site:
+      # it names content files and a media folder that the rest of the
+      # repository has to agree with, and every way they can disagree is
+      # silent. Needs no Hugo and no image tooling.
+      - name: Check the CMS configuration
+        if: always()
+        run: ./scripts/check-cms-config.sh
+
       # The optimizer rewrites files repo-wide and then commits them, so it is
       # the one piece here whose failure would be silent and site-wide. Its
       # fixture tests run against a throwaway tree under $TMPDIR and touch
@@ -160,3 +168,7 @@ jobs:
       - name: Test the image optimizer
         if: always()
         run: ./scripts/test-optimize-images.sh
+
+      - name: Test the CMS configuration checker
+        if: always()
+        run: ./scripts/test-check-cms-config.sh

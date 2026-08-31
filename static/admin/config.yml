@@ -1,0 +1,127 @@
+# What the CMS shows a student, and where it puts what they write.
+#
+# Sveltia loads this from alongside index.html - /admin/config.yml - working it
+# out from the page's own path. That is why nothing here is an absolute URL to
+# this site: the same file is correct at frc2053.github.io/team2053.org/admin/
+# today and at team2053.org/admin/ after cutover.
+
+backend:
+  name: github
+  repo: frc2053/team2053.org
+  branch: main
+  # Token only. The alternative, OAuth, needs an OAuth client this project does
+  # not run - Sveltia defaults to Netlify's - so leaving it enabled would put a
+  # second sign-in button on the login screen that can never work, next to the
+  # one that does. Students hold the token and never a login, which is also
+  # what keeps the str-coder machine account inside GitHub's terms of service.
+  auth_methods: [token]
+
+# No review gate, as a decision rather than a limitation. Sveltia's editorial
+# workflow exists and is declined: a gate with no reviewer turns "published
+# immediately" into "never published", and it would need a token wider than
+# Contents: write.
+publish_mode: simple
+
+# DELIBERATELY ABSENT: `skip_ci`. Setting it to EITHER value puts a "skip CI"
+# toggle on the Publish button - the flag only controls which way it starts.
+# A student who flips it publishes a commit carrying `[skip ci]`, which is an
+# edit that lands in the repository and silently never reaches the site.
+# Omitted, the toggle does not render at all and every publish builds.
+
+app_title: Southern Tier Robotics
+
+# One shared folder for every image, never per-page bundles. Deleting an entry
+# that owns a bundle offers to delete the images inside it, and an image can be
+# referenced from more than one page - so that offer is a way to break pages
+# other than the one being deleted. A shared folder has no such offer.
+media_folder: static/images
+public_folder: /images
+
+media_libraries:
+  default:
+    config:
+      # Normalize the upload in the browser, before it ever enters git: a phone
+      # photo becomes a 1920px WebP on the way in.
+      transformations:
+        raster_image:
+          format: webp
+          width: 1920
+          quality: 85
+
+      # 20 MiB, generous on purpose.
+      #
+      # VERIFIED against the bundle's own source, because the documentation
+      # does not say which side of the transform this applies to, and it
+      # inverts the setting. `services/assets/process.js` transforms the file
+      # FIRST and then tests `file.size > maxFileSize`, so the cap is measured
+      # against the transformed WebP, not the original upload.
+      #
+      # It is still not set to the site's 300 KB ceiling. A file over the cap
+      # is not shrunk further or explained - it is listed as oversized and
+      # cannot be uploaded at all, which strands the student with nothing to
+      # do. The 300 KB ceiling is enforced after the commit instead, by
+      # scripts/optimize-images.sh, which steps quality down until it fits.
+      max_file_size: 20971520
+
+      # scripts/optimize-images.sh states that "the CMS slugifies uploads" and
+      # rewrites references with sed on the strength of it; check-site.sh
+      # resolves the same names as URLs. Sveltia keeps the original filename by
+      # DEFAULT, so without this line `Beach Day (2).JPG` would arrive with its
+      # spaces, parentheses and capitals intact. This is the line that makes
+      # the rest of the pipeline's assumption true.
+      slugify_filename: true
+
+# Feeds slugify_filename above, and the slug of any entry created from a title
+# by a later collection. The default is `unicode`, which keeps accented and
+# non-Latin characters in a filename verbatim.
+slug:
+  encoding: ascii
+  clean_accents: true
+
+collections:
+  - name: pages
+    label: Pages
+    label_singular: Page
+    format: yaml-frontmatter
+    # A FILE collection: a fixed list of entries. It has no `create` option and
+    # no `delete` option - not set to false, absent from the shape - so these
+    # pages are undeletable by construction rather than by a rule in a document
+    # nobody reads.
+    #
+    # Three of the five prose pages are missing from this list because they do
+    # not exist yet; slices 09 and 11 write them and add them here. An entry
+    # pointing at a file that is not in the repository shows a student a blank
+    # page and invites them to publish it, so scripts/check-cms-config.sh
+    # fails the build if this list and the content tree ever disagree.
+    files:
+      - name: home
+        label: Home
+        file: content/_index.md
+        # Anchored, and reused verbatim below, so the prose pages cannot drift
+        # into several different shapes as they are added.
+        fields: &page_fields
+          - name: title
+            label: Title
+            widget: string
+          - name: description
+            label: Search description
+            widget: string
+            required: false
+            hint: One sentence, shown by Google under the page's title.
+          - name: heroImage
+            label: Banner image
+            widget: image
+            required: false
+            hint: The wide picture across the top. Leave empty for no banner.
+          - name: heroImageAlt
+            label: Banner image description
+            widget: string
+            required: false
+            hint: What is in the picture, for people using a screen reader.
+          - name: body
+            label: Page
+            widget: markdown
+      - name: contact
+        label: Contact
+        file: content/pages/contact.md
+        fields: *page_fields

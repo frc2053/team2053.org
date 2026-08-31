@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- The editor is not a page of the site. Keep it out of search results. -->
+<meta name="robots" content="noindex">
+<title>Edit the website</title>
+</head>
+<body>
+<!--
+  Sveltia CMS 0.203.2, committed rather than loaded from a CDN.
+
+  WHY COMMITTED
+  The project ships multiple releases a day, is still 0.x, and its documented
+  install snippet carries no version constraint - so a CDN copy would change
+  underneath this site on a schedule nobody here is watching. The committed
+  copy is what makes "if the maintainer stops, nothing happens" literally
+  true: this bundle keeps working whatever upstream does.
+
+  PROVENANCE - how to verify this file, or replace it
+  It is byte-identical to `dist/sveltia-cms.js` inside the published npm
+  tarball. To check, or to upgrade by repeating the same three lines with a
+  newer version number:
+
+    curl -sSLfo cms.tgz https://registry.npmjs.org/@sveltia/cms/-/cms-0.203.2.tgz
+    tar -xzf cms.tgz package/dist/sveltia-cms.js
+    shasum -a 256 package/dist/sveltia-cms.js
+    # 98c4196ceec117528c65290213c7ed5578503bb1038a0aef6a42919bac9a0b4c
+
+  The sourcemap alongside it in that tarball is deliberately NOT committed:
+  7.9 MB in every clone to give browser devtools original sources for a
+  dependency nobody here will debug. Devtools will 404 looking for it, which
+  nothing but devtools ever notices.
+
+  THE SCRIPT TAG
+  No `type="module"`, and no stylesheet link. This build is a plain classic
+  script that initializes itself, and Sveltia logs a warning about both of
+  those if you add them. The `src` is relative on purpose: the site is served
+  from a subdirectory today (/team2053.org/) and moves to the domain root at
+  cutover, and a relative path is correct at both. Sveltia finds config.yml
+  next to this page the same way.
+-->
+<script src="sveltia-cms.js"></script>
+</body>
+</html>

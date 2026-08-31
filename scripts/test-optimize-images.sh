@@ -404,6 +404,44 @@ else
   fail "deploy hangs off build, so a failed build deploys nothing"
 fi
 
+# ── 13. The committed CMS bundle is never rewritten ───────────────────────
+# static/admin/sveltia-cms.js is 2 MB of minified third-party JavaScript, and
+# it happens to contain the string `image.png`. `image.png` is also about the
+# most likely name a student's upload could carry. Left in scope, the rewrite
+# would edit that string inside the bundle - silently corrupting the CMS while
+# reporting a successful optimization.
+R="$WORK/vendored"
+make_fixture "$R"
+mkdir -p "$R/static/admin"
+cp "$ROOT/static/admin/sveltia-cms.js" "$R/static/admin/sveltia-cms.js"
+cp "$FIXTURE_JPEG" "$R/static/images/image.png"
+printf 'hero: /images/image.png\n' > "$R/content/uploaded.md"
+git -C "$R" add -A
+git -C "$R" commit -qm 'an upload named like a string inside the CMS bundle'
+
+bundle_before=$(sha_of "$R/static/admin/sveltia-cms.js")
+if run_optimizer "$R"; then
+  pass "the optimizer exits 0 with the CMS bundle in the tree"
+else
+  fail "the optimizer exits 0 with the CMS bundle in the tree"
+  while IFS= read -r l; do detail "$l"; done < "$WORK/out.log"
+fi
+
+if [ "$(sha_of "$R/static/admin/sveltia-cms.js")" = "$bundle_before" ]; then
+  pass "the committed CMS bundle is byte-identical after a rewrite of image.png"
+else
+  fail "the committed CMS bundle is byte-identical after a rewrite of image.png"
+  detail "the rewrite edited 2 MB of vendored third-party JavaScript"
+fi
+
+# The real reference still has to have been rewritten, or the test above would
+# pass just as well against an optimizer that gave up entirely.
+if [ -f "$R/static/images/image.webp" ] && grep -qF '/images/image.webp' "$R/content/uploaded.md"; then
+  pass "the upload was still converted and its real reference rewritten"
+else
+  fail "the upload was still converted and its real reference rewritten"
+fi
+
 echo
 if [ "$failures" -gt 0 ]; then
   echo "$failures check(s) failed."
