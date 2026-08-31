@@ -24,11 +24,65 @@ env:
   HUGO_VERSION: 0.165.0
 
 jobs:
+  # Runs BEFORE the build, in the same workflow, on purpose. A push made with
+  # GITHUB_TOKEN does not trigger workflows, so an optimizer living in its own
+  # workflow would rename a file and rewrite its references with nothing left
+  # to rebuild the site - leaving the deployed pages pointing at a filename
+  # that no longer exists. That is a 404 on every optimized image. Building
+  # from this job's output instead removes the second trigger entirely.
+  optimize:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    outputs:
+      # The commit the rest of the workflow builds. Empty if this job failed,
+      # which is what makes the fallback below ship the un-optimized state.
+      sha: ${{ steps.push.outputs.sha }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          # Not shallow: a shallow clone cannot push what it commits.
+          fetch-depth: 0
+
+      - name: Install image tooling
+        # Neither ImageMagick nor libwebp is preinstalled on ubuntu-latest
+        # (checked against actions/runner-images), so `webp` is installed here -
+        # the whole dependency, about 200 KB, and still no Node anywhere.
+        run: command -v cwebp >/dev/null || { sudo apt-get update -qq && sudo apt-get install -y -qq webp; }
+
+      - name: Identify the committer
+        # actions/checkout sets up credentials but not an identity, and git
+        # refuses to commit without one. Without this the optimizer would roll
+        # back and report a failed run on every push that has work to do -
+        # images never shrunk, and a permanently red workflow.
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+
+      - name: Optimize images
+        run: ./scripts/optimize-images.sh
+
+      - name: Push the optimized tree
+        id: push
+        run: |
+          git push origin "HEAD:${GITHUB_REF}"
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+        env:
+          GITHUB_REF: ${{ github.ref }}
+
   build:
+    needs: optimize
+    # A failed optimize must still ship. The site going one push without its
+    # images being shrunk is a slow page; the site not updating at all is an
+    # outage nobody left here can lift.
+    if: always()
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
         with:
+          # What optimize left behind, or - if it failed and pushed nothing -
+          # the commit that triggered the run.
+          ref: ${{ needs.optimize.outputs.sha || github.sha }}
           # Full history, or enableGitInfo stamps every page with the same
           # "Last updated" date.
           fetch-depth: 0
@@ -67,11 +121,19 @@ jobs:
   # It rebuilds rather than reading deploy's artifact so that it depends on
   # nothing but the pinned Hugo above.
   check:
-    needs: build
+    needs: [optimize, build]
+    # `always()` is what lifts the automatic skip when a needed job failed -
+    # without it a failed optimize would silently take the checks with it. The
+    # second half is what keeps slice 03's drill true: a build that failed
+    # produced no site, and a second red job asserting that would only obscure
+    # the first one. Together: "check whatever optimize did, if there is a
+    # site to check".
+    if: always() && needs.build.result == 'success'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
         with:
+          ref: ${{ needs.optimize.outputs.sha || github.sha }}
           fetch-depth: 0
 
       - name: Install Hugo
@@ -86,3 +148,15 @@ jobs:
 
       - name: Check the generated site
         run: ./scripts/check-site.sh
+
+      # The optimizer rewrites files repo-wide and then commits them, so it is
+      # the one piece here whose failure would be silent and site-wide. Its
+      # fixture tests run against a throwaway tree under $TMPDIR and touch
+      # nothing real.
+      - name: Install image tooling
+        if: always()
+        run: command -v cwebp >/dev/null || { sudo apt-get update -qq && sudo apt-get install -y -qq webp; }
+
+      - name: Test the image optimizer
+        if: always()
+        run: ./scripts/test-optimize-images.sh
