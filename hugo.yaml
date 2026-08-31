@@ -1,7 +1,7 @@
 # The whole site's configuration. Hugo is pinned in .github/workflows/publish.yml;
 # this file deliberately does not restate the version.
 
-baseURL: https://frc2053.github.io/team2053.org/
+baseURL: https://team2053.org/
 locale: en-US
 title: Southern Tier Robotics
 
