@@ -11,6 +11,8 @@
 # Usage:  scripts/check-site.sh [site-directory]
 # Run from the repository root; the defaults come out of hugo.yaml.
 
+# Deliberately no `set -e`: every check has to run so one failure does not hide
+# the rest. Failures are counted, and the exit status comes from the count.
 set -uo pipefail
 
 CONFIG=hugo.yaml
@@ -19,7 +21,11 @@ if [ ! -f "$CONFIG" ]; then
   exit 2
 fi
 
-read_key() { sed -n "s/^$1:[[:space:]]*//p" "$CONFIG" | head -1 | tr -d "\"' " ; }
+# Reads a top-level scalar out of hugo.yaml, dropping quotes and any trailing
+# `# comment`. Enough for baseURL and publishDir; not a YAML parser.
+read_key() {
+  sed -n "s/^$1:[[:space:]]*//p" "$CONFIG" | head -1 | sed 's/[[:space:]]*#.*$//' | tr -d "\"' "
+}
 
 SITE="${1:-$(read_key publishDir)}"
 SITE="${SITE:-public}"
@@ -42,29 +48,42 @@ pass() { printf 'ok    %s\n' "$1"; }
 fail() { printf 'FAIL  %s\n' "$1"; failures=$((failures + 1)); }
 detail() { printf '        %s\n' "$1"; }
 
-html_files() { find "$SITE" -type f -name '*.html' | sort; }
+# Fails if $2 (a grep pattern) appears anywhere in the site.
+assert_absent() {
+  local label="$1" pattern="$2" hits
+  shift 2
+  hits=$(grep -rlI "$@" -e "$pattern" "$SITE" 2>/dev/null)
+  if [ -n "$hits" ]; then
+    fail "$label"
+    while IFS= read -r f; do detail "$f"; done <<< "$hits"
+  else
+    pass "no $label"
+  fi
+}
+
+# ── 0. The site is not empty ──────────────────────────────────────────────
+# Hugo exits 0 and writes no HTML at all if a layout is missing, and every
+# other check below reports ok over an empty tree. Without this the whole
+# script blesses a blank deploy, which is the Tier 0 failure it exists to
+# prevent.
+pages=$(find "$SITE" -type f -name '*.html' | wc -l | tr -d ' ')
+if [ "$pages" -lt 1 ]; then
+  fail "the build produced no HTML pages at all"
+  echo
+  echo "1 check failed. Nothing else was checked: there is no site to check."
+  exit 1
+fi
+pass "the build produced $pages HTML page(s)"
 
 # ── 1. Nothing is served from CloudFront ──────────────────────────────────
 # The highest-value assertion here: it is the difference between the image
 # repatriation being complete and being 95% complete.
-hits=$(grep -rlI 'cloudfront\.net' "$SITE" 2>/dev/null)
-if [ -n "$hits" ]; then
-  fail "cloudfront.net still referenced"
-  printf '%s\n' "$hits" | while read -r f; do detail "$f"; done
-else
-  pass "no cloudfront.net reference anywhere in $SITE"
-fi
+assert_absent "cloudfront.net reference anywhere in $SITE" 'cloudfront\.net'
 
 # ── 2. No unrendered template syntax ──────────────────────────────────────
 # Catches MDX and shortcode leftovers that survived migration without
 # breaking the build.
-hits=$(grep -rlIF '{{' --include='*.html' "$SITE" 2>/dev/null)
-if [ -n "$hits" ]; then
-  fail "literal {{ found in rendered HTML"
-  printf '%s\n' "$hits" | while read -r f; do detail "$f"; done
-else
-  pass "no literal {{ in rendered HTML"
-fi
+assert_absent "literal {{ in rendered HTML" '{{' -F --include='*.html'
 
 # ── 3. Every local reference resolves to something on disk ────────────────
 # Catches a mistyped image path, a deleted-but-still-referenced image, and a
@@ -81,6 +100,8 @@ while IFS= read -r f; do
   while IFS= read -r ref; do
     ref=${ref%%#*}
     ref=${ref%%\?*}
+    # Repatriation guarantees every filename matches [A-Za-z0-9._/-], so a
+    # space is the only percent-encoding this has to undo.
     ref=${ref//%20/ }
     [ -z "$ref" ] && continue
     # Skip anything with a scheme (http:, mailto:, tel:, data:) and //host refs.
@@ -90,13 +111,14 @@ while IFS= read -r f; do
     esac
 
     if [ "${ref#/}" != "$ref" ]; then
-      if [ "${ref#$BASE_PATH}" = "$ref" ] && [ "$BASE_PATH" != "/" ]; then
+      # Quoted so a base path is matched literally, never as a glob.
+      if [ "${ref#"$BASE_PATH"}" = "$ref" ] && [ "$BASE_PATH" != "/" ]; then
         fail "reference outside the site base path $BASE_PATH: $ref"
         detail "in $f"
         broken=$((broken + 1))
         continue
       fi
-      target="$SITE/${ref#$BASE_PATH}"
+      target="$SITE/${ref#"$BASE_PATH"}"
     else
       target="$dir/$ref"
     fi
@@ -126,7 +148,7 @@ while IFS= read -r f; do
     fail "copyright notice in the footer of $f"
     yearly=$((yearly + 1))
   fi
-done < <(html_files)
+done < <(find "$SITE" -type f -name '*.html' | sort)
 
 [ "$yearly" -eq 0 ] && pass "no year and no copyright notice in any footer"
 

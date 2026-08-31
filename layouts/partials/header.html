@@ -1,11 +1,10 @@
 <header class="head">
-  <a class="mark" href="{{ "" | relURL }}">Southern Tier <b>Robotics</b></a>
+  <a class="mark" href="{{ "" | relURL }}">{{ partial "wordmark.html" }}</a>
   {{/* The row wraps rather than reorders: a 9th and 10th item make the header
        one line taller, with no hamburger and no breakpoint to maintain. */}}
   <nav class="nav" aria-label="Main">
-    {{ $page := . }}
     {{ range site.Menus.main }}
-      <a href="{{ .URL }}"{{ if or ($page.IsMenuCurrent "main" .) ($page.HasMenuCurrent "main" .) }} aria-current="page"{{ end }}>{{ .Name }}</a>
+      <a href="{{ .URL }}"{{ if or ($.IsMenuCurrent "main" .) ($.HasMenuCurrent "main" .) }} aria-current="page"{{ end }}>{{ .Name }}</a>
     {{ end }}
   </nav>
 </header>

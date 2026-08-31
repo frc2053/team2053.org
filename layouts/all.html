@@ -1,1 +1,4 @@
+{{/* Every page kind shares one layout. Hugo will not render a page without a
+     template here: with only baseof.html it exits 0 and writes no HTML at all,
+     which is why scripts/check-site.sh asserts the site is non-empty. */}}
 {{ define "main" }}{{ .Content }}{{ end }}
