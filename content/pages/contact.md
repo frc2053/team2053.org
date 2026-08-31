@@ -7,7 +7,3 @@ If you have any questions, comments or concerns, please feel free to reach out
 by email.
 
 [southerntierrobotics@gmail.com](mailto:southerntierrobotics@gmail.com)
-
-DRILL-MARKER-3
-
-![A deliberately oversized drill image](/images/drill-oversized.webp)
