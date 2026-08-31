@@ -8,6 +8,6 @@ by email.
 
 [southerntierrobotics@gmail.com](mailto:southerntierrobotics@gmail.com)
 
-DRILL-MARKER: if you can read this on the live site, a broken build published anyway.
+DRILL-MARKER-2: a failing check must not stop this line from publishing.
 
-{{< this-shortcode-does-not-exist >}}
+[a page that does not exist](/nowhere/)
