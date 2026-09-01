@@ -43,8 +43,13 @@
 
   {{ .Content }}
 
+  {{/* Decorative, on the same reasoning as the thumbnails in section.html:
+       this is the logo of the game the page is titled after, so a described
+       alt could only repeat the h1 back to a screen reader. The robot photo
+       above is different - it is a photograph nothing else on the page
+       describes - and it keeps a real alt. */}}
   {{ with .Params.gameLogo }}
-    <img class="gamelogo" src="{{ partial "url.html" . }}" alt="{{ $.Title }}" loading="lazy">
+    <img class="gamelogo" src="{{ partial "url.html" . }}" alt="" loading="lazy">
   {{ end }}
 
   {{/* The embed lives in the template rather than in the content: all twelve
@@ -62,7 +67,7 @@
               title="{{ $.Title }}"
               loading="lazy"
               referrerpolicy="strict-origin-when-cross-origin"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allow="encrypted-media; picture-in-picture; web-share"
               allowfullscreen></iframe>
     </div>
   {{ end }}

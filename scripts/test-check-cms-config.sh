@@ -217,6 +217,31 @@ sed -i.bak 's|^  auth_methods: \[token\]|  auth_methods: [oauth]|' "$d/static/ad
 rm -f "$d/static/admin/config.yml.bak"
 expect_fail "token sign-in switched off" "$d" "token"
 
+# ── Next season is still addable, at the right address ────────────────────
+# History is the one open, recurring type. Both of these break silently: one
+# removes the only way to add a season, the other moves every future season to
+# an address the other twelve years do not share.
+d=$(new_fixture history_uncreatable)
+sed -i.bak 's|^    create: true|    create: false|' "$d/static/admin/config.yml"
+rm -f "$d/static/admin/config.yml.bak"
+expect_fail "no way left to add next season" "$d" "create: true"
+
+d=$(new_fixture history_slug_dropped)
+sed -i.bak "s|^    slug: '{{fields.robotYear}}'||" "$d/static/admin/config.yml"
+rm -f "$d/static/admin/config.yml.bak"
+expect_fail "the year-based address dropped" "$d" "robotYear"
+
+d=$(new_fixture history_slug_retitled)
+sed -i.bak "s|^    slug: '{{fields.robotYear}}'|    slug: '{{title}}'|" "$d/static/admin/config.yml"
+rm -f "$d/static/admin/config.yml.bak"
+expect_fail "a season addressed by its title instead of its year" "$d" "robotYear"
+
+d=$(new_fixture history_collection_gone)
+awk '/^  - name: history$/ { skip = 1 } skip && /^  - name: / && !/^  - name: history$/ { skip = 0 }
+     !skip { print }' "$d/static/admin/config.yml" > "$WORK/mutated"
+cat "$WORK/mutated" > "$d/static/admin/config.yml"
+expect_fail "the history collection removed entirely" "$d" "no collection called"
+
 echo
 if [ "$failures" -gt 0 ]; then
   echo "$failures test(s) failed."

@@ -160,20 +160,22 @@ done < <(find "$SITE" -type f -name '*.html' | sort)
 # otherwise perfectly fine page - invisible to the build, and to anyone who
 # does not scroll down and press play.
 #
-# Zero embeds is a legitimate state here, unlike the empty tree in check 0: no
-# history year is obliged to have a video, and neither is any other page.
-#
 # The query string is stripped first, the same way check 3 strips one. Hugo's
 # OWN {{< youtube >}} shortcode - which slice 10 uses for the one embed that
 # lives inside a post body - emits
 # `/embed/wv1_1sGGmfQ?autoplay=0&controls=1&...`, and a check that rejected
 # that would turn the workflow red over correct output.
+#
+# `#*/embed/` and not `##*/embed/`: the shortest match, so a whole address
+# pasted into the field - which builds `/embed/https://youtu.be/xxx` - is read
+# as one bad value rather than having its own trailing ID picked out and
+# blessed.
 embeds=0
 bad_embeds=0
 while IFS= read -r src; do
   [ -z "$src" ] && continue
   embeds=$((embeds + 1))
-  id=${src##*/embed/}
+  id=${src#*/embed/}
   id=${id%%\?*}
   id=${id%%#*}
   if ! printf '%s' "$id" | grep -qE '^[A-Za-z0-9_-]{11}$'; then
@@ -182,10 +184,33 @@ while IFS= read -r src; do
   fi
 done < <(grep -rhoE "youtube(-nocookie)?\.com/embed/[^\"'<> ]*" "$SITE" --include='*.html' | sort -u)
 
-if [ "$embeds" -eq 0 ]; then
-  pass "no video embed in $SITE to check"
-elif [ "$bad_embeds" -eq 0 ]; then
-  pass "all $embeds video embed(s) carry a bare 11-character YouTube ID"
+# Counted distinct, because two years could legitimately share one video and
+# the loop above only needs to judge each value once.
+[ "$bad_embeds" -eq 0 ] && pass "all $embeds distinct video embed(s) carry a bare 11-character YouTube ID"
+
+# ...and every history year actually has one. Without this, the assertion
+# above is satisfied by there being no embeds at all - the same vacuous shape
+# slices 03 and 05 were each caught by. Renaming the field, or dropping the
+# `with` block from layouts/history/page.html, silently takes the video off
+# every year at once while the pages still render and the build still passes.
+#
+# The CMS marks the video required, so a year without one is drift rather than
+# a choice, and this reports it the way check-cms-config.sh reports a config
+# that has drifted from the content tree: a red run and an email, never a gate.
+yearless=0
+years=0
+while IFS= read -r f; do
+  years=$((years + 1))
+  if ! grep -qE "youtube(-nocookie)?\.com/embed/" "$f"; then
+    fail "history year with no game video: $f"
+    yearless=$((yearless + 1))
+  fi
+done < <(find "$SITE/history" -mindepth 2 -name 'index.html' 2>/dev/null | sort)
+
+if [ "$years" -lt 1 ]; then
+  pass "no history year pages in $SITE yet"
+elif [ "$yearless" -eq 0 ]; then
+  pass "all $years history year page(s) render a game video"
 fi
 
 echo
