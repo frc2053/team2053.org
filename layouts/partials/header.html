@@ -1,5 +1,13 @@
 <header class="head">
-  <a class="mark" href="{{ "" | relURL }}">{{ partial "wordmark.html" }}</a>
+  {{/* The compressed lockup, ~110px. The accessible name is on the LINK, not
+       in the SVG: the mark is aria-hidden, and without this the site would
+       have no machine-readable name for itself anywhere in its header.
+
+       It is read from the config's `title` rather than typed, so the site's
+       name lives in ONE place and a rename cannot leave the two marks
+       announcing something the rest of the site no longer says. `default`
+       because an empty aria-label is worse than a stale one. */}}
+  <a class="mark" href="{{ "" | relURL }}" aria-label="{{ site.Title | default "Southern Tier Robotics" }}">{{ partial "mark.html" "compressed" }}</a>
   {{/* The row wraps rather than reorders: a 9th and 10th item make the header
        one line taller, with no hamburger and no breakpoint to maintain.
 

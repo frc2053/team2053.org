@@ -12,8 +12,42 @@
   src:url(../fonts/spacemono-bolditalic-webfont.woff2) format('woff2'),url(../fonts/spacemono-bolditalic-webfont.woff) format('woff')}
 
 :root{
-  --purple:#4600AA; --red:#DC0000;
-  --bg:#000; --fg:#fff; --dim:#a9a3b5; --line:#2a2432; --panel:#0d0a12;
+  /* ── the three brand colours, in their settled roles ──────────────
+     Violet is the FIELD, orange is the ACCENT, red is the INCIDENT. That
+     order is contrast, not taste. Against white text:
+       violet 11.4:1 · red 5.2:1 · orange 3.5:1 (fails AA for body text).
+     So orange never carries prose. It underlines, rules, and fills one small
+     bold label, where it is measured as a non-text colour - and where it does
+     take a field, the text on it is BLACK (6.0:1), never white. */
+  --violet:#4600AA;
+  --orange:#FF4200;
+  --red:#DC0000;
+
+  --bg:#000; --fg:#fff;
+  /* Was #a9a3b5, a purple-grey belonging to no palette - the site gesturing
+     at violet without committing. This is violet's own hue (263°)
+     desaturated and lifted, so the neutral is DERIVED: 10.2:1 on black,
+     5.5:1 on a violet field. */
+  --dim:#BAB0CA;
+  --line:#2a2432; --panel:#0d0a12;
+
+  /* Indirection, so a violet field can re-point all three at once. This is
+     load-bearing, not tidiness: on violet, orange falls to 3.28:1 and red to
+     2.20:1 - red failing the 3:1 non-text minimum as a FOCUS RING, in a
+     footer holding eight focusable links. Do not flatten these back to
+     literal colours. */
+  --accent:var(--orange);
+  --ring:var(--red);
+  --rule:var(--orange);
+
+  /* The heading rule, written once and used by .body h1, .body h2 and
+     .sponsor-head: a short orange nib running out into violet.
+
+     The nib follows --rule, so it turns white inside a violet field; the RUN
+     is violet either way, and would be invisible on one. No heading sits in a
+     field today. Put one there and the run has to be re-pointed too. */
+  --headrule:linear-gradient(90deg,var(--rule) 0 4.5rem,var(--violet) 4.5rem 100%);
+
   --mono:'Space Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
   --measure:68ch;
   /* Every cropped photo on the site shares one crop bias, toward the upper
@@ -21,21 +55,68 @@
      blog card cannot drift into two different crops. */
   --focal:50% 28%;
 }
+
+/* ── the violet fields ────────────────────────────────────────────
+   Every violet field on the site, painted and token-re-pointed in ONE rule,
+   because the two must not be separable. Nothing inside a field has to know
+   it is in one.
+
+   TO ADD A VIOLET FIELD, ADD ITS SELECTOR HERE. Never write
+   `background:var(--violet)` anywhere else in this file: the prototype kept
+   these declarations in a class of their own, the class was never applied to
+   the markup, and the footer shipped a red focus ring at 2.20:1 on violet
+   while the CSS said otherwise. Kept in the same rule, that cannot recur. */
+.foot,
+.body .sponsorwrap .sponsor-tier{
+  background:var(--violet);
+  --dim:#D9D2E6;                     /* 7.8:1 on violet */
+  --accent:#fff; --ring:#fff; --rule:#fff;
+  --line:rgba(255,255,255,.30);
+  --panel:rgba(0,0,0,.22);
+}
+
 *{box-sizing:border-box}
 html,body{margin:0;padding:0}
 body{background:var(--bg);color:var(--fg);font-family:var(--mono);font-size:17px;line-height:1.65;-webkit-font-smoothing:antialiased}
 img{max-width:100%;display:block}
 a{color:inherit}
-:focus-visible{outline:2px solid var(--red);outline-offset:3px}
+:focus-visible{outline:2px solid var(--ring);outline-offset:3px}
 
 /* ── header ──────────────────────────────────────────────────── */
-.head{border-bottom:1px solid var(--line);padding:1.6rem 1rem 1.1rem;text-align:center}
-.mark{display:block;font-weight:700;letter-spacing:.24em;font-size:.82rem;text-transform:uppercase;text-decoration:none}
-.mark b{color:var(--red)}
+.head{border-bottom:3px solid var(--violet);padding:1.6rem 1rem 1.1rem;text-align:center}
 .nav{display:flex;flex-wrap:wrap;justify-content:center;gap:.4rem 1.5rem;margin-top:1rem}
 .nav a{text-decoration:none;font-size:.8rem;letter-spacing:.06em;color:var(--dim);padding:.2rem 0;border-bottom:2px solid transparent}
 .nav a:hover{color:var(--fg)}
-.nav a[aria-current]{color:var(--fg);border-bottom-color:var(--red)}
+.nav a[aria-current]{color:var(--fg);border-bottom-color:var(--accent)}
+
+/* ── the mark ─────────────────────────────────────────────────────
+   Inline SVG on `fill:currentColor`, so the mark takes the colour of whatever
+   it sits in - white here, and reachable in black from CSS alone.
+
+   THE GUIDELINES' TWO DON'TS ARE ENFORCED AT THIS RULE, and nowhere else:
+
+   · NEVER THE COLOUR LOGO ON IMAGES - white or black only. currentColor makes
+     recolouring possible, so this is the rule that has to keep it from
+     happening: `color` is never set on .mark, so the mark inherits the page's
+     white and cannot become orange or violet by accident. The header sits on
+     black today, above the hero rather than on it. If a field ever puts the
+     mark over a photograph, set `color:#fff` or `color:#000` here - never a
+     palette token.
+   · NEVER DISTORT, RECOLOUR OR SPLIT THE MARK. `height:auto` against a fixed
+     width is what holds the proportions: the two lockups are 3.94:1 and
+     2.96:1 and must never be forced into a shared box. Do not set both
+     dimensions, and do not set `preserveAspectRatio`.
+
+   Sizes are twice and 1.5x the guidelines' floors (55px compressed, 120px
+   extended), which leaves room to come down before either is breached. */
+.mark{display:block;text-decoration:none;
+  /* Inert while an SVG is what renders; these style the text fallback that
+     mark.html emits when assets/brand/logo-*.svg is missing, so the degraded
+     header reads as the site rather than as something broken. */
+  font-weight:700;letter-spacing:.24em;font-size:.82rem;text-transform:uppercase}
+.mark b{color:var(--accent)}
+.mark svg{width:110px;height:auto;margin:0 auto;display:block}   /* compressed */
+.foot .mark svg{width:180px}                                     /* extended */
 
 /* ── hero: focal band ────────────────────────────────────────────
    Fixed-height full-bleed band. It crops, but object-position biases the
@@ -59,33 +140,60 @@ a{color:inherit}
 /* Every heading level the rich-text editor can reach is styled. A student can
    pick any of them and no document will ever have to warn them off one. */
 .body :is(h1,h2,h3,h4,h5,h6){line-height:1.2;font-weight:700}
-.body h1{font-size:1.8rem;margin:3.2rem 0 1rem;padding-top:1rem;border-top:3px solid var(--red)}
-.body h2{font-size:1.45rem;margin:3rem 0 1rem;padding-top:1rem;border-top:3px solid var(--red)}
+/* The heading rule is the palette rather than one colour. Drawn as a
+   background image at `100% 3px` rather than as a border, so BOTH colours fit
+   inside the 3px the rule already occupied - the padding makes up the
+   difference exactly, and nothing on the page moves. */
+.body h1{font-size:1.8rem;margin:3.2rem 0 1rem;padding-top:calc(1rem + 3px);background:var(--headrule) no-repeat 0 0/100% 3px}
+.body h2{font-size:1.45rem;margin:3rem 0 1rem;padding-top:calc(1rem + 3px);background:var(--headrule) no-repeat 0 0/100% 3px}
 .body h3{font-size:1.2rem;margin:2.4rem 0 .8rem}
 .body h4{font-size:1.02rem;margin:2rem 0 .6rem}
 .body h5{font-size:.85rem;margin:1.8rem 0 .5rem;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}
 .body h6{font-size:.75rem;margin:1.6rem 0 .5rem;letter-spacing:.16em;text-transform:uppercase;color:var(--dim)}
-.body :is(h1,h2,h3,h4,h5,h6):first-child{margin-top:0;padding-top:0;border-top:0}
+.body :is(h1,h2,h3,h4,h5,h6):first-child{margin-top:0;padding-top:0;border-top:0;background-image:none}
 
 .body p{margin:0 0 1.1em}
 .body :is(ul,ol){margin:0 0 1.2em;padding-left:1.4em}
 .body li{margin:.35em 0}
-.body a{text-decoration:underline;text-decoration-color:var(--red);text-underline-offset:.2em}
-.body img{width:100%;border-radius:.6rem;margin:1.6rem 0}
+.body a{text-decoration:underline;text-decoration-color:var(--accent);text-underline-offset:.2em}
+.body img{width:100%;margin:1.6rem 0}
 .body figure{margin:1.6rem 0}
 .body figcaption{font-size:.72rem;color:var(--dim);margin-top:.5rem}
 .body blockquote{margin:1.6rem 0;padding:.2rem 0 .2rem 1.2rem;border-left:3px solid var(--line);color:var(--dim)}
 .body hr{border:0;border-top:1px solid var(--line);margin:2.5rem 0}
-.body code{font-size:.85em;background:var(--panel);border:1px solid var(--line);border-radius:.3rem;padding:.1em .35em}
-.body pre{background:var(--panel);border:1px solid var(--line);border-radius:.5rem;padding:1rem;overflow-x:auto}
+.body code{font-size:.85em;background:var(--panel);border:1px solid var(--line);padding:.1em .35em}
+.body pre{background:var(--panel);border:1px solid var(--line);padding:1rem;overflow-x:auto}
 .body pre code{background:none;border:0;padding:0}
 .body table{width:100%;border-collapse:collapse;margin:1.6rem 0;font-size:.9rem;display:block;overflow-x:auto}
 .body :is(th,td){border:1px solid var(--line);padding:.5rem .7rem;text-align:left}
 .body th{background:var(--panel)}
 
-/* ── footer ──────────────────────────────────────────────────── */
-.foot{max-width:var(--measure);margin:6rem auto 0;padding:2rem 1rem 3rem;border-top:1px solid var(--line);text-align:center}
+/* ── footer: the site's one full-bleed field ─────────────────────
+   CHROME, so it can take a field: nothing a student typed renders here. It is
+   full-bleed rather than a 68ch panel because the whole diagnosis behind this
+   pass is that the brand uses colour as GROUND and the site used it as trim -
+   and a centred rectangle of violet is trim wearing a costume.
+
+   The field is painted, with its tokens, in the violet-fields rule at the top
+   of this file. Everything below is geometry.
+
+   `max-width:none` on the element with its direct children re-centred at the
+   measure is what holds the field without a wrapper: no markup changed. */
+.foot{position:relative;overflow:hidden;max-width:none;margin:6rem 0 0;padding:3rem 1rem 3.5rem;text-align:center}
+.foot>:not(.foot-shape){position:relative;z-index:1;max-width:var(--measure);margin-left:auto;margin-right:auto}
 .foot small{display:block;margin-top:1.2rem;color:var(--dim);font-size:.72rem;line-height:1.8}
+
+/* ONE shape, bleeding off the bottom-left, clipped by the footer's own
+   `overflow:hidden`. Wider than the footer on purpose - the brand's shapes are
+   used as bleeds, never as centred motifs.
+
+   30% opacity is baked into assets/brand/shape-2.svg rather than set here, so
+   the brand rule is structurally true of the file wherever it is used. The
+   fill is `currentColor`, which resolves to the footer's inherited white; this
+   is why the shape is an inline SVG element and not a background-image, which
+   could not resolve it. */
+.foot-shape{position:absolute;z-index:0;left:-10%;bottom:-18%;width:150%;pointer-events:none}
+.foot-shape svg{width:100%;height:auto;display:block}
 
 /* ── blog index cards ────────────────────────────────────────────
    One column at the same 68ch measure as prose, because a card grid would
@@ -96,13 +204,17 @@ a{color:inherit}
 .card{margin:0 0 3rem;padding:0 0 3rem;border-bottom:1px solid var(--line)}
 .card:last-child{border-bottom:0;padding-bottom:0}
 .card-link{display:block;text-decoration:none}
-.card-img{width:100%;height:min(34vw,220px);object-fit:cover;object-position:var(--focal);border-radius:.6rem;background:var(--panel)}
+.card-img{width:100%;height:min(34vw,220px);object-fit:cover;object-position:var(--focal);background:var(--panel)}
 .card-title{font-size:1.35rem;line-height:1.2;font-weight:700;margin:1.1rem 0 .6rem}
-.card-link:hover .card-title{text-decoration:underline;text-decoration-color:var(--red);text-underline-offset:.2em}
+.card-link:hover .card-title{text-decoration:underline;text-decoration-color:var(--accent);text-underline-offset:.2em}
 .card-sum{margin:.7rem 0 0;color:var(--dim)}
 /* ── history year ────────────────────────────────────────────────
    Everything here is emitted by layouts/history/, never typed into a page. */
-.facts{margin:2rem 0;padding:1.2rem 1.4rem;background:var(--panel);border:1px solid var(--line);border-radius:.6rem}
+/* The left border takes the accent and goes 1px -> 3px. The extra 2px comes
+   out of the padding rather than off the content, the same compensation the
+   heading rule makes for its own 3px: the panel restyles and nothing inside
+   it moves. */
+.facts{margin:2rem 0;padding:1.2rem 1.4rem;padding-left:calc(1.4rem - 2px);background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--accent)}
 .facts dt{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin-top:1.2rem}
 .facts dt:first-child{margin-top:0}
 .facts dd{margin:.25rem 0 0}
@@ -116,7 +228,7 @@ a{color:inherit}
 .gamelogo{background:#fff;padding:1rem}
 
 /* Reserves the 16:9 box before the iframe loads, so nothing below it jumps. */
-.video{position:relative;aspect-ratio:16/9;margin:1.6rem 0;background:var(--panel);border-radius:.6rem;overflow:hidden}
+.video{position:relative;aspect-ratio:16/9;margin:1.6rem 0;background:var(--panel);overflow:hidden}
 .video iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
 
 /* ── history index ───────────────────────────────────────────── */
@@ -127,9 +239,9 @@ a{color:inherit}
    own proportions - the CMS caps width, not shape - so a phone photo held
    upright would otherwise render as a column taller than the screen, and the
    list would stop being a list. */
-.years a img{border-radius:.6rem;margin:0 0 .9rem;aspect-ratio:16/9;object-fit:cover;object-position:50% 28%}
+.years a img{margin:0 0 .9rem;aspect-ratio:16/9;object-fit:cover;object-position:50% 28%}
 .years a span{font-size:1.2rem;font-weight:700;border-bottom:2px solid transparent}
-.years a:hover span{border-bottom-color:var(--red)}
+.years a:hover span{border-bottom-color:var(--accent)}
 .years p{margin:.6rem 0 0;color:var(--dim);font-size:.9rem}
 /* ── sponsor grid ────────────────────────────────────────────────
    The 15 committed logos are not a consistent set - some white-on-transparent,
@@ -146,31 +258,58 @@ a{color:inherit}
    classic (non-overlay) scrollbar overflows by the scrollbar's width and puts
    a horizontal scrollbar on the page. */
 .sponsorwrap{width:min(1100px,calc(100vw - 2rem));position:relative;left:50%;transform:translateX(-50%)}
-.sponsorwrap .sponsor-tier{margin:2.6rem 0 1.2rem;padding:0 0 .5rem;border-top:0;border-bottom:1px solid var(--line);font-size:.75rem;letter-spacing:.18em;text-transform:uppercase;color:var(--dim)}
+/* A tier header is a BAR, not an underline - the second violet field, painted
+   at the top of this file. White on violet is 11.4:1, and the label is
+   uppercase and letterspaced, so it holds at .75rem. */
+.body .sponsorwrap .sponsor-tier{margin:2.6rem 0 1.4rem;padding:.55rem .9rem;border-top:0;border-bottom:0;font-size:.75rem;letter-spacing:.18em;text-transform:uppercase;color:var(--fg)}
 .sponsorwrap .sponsor-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:1.6rem 1.4rem;margin-bottom:1rem}
 .sponsorwrap .sponsor{margin:0;display:flex;flex-direction:column;gap:.7rem}
-.sponsorwrap .plate{border:1px solid var(--line);border-radius:.6rem;background:#141018;padding:1.1rem;height:150px;display:flex;align-items:center;justify-content:center}
-.sponsorwrap .plate img{max-height:100%;max-width:100%;width:auto;margin:0;border-radius:0;object-fit:contain}
+/* The plate is also what keeps a sponsor logo off a colour field: the tier
+   bars are headers, and every logo sits on its own dark plate first. No
+   sponsor logo ever touches violet, whatever the logo turns out to look like. */
+.sponsorwrap .plate{border:1px solid var(--line);background:#141018;padding:1.1rem;height:150px;display:flex;align-items:center;justify-content:center}
+.sponsorwrap .plate img{max-height:100%;max-width:100%;width:auto;margin:0;object-fit:contain}
 .sponsorwrap .sponsor figcaption{font-size:.78rem;line-height:1.4;color:var(--fg);margin:0}
 .sponsorwrap .tierlab{display:block;font-size:.64rem;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);margin-top:.15rem}
 
-/* The sponsor packet: a link, never an <embed>. */
+/* The sponsor packet: a link, never an <embed>.
+
+   The site's ONE orange field, and the only element small and bold enough to
+   carry one. Its text is BLACK, at 6.0:1 - white on orange is 3.5:1 and is
+   never used. Orange is not a token here for the same reason: this is a field,
+   so it must not follow --accent into white if it ever lands inside one. */
 .packet{margin:2rem 0}
-.packet .dl{display:inline-flex;align-items:center;gap:.6rem;border:2px solid var(--fg);border-radius:3rem;padding:.6rem 1.4rem;text-decoration:none;font-size:.9rem}
-.packet .dl:hover{background:var(--fg);color:var(--bg)}
+.packet .dl{display:inline-flex;align-items:center;gap:.6rem;border:2px solid var(--orange);background:var(--orange);color:#000;font-weight:700;padding:.6rem 1.4rem;text-decoration:none;font-size:.9rem}
+.packet .dl:hover{background:var(--fg);border-color:var(--fg);color:var(--bg)}
 
 /* ── footer socials ──────────────────────────────────────────────
-   36px circles carrying the eight inline SVG glyphs. The row wraps, so a
-   platform removed in the CMS simply leaves one fewer circle. */
-.socials{display:flex;flex-wrap:wrap;gap:.7rem;justify-content:center;margin:1.4rem 0;padding:0;list-style:none}
+   36px SQUARES carrying the eight inline SVG glyphs - sharp, like every other
+   corner on the site. The row wraps, so a platform removed in the CMS simply
+   leaves one fewer tile.
+
+   These eight links are why the violet field re-points --ring: on violet a red
+   focus ring is 2.20:1, under the 3:1 minimum for a non-text indicator. */
+.socials{display:flex;flex-wrap:wrap;gap:.7rem;justify-content:center;margin:1.4rem auto;padding:0;list-style:none}
 .socials li{margin:0}
-.socials a{width:36px;height:36px;border:1px solid var(--line);border-radius:50%;display:grid;place-items:center;color:var(--dim);text-decoration:none;font-size:.8rem;transition:.15s}
+.socials a{width:36px;height:36px;border:1px solid var(--line);display:grid;place-items:center;color:var(--dim);text-decoration:none;font-size:.8rem;transition:.15s}
 .socials a svg{width:19px;height:19px;fill:currentColor;display:block}
 .socials a:hover{border-color:var(--fg);color:var(--fg)}
 
 /* The grid's own heading, so prose can never drift away from where the logos
    actually are. Matched to the body's h2 rule, which it sits outside of. */
-.sponsor-head{font-size:1.45rem;line-height:1.2;font-weight:700;margin:3rem 0 1rem;padding-top:1rem;border-top:3px solid var(--red)}
+.sponsor-head{font-size:1.45rem;line-height:1.2;font-weight:700;margin:3rem 0 1rem;padding-top:calc(1rem + 3px);background:var(--headrule) no-repeat 0 0/100% 3px}
+
+/* Forced-colors mode paints no background images, and the heading rule is one.
+   It was a 3px BORDER before this pass, and borders survive forced colours, so
+   without this the rule silently disappears for anyone using high contrast -
+   a regression this pass would otherwise have introduced quietly. Restored as
+   a border in the system colour, with the 3px taken back out of the padding.
+
+   Placed after .sponsor-head, not next to .body h1: a media query adds no
+   specificity, so this only wins over all three by coming last. */
+@media (forced-colors:active){
+  .body h1,.body h2,.sponsor-head{background-image:none;border-top:3px solid;padding-top:1rem}
+}
 
 /* ── the meeting calendar ────────────────────────────────────────
    Google Calendar's embed is a fixed-height application, not a 16:9 video, so
@@ -180,5 +319,5 @@ a{color:inherit}
    It breaks out of the 68ch measure the same way the sponsor grid does, and
    for the same reason: a month grid is not prose, and at prose width its day
    cells are too narrow to read. */
-.calendar{width:min(1100px,calc(100vw - 2rem));position:relative;left:50%;transform:translateX(-50%);height:min(80vh,600px);margin:0 0 3rem;background:var(--panel);border-radius:.6rem;overflow:hidden}
+.calendar{width:min(1100px,calc(100vw - 2rem));position:relative;left:50%;transform:translateX(-50%);height:min(80vh,600px);margin:0 0 3rem;background:var(--panel);overflow:hidden}
 .calendar iframe{width:100%;height:100%;border:0;display:block}

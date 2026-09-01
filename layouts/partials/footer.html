@@ -4,7 +4,23 @@
      scripts/check-site.sh asserts both halves - the notice is present, and no
      four-digit year appears anywhere in this footer. */}}
 <footer class="foot">
-  <div class="mark">{{ partial "wordmark.html" }}</div>
+  {{/* ONE shape, bleeding off the bottom-left of the violet field, at the 30%
+       the brand specifies - baked into the file, not set here. It is an
+       INLINE SVG and not a CSS background because a background-image cannot
+       resolve currentColor, and the only way to give it one from CSS would
+       be to keep a second, white-filled copy of the same artwork under
+       static/. assets/brand/ is the only home the artwork gets.
+
+       Purely decorative, so it is aria-hidden and absent from the
+       accessibility tree entirely; `with` means a missing file leaves the
+       footer flat violet rather than failing the build. */}}
+  {{ with resources.Get "brand/shape-2.svg" }}
+  <div class="foot-shape" aria-hidden="true">{{ .Content | safeHTML }}</div>
+  {{ end }}
+  {{/* The extended lockup, ~180px. role="img" with a label, because the
+       wrapper is a <div> rather than the header's link. Same config-read name
+       as the header - see header.html. */}}
+  <div class="mark" role="img" aria-label="{{ site.Title | default "Southern Tier Robotics" }}">{{ partial "mark.html" "extended" }}</div>
   {{ partial "socials.html" . }}
   <small>
     {{ with site.Params.affiliation }}{{ . }}<br>{{ end }}

@@ -1,0 +1,36 @@
+{{- /* The MARK: the STR logo, inlined as SVG. One definition, two lockups.
+
+       This was wordmark.html until brand-alignment slice 02. A WORDMARK is the
+       team's name set in type, which is what this file used to emit and what
+       the mark replaced; it survives here only as the fallback at the bottom.
+       Keeping the old filename would have left the site's most-included
+       partial named after the one thing it no longer renders.
+
+       The two lockups diverge, so the partial takes one:
+
+         "compressed"  the mark alone, 653.6x165.9 (3.94:1)   header, 110px
+         "extended"    the mark with the name set beneath it,
+                       653.6x221.1 (2.96:1)                   footer, 180px
+
+       The name inside the extended lockup is OUTLINED ARTWORK, not live type -
+       Antarctican Mono Book, which is embedded in the brand guidelines PDF, is
+       not Space Mono, and is not licensed to this project. It is placed, never
+       typeset. That is why the footer uses this file rather than setting the
+       name in CSS.
+
+       Reached through `resources.Get` and inlined, with a visible fallback to
+       the old text wordmark if the file is missing - the same shape as
+       socials.html's fallback to a platform's first letter. A missing logo
+       must degrade to something legible, never to a blank header or a failed
+       build.
+
+       The accessible name lives on the WRAPPING element, in header.html and
+       footer.html: the SVG is aria-hidden, and replacing text with SVG would
+       otherwise delete the site's own name for a screen reader - silently, and
+       on every page at once. */ -}}
+{{- $lockup := . | default "compressed" -}}
+{{- with resources.Get (printf "brand/logo-%s.svg" $lockup) -}}
+{{- .Content | safeHTML -}}
+{{- else -}}
+Southern Tier <b>Robotics</b>
+{{- end -}}
