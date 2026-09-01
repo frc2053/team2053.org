@@ -1,8 +1,9 @@
 ---
-title: Current Season
+title: 'Current Season: BIOCORE™ presented by Haas'
 description: When Southern Tier Robotics meets, where to find the schedule, and what to read before you turn up.
 heroImage: /images/shop.webp
 heroImageAlt: Students working around a bench in the shop during a build meeting
+bannerFit: cover
 ---
 
 The calendar above is the schedule. It is kept in Google Calendar rather than on
