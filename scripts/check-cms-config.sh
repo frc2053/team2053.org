@@ -29,7 +29,7 @@ detail() { printf '        %s\n' "$1"; }
 # config explains at length why two of them are absent - is never mistaken for
 # a line that sets it.
 BARE=$(mktemp)
-trap 'rm -f "$BARE"' EXIT
+trap 'rm -f "$BARE" "${PAGES_BLOCK:-}"' EXIT
 sed 's/[[:space:]]*#.*$//' "$CONFIG" > "$BARE"
 
 # ── 1. Every configured file is in the repository ─────────────────────────
@@ -79,30 +79,49 @@ fi
 # The realistic regression is an upgrade done the easy way - point the script
 # tag back at the CDN and the version pin is gone, along with the property that
 # makes this site indifferent to what the project publishes next.
-remote=$(grep -oE '<script[^>]+src="[^"]*"' "$ADMIN_PAGE" \
-  | sed -E 's/.*src="([^"]*)".*/\1/' \
-  | grep -E '^(https?:)?//' )
-if [ -n "$remote" ]; then
-  fail "$ADMIN_PAGE loads a script from somewhere other than this repository"
-  while IFS= read -r u; do detail "$u"; done <<< "$remote"
+#
+# Every `src` is read whatever it is quoted with, INCLUDING unquoted, because
+# the failure this guards is somebody hand-editing the tag and a single quote
+# is the likeliest thing they would type. Matching only `src="..."` would read
+# a page full of CDN scripts as a page with none.
+SQ=\'
+script_srcs() {
+  grep -oiE "<script[^>]*src=(\"[^\"]*\"|$SQ[^$SQ]*$SQ|[^\"$SQ >]+)" "$ADMIN_PAGE" \
+    | sed -E "s/.*[sS][rR][cC]=//; s/^[\"$SQ]//; s/[\"$SQ]\$//"
+}
+
+# Counted FIRST. An empty result satisfies both assertions below for the same
+# reason an empty tree satisfied every assertion in check-site.sh before slice
+# 03 caught it: nothing to iterate is not the same as nothing wrong. An admin
+# page that loads no script at all is a blank screen, and it must not be able
+# to report "no script is loaded from a CDN" and pass.
+total_scripts=$(script_srcs | grep -c .)
+if [ "$total_scripts" -lt 1 ]; then
+  fail "$ADMIN_PAGE loads no script at all, so it renders a blank page"
+  detail "nothing below could be checked: there is no script tag to check"
 else
-  pass "no script in $ADMIN_PAGE is loaded from a CDN"
-fi
-
-# And the local one it does load is actually there. A script tag pointing at a
-# file nobody committed is an admin page that loads to a blank screen.
-local_missing=0
-while IFS= read -r src; do
-  [ -z "$src" ] && continue
-  case "$src" in "/"*) target="${src#/}" ;; *) target="$(dirname "$ADMIN_PAGE")/$src" ;; esac
-  if [ ! -f "$target" ]; then
-    fail "$ADMIN_PAGE loads $src, which is not in this repository"
-    local_missing=$((local_missing + 1))
+  remote=$(script_srcs | grep -E '^(https?:)?//')
+  if [ -n "$remote" ]; then
+    fail "$ADMIN_PAGE loads a script from somewhere other than this repository"
+    while IFS= read -r u; do detail "$u"; done <<< "$remote"
+  else
+    pass "all $total_scripts script(s) in $ADMIN_PAGE are loaded from this repository"
   fi
-done < <(grep -oE '<script[^>]+src="[^"]*"' "$ADMIN_PAGE" \
-  | sed -E 's/.*src="([^"]*)".*/\1/' | grep -vE '^(https?:)?//')
 
-[ "$local_missing" -eq 0 ] && pass "every script $ADMIN_PAGE loads is committed here"
+  # And the local ones are actually here. A script tag pointing at a file
+  # nobody committed is, again, a blank screen.
+  local_missing=0
+  while IFS= read -r src; do
+    [ -z "$src" ] && continue
+    case "$src" in "/"*) target="${src#/}" ;; *) target="$(dirname "$ADMIN_PAGE")/$src" ;; esac
+    if [ ! -f "$target" ]; then
+      fail "$ADMIN_PAGE loads $src, which is not in this repository"
+      local_missing=$((local_missing + 1))
+    fi
+  done < <(script_srcs | grep -vE '^(https?:)?//')
+
+  [ "$local_missing" -eq 0 ] && pass "every script $ADMIN_PAGE loads is committed here"
+fi
 
 # ── 4. A publish reaches the site ─────────────────────────────────────────
 # Both of these fail the same way from the student's chair: Publish succeeds,
@@ -128,9 +147,28 @@ else
 fi
 
 # Reads a nested scalar by name from anywhere in the comment-stripped config.
-# The media settings live four levels deep and there is exactly one of each,
-# so matching on the key alone is unambiguous here and stays readable.
+# Unanchored on purpose - the media settings live four levels deep - which
+# means it is only safe for a key that appears once. `format` is NOT such a
+# key: the transformation has one and so does the collection. Use read_in_block
+# for anything that is not unique.
 read_nested() { sed -n "s/^[[:space:]]*$1:[[:space:]]*//p" "$BARE" | head -1 | tr -d "\"' "; }
+
+# Reads scalar $2 from inside the block introduced by key $1 - everything more
+# indented than the line `$1:` itself. This is what keeps `format: webp` under
+# `transformations` from being read as the collection's `format:
+# yaml-frontmatter`, which today it is not only by the order the two happen to
+# appear in the file.
+read_in_block() {
+  awk -v opener="$1" -v key="$2" '
+    { indent = match($0, /[^ ]/) - 1 }
+    $0 ~ "^[[:space:]]*" opener ":[[:space:]]*$" { depth = indent; inside = 1; next }
+    inside && indent <= depth && NF { inside = 0 }
+    inside && $1 == key ":" { $1 = ""; sub(/^[[:space:]]+/, ""); print; exit }
+    inside && $0 ~ "^[[:space:]]*" key ":" {
+      sub("^[[:space:]]*" key ":[[:space:]]*", ""); print; exit
+    }
+  ' "$BARE" | head -1 | tr -d "\"' "
+}
 
 # ── 5. The upload is normalized on the way in ─────────────────────────────
 # Sveltia rewrites the photo in the browser, before it enters git. This is the
@@ -144,9 +182,9 @@ else
   detail "both assume filenames match [A-Za-z0-9._/-], which only this setting guarantees"
 fi
 
-t_format=$(read_nested format)
-t_width=$(read_nested width)
-t_quality=$(read_nested quality)
+t_format=$(read_in_block transformations format)
+t_width=$(read_in_block transformations width)
+t_quality=$(read_in_block transformations quality)
 if [ "$t_format" = webp ] && [ "$t_width" = 1920 ] && [ "$t_quality" = 85 ]; then
   pass "uploads are transformed to ${t_width}px ${t_format} at quality ${t_quality}"
 else
@@ -174,13 +212,34 @@ fi
 # regression is somebody converting it to a folder collection to add a sixth
 # page, which makes all of them deletable on the way past. Sveltia has no undo:
 # recovery from a deleted page is retyping it out of the commit list.
-structure=$(grep -nE '^[[:space:]]*(folder|create|delete|duplicate)[[:space:]]*:' "$BARE")
-if [ -n "$structure" ]; then
-  fail "$CONFIG has folder-collection options in it"
-  detail "the prose pages are undeletable only for as long as Pages is a file collection"
-  while IFS= read -r l; do detail "line $l"; done <<< "$structure"
+#
+# Scoped to the Pages collection, deliberately. Post, History and the sponsor
+# list are all MEANT to be creatable and deletable - slices 06 and 07 add them
+# as folder collections - so banning these keys config-wide would forbid the
+# next two slices rather than protect this one.
+PAGES_BLOCK=$(mktemp)
+awk '
+  /^[[:space:]]*-[[:space:]]*name:[[:space:]]*pages[[:space:]]*$/ {
+    inside = 1; depth = match($0, /[^ ]/) - 1; print; next
+  }
+  inside && /^[[:space:]]*-[[:space:]]*name:/ && match($0, /[^ ]/) - 1 <= depth { inside = 0 }
+  inside { print }
+' "$BARE" > "$PAGES_BLOCK"
+
+if [ ! -s "$PAGES_BLOCK" ]; then
+  fail "$CONFIG has no collection called \"pages\""
+  detail "the prose pages are undeletable only for as long as that collection exists as a file collection"
+elif ! grep -qE '^[[:space:]]*files[[:space:]]*:' "$PAGES_BLOCK"; then
+  fail "the pages collection has no files: list, so it is not a file collection any more"
 else
-  pass "no folder, create or delete option - the prose pages cannot be deleted"
+  structure=$(grep -nE '^[[:space:]]*(folder|create|delete|duplicate)[[:space:]]*:' "$PAGES_BLOCK")
+  if [ -n "$structure" ]; then
+    fail "the pages collection has folder-collection options in it"
+    detail "the prose pages are undeletable only for as long as Pages is a file collection"
+    while IFS= read -r l; do detail "$l"; done <<< "$structure"
+  else
+    pass "pages is a file collection with no folder, create or delete - its pages cannot be deleted"
+  fi
 fi
 
 # ── 7. The token sign-in is still there ───────────────────────────────────

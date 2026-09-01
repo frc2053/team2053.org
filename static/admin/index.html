@@ -36,10 +36,10 @@
   THE SCRIPT TAG
   No `type="module"`, and no stylesheet link. This build is a plain classic
   script that initializes itself, and Sveltia logs a warning about both of
-  those if you add them. The `src` is relative on purpose: the site is served
-  from a subdirectory today (/team2053.org/) and moves to the domain root at
-  cutover, and a relative path is correct at both. Sveltia finds config.yml
-  next to this page the same way.
+  those if you add them. The `src` is relative on purpose, so this page works
+  wherever the site is served from - a subdirectory or the domain root, with
+  nothing to change if that ever moves again. Sveltia finds config.yml next to
+  this page the same way.
 -->
 <script src="sveltia-cms.js"></script>
 </body>

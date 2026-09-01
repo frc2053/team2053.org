@@ -45,7 +45,11 @@ new_fixture() {
   mkdir -p "$dir/static/admin" "$dir/static/images" "$dir/scripts" "$dir/content/pages"
   cp "$ROOT/static/admin/config.yml" "$dir/static/admin/config.yml"
   cp "$ROOT/static/admin/index.html" "$dir/static/admin/index.html"
-  [ "$1" = missing_bundle ] || cp "$ROOT/static/admin/sveltia-cms.js" "$dir/static/admin/sveltia-cms.js"
+  # A placeholder, not the real 2 MB bundle: every assertion here is about the
+  # script tag pointing at a file that exists, never about its contents, and
+  # fourteen real copies is 28 MB of pointless I/O per CI run. The one fixture
+  # that wants it absent gets it absent.
+  [ "$1" = missing_bundle ] || : > "$dir/static/admin/sveltia-cms.js"
   cp "$ROOT/scripts/optimize-images.sh" "$dir/scripts/optimize-images.sh"
   # Content only has to exist; the checker asserts presence, never contents.
   cp "$ROOT/content/_index.md" "$dir/content/_index.md"
@@ -54,7 +58,10 @@ new_fixture() {
 }
 
 # Runs the checker in $1 and reports its exit status.
-check_in() { ( cd "$1" && "$CHECKER" >"$WORK/out" 2>&1 ); }
+# Truncated before the run, not by it: if `cd` failed, the redirect would never
+# happen and the next expect_fail would grep the PREVIOUS test's output - a
+# test passing on evidence from a different test.
+check_in() { : > "$WORK/out"; ( cd "$1" && "$CHECKER" >"$WORK/out" 2>&1 ); }
 
 # $1 label, $2 fixture dir. Requires the checker to pass.
 expect_pass() {
@@ -123,6 +130,19 @@ expect_fail "the admin page loading the CMS from a CDN" "$d" "unpkg.com"
 d=$(new_fixture missing_bundle)
 expect_fail "a script tag with no committed bundle behind it" "$d" "sveltia-cms.js"
 
+# Both of these passed silently until the review caught them, and both are the
+# same shape as the empty-tree hole slice 03 found in check-site.sh: an
+# assertion that iterates a set is satisfied by the set being empty.
+d=$(new_fixture no_script_at_all)
+printf '<!doctype html>\n<html><head><title>x</title></head><body></body></html>\n' \
+  > "$d/static/admin/index.html"
+expect_fail "an admin page that loads no script at all" "$d" "no script at all"
+
+d=$(new_fixture single_quoted_cdn)
+printf '<!doctype html>\n<html><body><script src=%s></script></body></html>\n' \
+  "'https://unpkg.com/@sveltia/cms/dist/sveltia-cms.js'" > "$d/static/admin/index.html"
+expect_fail "a CDN script tag written with single quotes" "$d" "unpkg.com"
+
 # ── A publish reaches the site ────────────────────────────────────────────
 # Both failures here look identical to the student - they press Publish, it
 # succeeds, and the site never changes.
@@ -148,7 +168,10 @@ expect_fail "uploads no longer slugified" "$d" "slugify_filename"
 d=$(new_fixture no_transform)
 sed -i.bak 's|^          width: 1920|          width: 4096|' "$d/static/admin/config.yml"
 rm -f "$d/static/admin/config.yml.bak"
-expect_fail "the upload transform widened past 1920" "$d" "1920"
+# Matched on the found value, not on "1920": the checker's failure line reads
+# "the upload transform is not webp/1920/85", so matching "1920" would be
+# satisfied by the message itself whatever the mutation did.
+expect_fail "the upload transform widened past 1920" "$d" "width=4096"
 
 d=$(new_fixture tight_cap)
 sed -i.bak 's|^      max_file_size: 20971520|      max_file_size: 307200|' "$d/static/admin/config.yml"
@@ -161,16 +184,33 @@ expect_fail "a cap tight enough to reject a normalized photo" "$d" "max_file_siz
 
 # ── The prose pages stay undeletable, and the door stays open ─────────────
 d=$(new_fixture folder_collection)
-python3 - "$d/static/admin/config.yml" <<'MUTATE'
-import sys, re
-p = sys.argv[1]
-s = open(p).read()
 # The realistic regression: someone converts Pages to a folder collection to
 # add a sixth page, and every prose page becomes deletable in the process.
-s = s.replace("    files:\n", "    folder: content/pages\n    create: true\n    delete: true\n    files:\n", 1)
-open(p, "w").write(s)
-MUTATE
+awk '!done && /^    files:$/ {
+       print "    folder: content/pages"; print "    create: true"
+       print "    delete: true"; done = 1
+     } { print }' "$d/static/admin/config.yml" > "$WORK/mutated"
+cat "$WORK/mutated" > "$d/static/admin/config.yml"
 expect_fail "the prose pages made deletable" "$d" "delete"
+
+# ...but a folder collection that is NOT Pages is exactly what slices 06 and 07
+# add. Post and History are meant to be creatable and deletable; only the prose
+# pages are not. A checker that forbids `create` config-wide would block the
+# next two slices, so this asserts the guard is scoped to Pages rather than to
+# the word.
+d=$(new_fixture sibling_folder_collection)
+cat >> "$d/static/admin/config.yml" <<'YAML'
+  - name: posts
+    label: Blog
+    folder: content/blog
+    create: true
+    delete: true
+    fields:
+      - name: title
+        widget: string
+YAML
+mkdir -p "$d/content/blog"
+expect_pass "a sibling folder collection, as slices 06 and 07 add" "$d"
 
 d=$(new_fixture no_token_auth)
 sed -i.bak 's|^  auth_methods: \[token\]|  auth_methods: [oauth]|' "$d/static/admin/config.yml"

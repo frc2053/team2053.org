@@ -2,8 +2,8 @@
 #
 # Sveltia loads this from alongside index.html - /admin/config.yml - working it
 # out from the page's own path. That is why nothing here is an absolute URL to
-# this site: the same file is correct at frc2053.github.io/team2053.org/admin/
-# today and at team2053.org/admin/ after cutover.
+# this site: the same file is correct wherever the site is served from, whether
+# that is a subdirectory or the domain root.
 
 backend:
   name: github
@@ -92,7 +92,9 @@ collections:
     # not exist yet; slices 09 and 11 write them and add them here. An entry
     # pointing at a file that is not in the repository shows a student a blank
     # page and invites them to publish it, so scripts/check-cms-config.sh
-    # fails the build if this list and the content tree ever disagree.
+    # reports it when this list and the content tree disagree. It reports,
+    # rather than prevents: checks in this repository never gate the deploy, so
+    # the drift ships and turns the workflow red and emails the team.
     files:
       - name: home
         label: Home
