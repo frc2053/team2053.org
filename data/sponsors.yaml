@@ -1,30 +1,3 @@
-# The sponsor grid. Edited in the CMS under "Sponsors".
-#
-# ORDER IS FILE ORDER. Sveltia's list widget is drag-to-reorder, and the
-# template groups by tier while preserving the order within each tier. There is
-# deliberately no order-number field: the old `sortOrder` was a global 1-15
-# permutation that only ever tracked tier, and a student adding a sixteenth
-# sponsor would type `16` and land last in Bronze whatever tier they picked.
-#
-# There is deliberately no `url` field either. It was empty on all fifteen
-# sponsors and no template ever read it.
-#
-# The wrapping `sponsors:` key is not decoration - see data/socials.yaml for
-# why a Sveltia file collection cannot address a file whose root is a list.
-# The template reads hugo.Data.sponsors.sponsors.
-#
-# THE FAMILY MARK is shared on purpose. Law Family and Canaugh Family both
-# pointed at sponsor/family.webp in the Astro corpus, which slice 10 was to
-# resolve - but the duplicate was never the real defect. That raster is black
-# line art on transparency and the plate behind it is #141018, so BOTH
-# families rendered as blank boxes. It is now sponsor/family.svg: the same
-# icon, vectorised and recoloured to the site's foreground, and visible.
-#
-# It carries no name, and that is the point. Neither family has a logo and
-# neither ever will, and the caption under every plate already prints the name
-# and the tier - so the two are told apart there, and a sixteenth family
-# sponsor needs a row here and no new file. A name burnt into the artwork
-# would have meant drawing a new logo for every donor who never had one.
 sponsors:
   - name: Vestal Central School District
     logo: /images/sponsor/vestal-logo.webp
@@ -35,30 +8,27 @@ sponsors:
   - name: BAE Systems
     logo: /images/sponsor/BAEsystem.sponsor.webp
     tier: Gold
-  - name: CMP Advanced Mechanical Solutions
-    logo: /images/sponsor/CMP-white-red.webp
-    tier: Gold
-  - name: IEEE Binghamton
+  - name: IEEE Binghamton Section
     logo: /images/sponsor/ieee.svg
-    tier: Gold
+    tier: Platinum
   - name: Lockheed Martin
     logo: /images/sponsor/LM-logo.svg
-    tier: Gold
+    tier: Bronze
   - name: Williams Auto
     logo: /images/sponsor/williamsauto.webp
-    tier: Gold
+    tier: Platinum
   - name: Endicott Precision
     logo: /images/sponsor/EpINC.logo.webp
-    tier: Gold
+    tier: Bronze
   - name: Binghamton University Athletic Robotics Club
     logo: /images/sponsor/acr.webp
-    tier: Silver
+    tier: Bronze
   - name: Law Family
     logo: /images/sponsor/family.svg
-    tier: Silver
+    tier: Gold
   - name: State Line Auto Auction
     logo: /images/sponsor/slaaLogo.svg
-    tier: Silver
+    tier: Gold
   - name: Canaugh Family
     logo: /images/sponsor/family.svg
     tier: Bronze
@@ -68,6 +38,12 @@ sponsors:
   - name: iA
     logo: /images/sponsor/ia.svg
     tier: Bronze
-  - name: The Cat Doctor
-    logo: /images/sponsor/catdoc.webp
-    tier: Bronze
+  - name: Carrier Global Corporation
+    logo: /images/pasted-image-1788301906988.webp
+    tier: Platinum
+  - name: Corning Inc.
+    logo: /images/pasted-image-1788301972964.webp
+    tier: Platinum
+  - name: NYSEG
+    logo: /images/pasted-image-1788302077856.webp
+    tier: Platinum
