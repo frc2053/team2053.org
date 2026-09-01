@@ -127,3 +127,85 @@ collections:
         label: Contact
         file: content/pages/contact.md
         fields: *page_fields
+
+  # ── The two data singletons ─────────────────────────────────────────────
+  #
+  # Both are FILE collections holding one YAML file each, and in both the whole
+  # file is a single `list` widget. Sveltia's list widget is DRAG-TO-REORDER,
+  # which is the entire reason these are one file rather than a folder of
+  # entries: a folder collection has no manual order at all.
+  #
+  # The `- name:` immediately under `fields:` looks redundant against the file
+  # name and is not. A file collection maps its fields onto the file's TOP-LEVEL
+  # KEYS, so it cannot address a file whose root is a bare list; the list lives
+  # one key down, and the templates read hugo.Data.sponsors.sponsors and
+  # hugo.Data.socials.socials to match.
+
+  - name: sponsors
+    label: Sponsors
+    files:
+      - name: sponsors
+        label: Sponsors
+        file: data/sponsors.yaml
+        fields:
+          # THREE FIELDS, deliberately.
+          #
+          # No `url`: it was empty on all fifteen sponsors and no template ever
+          # read it.
+          #
+          # No order number. The old `sortOrder` was a global 1-15 permutation
+          # that only ever tracked tier, and rendering groups by tier first - so
+          # a student adding a sixteenth sponsor would type `16` and land last
+          # in Bronze whatever tier they chose. Dragging the row does what the
+          # number was pretending to do, and cannot be typed wrong.
+          - name: sponsors
+            label: Sponsors
+            label_singular: Sponsor
+            widget: list
+            summary: '{{fields.name}} - {{fields.tier}}'
+            fields:
+              - name: name
+                label: Name
+                widget: string
+                hint: Printed under the logo. Several logos are hard to read on
+                  their own, so this is what makes the grid legible.
+              - name: logo
+                label: Logo
+                widget: image
+              - name: tier
+                label: Tier
+                widget: select
+                options: [Platinum, Gold, Silver, Bronze]
+                hint: The page groups sponsors by tier, in this order. Drag a
+                  row to change where it sits inside its tier.
+
+  - name: socials
+    label: Social links
+    files:
+      - name: socials
+        label: Social links
+        file: data/socials.yaml
+        fields:
+          - name: socials
+            label: Social links
+            label_singular: Social link
+            widget: list
+            summary: '{{fields.platform}}'
+            fields:
+              # A DROPDOWN, never a text box. These options are exactly the
+              # eight icons committed under assets/social-icons/, lowercased,
+              # so a student's choice can never produce a missing glyph.
+              # scripts/check-cms-config.sh asserts the two lists still agree.
+              #
+              # Adding a ninth platform is honestly a code edit: its icon has to
+              # exist as a file first. Pre-stocking unused icons was offered and
+              # declined - carry only what the team uses.
+              - name: platform
+                label: Platform
+                widget: select
+                options: [X, TikTok, Instagram, YouTube, GitHub, Discord, Facebook, LinkedIn]
+              - name: url
+                label: Link
+                widget: string
+                hint: The full web address of the team's page there, starting
+                  with https://

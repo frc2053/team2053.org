@@ -1,8 +1,14 @@
-{{/* No year. A build frozen in 2029 must not print a stale copyright line. */}}
+{{/* No year. A build frozen in 2029 must not print a stale copyright line, and
+     the copyright text below is hardcoded for the same reason: there is
+     nothing in it that can go out of date, and no field for anyone to fill in.
+     scripts/check-site.sh asserts both halves - the notice is present, and no
+     four-digit year appears anywhere in this footer. */}}
 <footer class="foot">
   <div class="mark">{{ partial "wordmark.html" }}</div>
+  {{ partial "socials.html" . }}
   <small>
     {{ with site.Params.affiliation }}{{ . }}<br>{{ end }}
-    {{ with site.Params.contactEmail }}<a href="mailto:{{ . }}">{{ . }}</a>{{ end }}
+    {{ with site.Params.contactEmail }}<a href="mailto:{{ . }}">{{ . }}</a><br>{{ end }}
+    Copyright &copy; Southern Tier Robotics
   </small>
 </footer>

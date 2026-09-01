@@ -82,3 +82,40 @@ a{color:inherit}
 /* ── footer ──────────────────────────────────────────────────── */
 .foot{max-width:var(--measure);margin:6rem auto 0;padding:2rem 1rem 3rem;border-top:1px solid var(--line);text-align:center}
 .foot small{display:block;margin-top:1.2rem;color:var(--dim);font-size:.72rem;line-height:1.8}
+
+/* ── sponsor grid ────────────────────────────────────────────────
+   The 15 committed logos are not a consistent set - some white-on-transparent,
+   some with a baked white background, IEEE grey-on-transparent and nearly
+   invisible on dark. The NAME AND TIER UNDER EACH CARD is the fix: the grid
+   stays legible however any one logo reads, and no logo has to be re-cut,
+   which is exactly the maintenance nobody would do.
+
+   Selectors are two classes deep on purpose. The block sits inside .body, and
+   `.body h3`, `.body img` and `.body a` would otherwise win on specificity. */
+/* Breaks out of the 68ch measure and stops at 1100px: 15 logos two-abreast is
+   a very long page, and the grid is not prose. The width is `100vw` minus the
+   measure's own gutters rather than a bare `100vw`, which on a desktop with a
+   classic (non-overlay) scrollbar overflows by the scrollbar's width and puts
+   a horizontal scrollbar on the page. */
+.sponsorwrap{width:min(1100px,calc(100vw - 2rem));position:relative;left:50%;transform:translateX(-50%)}
+.sponsorwrap .sponsor-tier{margin:2.6rem 0 1.2rem;padding:0 0 .5rem;border-top:0;border-bottom:1px solid var(--line);font-size:.75rem;letter-spacing:.18em;text-transform:uppercase;color:var(--dim)}
+.sponsorwrap .sponsor-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:1.6rem 1.4rem;margin-bottom:1rem}
+.sponsorwrap .sponsor{margin:0;display:flex;flex-direction:column;gap:.7rem}
+.sponsorwrap .plate{border:1px solid var(--line);border-radius:.6rem;background:#141018;padding:1.1rem;height:150px;display:flex;align-items:center;justify-content:center}
+.sponsorwrap .plate img{max-height:100%;max-width:100%;width:auto;margin:0;border-radius:0;object-fit:contain}
+.sponsorwrap .sponsor figcaption{font-size:.78rem;line-height:1.4;color:var(--fg);margin:0}
+.sponsorwrap .tierlab{display:block;font-size:.64rem;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);margin-top:.15rem}
+
+/* The sponsor packet: a link, never an <embed>. */
+.packet{margin:2rem 0}
+.packet .dl{display:inline-flex;align-items:center;gap:.6rem;border:2px solid var(--fg);border-radius:3rem;padding:.6rem 1.4rem;text-decoration:none;font-size:.9rem}
+.packet .dl:hover{background:var(--fg);color:var(--bg)}
+
+/* ── footer socials ──────────────────────────────────────────────
+   36px circles carrying the eight inline SVG glyphs. The row wraps, so a
+   platform removed in the CMS simply leaves one fewer circle. */
+.socials{display:flex;flex-wrap:wrap;gap:.7rem;justify-content:center;margin:1.4rem 0;padding:0;list-style:none}
+.socials li{margin:0}
+.socials a{width:36px;height:36px;border:1px solid var(--line);border-radius:50%;display:grid;place-items:center;color:var(--dim);text-decoration:none;font-size:.8rem;transition:.15s}
+.socials a svg{width:19px;height:19px;fill:currentColor;display:block}
+.socials a:hover{border-color:var(--fg);color:var(--fg)}

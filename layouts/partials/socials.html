@@ -1,0 +1,35 @@
+{{/* The footer's social row, driven entirely by data/socials.yaml.
+
+     Deleting an entry in the CMS deletes the link here, which is the whole
+     reason the footer is editable: a link to a platform the team has left is
+     the Tier 2 decay nothing else would ever catch.
+
+     Glyphs are INLINE SVG committed under assets/social-icons/. Nothing is
+     fetched at build time - `astro-icon` and `@iconify-json/*` did not survive
+     the move to Hugo, and getting npm out of the build was the point. The
+     paths are the mdi/ic marks the Astro footer resolved at build time,
+     inlined once; X is RemixIcon's `twitter-x-fill`, which sits on the same
+     24x24 inset as the other seven. Apache-2.0, both sets.
+
+     Every field is reached through `default`, and a platform whose icon file
+     is missing degrades to its first letter rather than to a blank circle or a
+     failed build. scripts/check-cms-config.sh asserts the dropdown and the
+     committed icon set agree, so that degradation should never be reached. */}}
+{{/* hugo.Data, not site.Data: the latter is deprecated as of Hugo 0.156 and
+     warns on every build. */}}
+{{ with hugo.Data.socials.socials }}
+<ul class="socials">
+  {{ range . }}
+    {{ $platform := .platform | default "" }}
+    {{ $url := .url | default "" }}
+    {{ if and $platform $url }}
+      {{ $icon := resources.Get (printf "social-icons/%s.svg" (lower $platform)) }}
+      <li>
+        <a href="{{ $url }}" aria-label="{{ $platform }}" rel="me noopener" target="_blank">
+          {{- with $icon }}{{ .Content | safeHTML }}{{ else }}<span aria-hidden="true">{{ substr $platform 0 1 }}</span>{{ end -}}
+        </a>
+      </li>
+    {{ end }}
+  {{ end }}
+</ul>
+{{ end }}

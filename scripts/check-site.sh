@@ -133,10 +133,21 @@ done < <(find "$SITE" -type f \( -name '*.html' -o -name '*.css' \) | sort)
 
 [ "$broken" -eq 0 ] && pass "every local src/href/url() resolves to a file in $SITE"
 
-# ── 4. No four-digit year in the footer ───────────────────────────────────
+# ── 4. A copyright notice in the footer, and no four-digit year ───────────
 # A build frozen in 2029 must not print a stale copyright line, which is why
 # getFullYear() was removed. "2053" is the team number, not a year, so it is
 # stripped before the year pattern is applied.
+#
+# Until slice 08 this rejected the notice outright, on the reasoning that the
+# whole line was rot. The design says otherwise: the footer carries "Copyright
+# (c) Southern Tier Robotics", hardcoded, with nothing in it that can go out of
+# date. So the assertion is now two-sided - the notice must be there, and the
+# year must not - which also means the line cannot quietly disappear.
+#
+# The presence test uses a here-string rather than `printf | grep -q`: under
+# pipefail a NEGATED pipeline can be inverted by printf dying of SIGPIPE when
+# grep matches and exits early. Slice 04 hit exactly that and the remedy was
+# here-strings. The year test above is left in its verified form.
 yearly=0
 while IFS= read -r f; do
   footer=$(tr '\n' ' ' < "$f" | grep -oE '<footer[^>]*>.*</footer>' | head -1)
@@ -144,13 +155,85 @@ while IFS= read -r f; do
   if printf '%s' "${footer//2053/}" | grep -qE '(19|20)[0-9]{2}'; then
     fail "four-digit year in the footer of $f"
     yearly=$((yearly + 1))
-  elif printf '%s' "$footer" | grep -qiE '&copy;|©|copyright'; then
-    fail "copyright notice in the footer of $f"
+  elif ! grep -qiE '&copy;|©|copyright' <<< "$footer"; then
+    fail "no copyright notice in the footer of $f"
     yearly=$((yearly + 1))
   fi
 done < <(find "$SITE" -type f -name '*.html' | sort)
 
-[ "$yearly" -eq 0 ] && pass "no year and no copyright notice in any footer"
+[ "$yearly" -eq 0 ] && pass "every footer carries the copyright notice, and no year"
+
+# ── 5. Every sponsor renders with a name and a tier caption ───────────────
+# The sponsor grid is the one surface driven entirely by a data file, and every
+# way it can go wrong is silent: a tier renamed by hand drops its whole group
+# off the page, and a caption that stops rendering leaves fifteen unlabelled
+# logos - which is precisely the failure the captions exist to prevent, since
+# the logo set has no consistent background and several logos are unreadable on
+# their own. So this compares data/sponsors.yaml against what was rendered,
+# entry by entry, rather than counting boxes.
+SPONSOR_DATA=data/sponsors.yaml
+if [ ! -f "$SPONSOR_DATA" ]; then
+  fail "no $SPONSOR_DATA, so the sponsor grid has no sponsors to render"
+else
+  # name<TAB>tier, in file order. Paired by awk rather than by two independent
+  # seds, so an entry missing a tier is reported as that entry rather than
+  # silently shifting every later name against the wrong tier. \042 and \047
+  # are " and ', which cannot be written literally inside this awk program.
+  sponsor_rows=$(awk '
+    function unquote(s) {
+      sub(/^[ \t]+/, "", s); sub(/[ \t]+$/, "", s)
+      if (s ~ /^\042.*\042$/ || s ~ /^\047.*\047$/) s = substr(s, 2, length(s) - 2)
+      return s
+    }
+    /^[[:space:]]*-[[:space:]]+name:/ {
+      if (name != "") print name "\t"
+      sub(/^[[:space:]]*-[[:space:]]+name:/, ""); name = unquote($0); next
+    }
+    /^[[:space:]]*tier:/ {
+      sub(/^[[:space:]]*tier:/, ""); print name "\t" unquote($0); name = ""; next
+    }
+    END { if (name != "") print name "\t" }
+  ' "$SPONSOR_DATA")
+
+  expected=$(printf '%s\n' "$sponsor_rows" | grep -c .)
+  if [ "$expected" -lt 1 ]; then
+    # Nothing to iterate is not the same as nothing wrong - the lesson slice 03
+    # learned when an empty site satisfied every assertion in this file.
+    fail "$SPONSOR_DATA lists no sponsors, so nothing below could be checked"
+  else
+    # The page carrying the grid, whichever page that turns out to be. Attribute
+    # quotes are normalized away first: `hugo --minify` writes `class=tierlab`
+    # and an unminified build writes `class="tierlab"`, and this has to match
+    # both. Newlines are folded so a caption is always on one "line".
+    grid=$(grep -rlI --include='*.html' -e 'sponsorwrap' "$SITE" 2>/dev/null | head -1)
+    if [ -z "$grid" ]; then
+      fail "no page in $SITE renders the sponsor grid, but $SPONSOR_DATA lists $expected sponsor(s)"
+    else
+      rendered=$(tr '\n' ' ' < "$grid" | sed 's/class="\([^"]*\)"/class=\1/g')
+      captions=$(grep -o 'class=tierlab' <<< "$rendered" | grep -c .)
+      missing=0
+      while IFS=$'\t' read -r name tier; do
+        [ -z "$name" ] && continue
+        # A shell glob, not a regex, so a sponsor name containing regex
+        # metacharacters needs no escaping.
+        case $rendered in
+          *">$name<span class=tierlab>$tier sponsor<"*) ;;
+          *)
+            fail "sponsor \"$name\" does not render with a name and tier caption"
+            [ -n "$tier" ] || detail "no tier in $SPONSOR_DATA for this entry"
+            detail "expected in $grid"
+            missing=$((missing + 1)) ;;
+        esac
+      done <<< "$sponsor_rows"
+
+      if [ "$captions" -ne "$expected" ]; then
+        fail "$grid renders $captions tier caption(s) for the $expected sponsor(s) in $SPONSOR_DATA"
+      elif [ "$missing" -eq 0 ]; then
+        pass "all $expected sponsor(s) render with a name and tier caption"
+      fi
+    fi
+  fi
+fi
 
 echo
 if [ "$failures" -gt 0 ]; then

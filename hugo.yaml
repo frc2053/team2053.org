@@ -42,3 +42,7 @@ cascade:
 params:
   contactEmail: southerntierrobotics@gmail.com
   affiliation: FIRST® Robotics Competition Team 2053 · Vestal, NY
+  # The Sponsors page links to this rather than embedding it: <embed> renders a
+  # blank rectangle on iOS Safari and most mobile browsers. The path is the one
+  # the Astro site served it from, so links already in the wild still resolve.
+  sponsorPacket: /assets/SponsorPacket.pdf
