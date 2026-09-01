@@ -32,6 +32,7 @@ set -uo pipefail
 
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
 CHECKER="$ROOT/scripts/check-site.sh"
+PACKET=$(sed -n 's|^[[:space:]]*sponsorPacket:[[:space:]]*||p' "$ROOT/hugo.yaml" | tr -d '"'"'"'' | head -1)
 HUGO=${HUGO:-hugo}
 
 [ -x "$CHECKER" ] || { echo "no executable checker at $CHECKER" >&2; exit 2; }
@@ -68,6 +69,23 @@ new_site() {
   cp -R "$ROOT/static/css" "$dir/static/css"
   cp -R "$ROOT/static/fonts" "$dir/static/fonts"
   cp "$ROOT/static/favicon.png" "$dir/static/favicon.png"
+  # The Sponsors page links the sponsor packet, so check 3 has to resolve it.
+  # Stubbed rather than copied: the assertion is that the reference lands on a
+  # file, and the real packet is 1.35 MB per fixture to prove nothing.
+  mkdir -p "$dir/static/assets"
+  : > "$dir/static/assets/$(basename "$PACKET")"
+  # The Sponsors page renders from data/, and check 5 is deliberately NOT
+  # vacuous - it fails a sponsors page that has no sponsor data behind it.
+  # Two entries are enough: the assertion is the name and tier caption, and
+  # `logo` is optional in the template, so nothing here has to resolve.
+  mkdir -p "$dir/data"
+  cat > "$dir/data/sponsors.yaml" <<'YAML'
+sponsors:
+  - name: A Sponsor
+    tier: Gold
+  - name: Another Sponsor
+    tier: Bronze
+YAML
   # The one content file that is structural rather than prose: it is what keeps
   # /pages/ itself from being published as a section.
   mkdir -p "$dir/content/pages"
@@ -89,7 +107,7 @@ all_eight() {
   printf '%s' "$dir"
 }
 
-# Builds $1 and leaves the output in $1/_site. enableGitInfo is switched off by
+# Builds $1 and leaves the output in $1/public. enableGitInfo is switched off by
 # environment rather than by editing the copied config, so the config under test
 # stays byte-identical to the one that ships: with it on, Hugo refuses to build
 # anything outside a git repository.
@@ -107,7 +125,7 @@ build() {
 # nav_items' `href|label` turned round, because these expectations are read by a
 # person and the label is what identifies the row.
 nav_of() {
-  nav_items "$1/_site/index.html" | awk -F'|' '{ print $2 " " $1 }'
+  nav_items "$1/public/index.html" | awk -F'|' '{ print $2 " " $1 }'
 }
 
 # Rewrites file $1 through the awk program $2, and requires it to have changed
