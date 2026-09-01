@@ -1,18 +1,3 @@
-# The footer's social links. Edited in the CMS under "Social links".
-#
-# `platform` is a DROPDOWN in Sveltia, not a text box, and its options are
-# exactly the eight icons committed under assets/social-icons/ - so a student's
-# choice can never produce a missing glyph. Adding a ninth platform is a code
-# edit, because its icon has to exist as a file first; that residual is
-# accepted and recorded in the slice.
-#
-# The wrapping `socials:` key is not decoration. A Sveltia file collection maps
-# its fields onto the TOP-LEVEL KEYS of the file it edits, so a file whose root
-# is a bare list is not something the CMS can address. The list therefore lives
-# one key down, and the template reads hugo.Data.socials.socials.
-#
-# Twitter is X here - the label, the icon and the URL. The account is the same
-# one; x.com/frc2053 is where twitter.com/frc2053 lands.
 socials:
   - platform: X
     url: https://x.com/frc2053
@@ -24,8 +9,6 @@ socials:
     url: https://www.youtube.com/user/Team2053
   - platform: GitHub
     url: https://github.com/frc2053/
-  - platform: Discord
-    url: https://discord.gg/n5NHE9QMG2
   - platform: Facebook
     url: https://www.facebook.com/FRC2053/
   - platform: LinkedIn
