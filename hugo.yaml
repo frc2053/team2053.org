@@ -10,10 +10,6 @@ enableGitInfo: true
 frontmatter:
   lastmod: [':git']
 
-# The Astro app still owns ./public until it is torn down, so Hugo builds
-# somewhere else. Both the workflow and scripts/check-site.sh read this.
-publishDir: _site
-
 enableRobotsTXT: true
 
 # The content model has no tags and no categories, so their pages should not exist.

@@ -4,6 +4,6 @@
 icon.d.ts
 *.cache
 # Hugo build output and caches
-/_site/
+/public/
 /resources/
 .hugo_build.lock
