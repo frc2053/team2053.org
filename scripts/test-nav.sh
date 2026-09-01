@@ -97,31 +97,37 @@ build() {
   ( cd "$1" && HUGO_ENABLEGITINFO=false "$HUGO" --gc --minify ) > "$WORK/build" 2>&1
 }
 
-# One `label href` line per nav item of $1's home page, in document order. The
-# same reading as check-site.sh: --minify emits attributes quoted, unquoted and
-# bare, and all three have to come back as the href they mean.
+# The checker's own nav parser, not a second copy of it: a parser bug has to be
+# able to fail a test, and it cannot if the test reads the page through the same
+# mistake privately.
+# shellcheck source=scripts/nav-items.sh
+. "$ROOT/scripts/nav-items.sh"
+
+# One `label href` line per nav item of $1's home page, in document order -
+# nav_items' `href|label` turned round, because these expectations are read by a
+# person and the label is what identifies the row.
 nav_of() {
-  tr '\n' ' ' < "$1/_site/index.html" \
-    | grep -oE '<nav[^>]*>.*</nav>' \
-    | awk '{
-        n = split($0, a, /<a /)
-        for (i = 2; i <= n; i++) {
-          s = a[i]
-          h = s
-          if (sub(/^[^>]*href="/, "", h))     { sub(/".*$/, "", h) }
-          else if (sub(/^[^>]*href=/, "", h)) { sub(/[> ].*$/, "", h) }
-          else                                { h = "" }
-          l = s; sub(/^[^>]*>/, "", l); sub(/<\/a>.*$/, "", l)
-          printf "%s %s\n", l, h
-        }
-      }'
+  nav_items "$1/_site/index.html" | awk -F'|' '{ print $2 " " $1 }'
 }
 
-# Rewrites file $1 through the awk program $2. Used instead of `sed -i` for the
-# mutations that insert lines: BSD and GNU sed disagree about `\n` in a
-# replacement, and these tests run on a developer's Mac as well as in CI.
+# Rewrites file $1 through the awk program $2, and requires it to have changed
+# something. Used instead of `sed -i` for the mutations that insert lines: BSD
+# and GNU sed disagree about `\n` in a replacement, and these tests run on a
+# developer's Mac as well as in CI.
 edit() {
-  awk "$2" "$1" > "$1.edited" && mv "$1.edited" "$1"
+  awk "$2" "$1" > "$1.edited" || { fail "awk failed rewriting $1"; return; }
+  cmp -s "$1" "$1.edited" && fail "the rewrite of $1 changed nothing"
+  mv "$1.edited" "$1"
+}
+
+# Applies sed program $2 to file $1, and requires it to have changed something.
+# A mutation whose pattern quietly stopped matching - after a rename, a
+# reindent, a reordering of the config - would leave the fixture pristine, and
+# the test built on it would be asserting nothing at all.
+mutate() {
+  sed -i.bak "$2" "$1"
+  cmp -s "$1" "$1.bak" && fail "the mutation of $1 matched nothing: $2"
+  rm -f "$1.bak"
 }
 
 # Runs check-site.sh in $1 and reports its exit status. Truncated before the
@@ -235,6 +241,23 @@ else
   detail "without it a ninth and tenth nav item overflow the header instead of wrapping"
 fi
 
+# A page can hold more than one <nav>, and slice 08 is adding the second one:
+# the social links in the footer. A parser that took everything between the
+# first <nav> and the last </nav> would read the whole page body as nav items
+# and report it as the nav differing between pages - the parser wrong, and the
+# report pointing somewhere else entirely.
+FOOTNAV=$(all_eight footnav)
+edit "$FOOTNAV/layouts/partials/footer.html" '
+  /<\/footer>/ {
+    print "<nav class=\"social\" aria-label=\"Social\">"
+    print "<a href=\"https://example.com/a\">A</a>"
+    print "<a href=\"https://example.com/b\">B</a>"
+    print "</nav>"
+  }
+  { print }'
+expect_pass "a second nav in the footer does not disturb the checks" "$FOOTNAV"
+expect_nav  "a second nav in the footer is not read as nav items" "$FOOTNAV" "$EIGHT"
+
 # Deleting a page unlinks it, and touches nothing else. The dangling failure -
 # a nav entry pointing at a page that is gone, on every page of the site - has
 # nowhere to come from either.
@@ -250,7 +273,7 @@ expect_nav  "deleting a page removes its nav entry and changes nothing else" "$S
 # Narrowing the catch-all cascade target is how it would realistically happen -
 # somebody scoping the rule to the page they were thinking about.
 STRANDED=$(all_eight stranded)
-sed -i.bak 's|path: /pages/\*\*|path: /pages/contact|' "$STRANDED/hugo.yaml"
+mutate "$STRANDED/hugo.yaml" 's|path: /pages/\*\*|path: /pages/contact|'
 expect_fail "a page built but left out of the nav is caught" "$STRANDED" \
   "is in this build but"
 
@@ -259,20 +282,20 @@ expect_fail "a page built but left out of the nav is caught" "$STRANDED" \
 # have pointed at is published and unreachable - which section 5 reports from
 # the page's side.
 TYPO=$(all_eight typo)
-sed -i.bak 's|pageRef: /blog$|pageRef: /blogg|' "$TYPO/hugo.yaml"
+mutate "$TYPO/hugo.yaml" 's|pageRef: /blog$|pageRef: /blogg|'
 expect_fail "a mistyped pageRef in hugo.yaml is caught" "$TYPO" \
   'blog/index.html is in this build but'
 
 # The one entry that points off this site, and so the one nobody's build would
 # ever notice was wrong.
 SHOP=$(all_eight shop)
-sed -i.bak 's|url: https://shop.team2053.org/|url: https://example.com/|' "$SHOP/hugo.yaml"
+mutate "$SHOP/hugo.yaml" 's|url: https://shop.team2053.org/|url: https://example.com/|'
 expect_fail "the Merch Store entry pointing somewhere else is caught" "$SHOP" \
   "not https://shop.team2053.org/"
 
 # The interleaved order is the thing a weight edit can silently undo.
 ORDER=$(all_eight order)
-sed -i.bak 's|weight: 30|weight: 75|' "$ORDER/hugo.yaml"
+mutate "$ORDER/hugo.yaml" 's|weight: 30|weight: 75|'
 expect_fail "the nav rendered out of order is caught" "$ORDER" \
   "out of order"
 
@@ -291,6 +314,23 @@ edit "$MIDDLE/hugo.yaml" '
   { print }'
 expect_fail "an added page sorted into the middle of the nav is caught" "$MIDDLE" \
   "instead of onto the end"
+
+# A nav with none of the expected items in it. The failures are what matter
+# less than what must NOT be reported: every item is "after the last expected
+# one" when there is no expected one, so the append report - which exists to
+# bless a page somebody added - would otherwise call a nav of pure junk healthy.
+JUNK=$(all_eight junk)
+printf '%s\n' \
+  '<header class="head"><nav class="nav" aria-label="Main">' \
+  '<a href="/alpha/">Alpha</a><a href="/beta/">Beta</a>' \
+  '</nav></header>' > "$JUNK/layouts/partials/header.html"
+expect_fail "a nav with none of the expected items in it is caught" "$JUNK" \
+  "is in this build but"
+if grep -q "appended to the end" "$WORK/out"; then
+  fail "a nav of pure junk was reported as pages appended to the end"
+else
+  pass "a nav with no expected item in it is not blessed as appended pages"
+fi
 
 # No nav at all. This is the empty-set hole slice 03 found in check-site.sh and
 # slice 05 found twice in check-cms-config.sh: nothing to iterate is not the
@@ -316,10 +356,17 @@ expect_fail "a nav that differs between pages is caught" "$UNEVEN" \
 # page you are already on.
 EMPTY=$(new_site empty)
 page "$EMPTY" pages/contact.md Contact
+# Matched as whole trimmed lines rather than by regex: `{` opens an interval
+# expression in POSIX ERE, so a pattern containing `{{` is undefined behaviour
+# that every awk here happens to treat literally.
 edit "$EMPTY/layouts/partials/header.html" '
-  /{{ if \.URL }}/            { dropping = 1; next }
-  dropping && /^[ \t]*{{ end }}[ \t]*$/ { dropping = 0; next }
-  { print }'
+  {
+    t = $0
+    gsub(/^[[:space:]]+|[[:space:]]+$/, "", t)
+    if (t == "{{ if .URL }}")            { dropping = 1; next }
+    if (dropping && t == "{{ end }}")    { dropping = 0; next }
+    print
+  }'
 expect_fail "an unguarded nav entry resolving to an empty href is caught" "$EMPTY" \
   "empty href"
 

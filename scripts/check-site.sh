@@ -181,59 +181,28 @@ Merch Store|@https://shop.team2053.org/
 Sponsors|sponsors
 Contact|contact'
 
-# Emits one `href|label` line per anchor in a page's nav, in document order.
-#
-# Attributes are read quoted, unquoted and bare, because `--minify` rewrites all
-# three: `<a href="/contact/">` is emitted as `<a href=/contact/>`, and an EMPTY
-# href as `<a href>`. That last shape is the one worth naming - read carelessly
-# it parses as the href "href", which is a broken link reported as a working
-# one. Newlines are flattened first: the minified nav still spans them, which is
-# what defeated a single-line grep during slice 03.
-nav_items() {
-  tr '\n' ' ' < "$1" \
-    | grep -oE '<nav[^>]*>.*</nav>' \
-    | awk '{
-        n = split($0, a, /<a /)
-        for (i = 2; i <= n; i++) {
-          s = a[i]
-          h = s
-          if (sub(/^[^>]*href="/, "", h))     { sub(/".*$/, "", h) }
-          else if (sub(/^[^>]*href=/, "", h)) { sub(/[> ].*$/, "", h) }
-          else                                { h = "" }
-          l = s; sub(/^[^>]*>/, "", l); sub(/<\/a>.*$/, "", l)
-          printf "%s|%s\n", h, l
-        }
-      }'
-}
+NAV_ORDER=$(printf '%s\n' "$NAV_EXPECTED" | cut -d'|' -f1 | paste -sd'|' - | tr '|' ',' | sed 's/,/, /g')
 
-# The page's own heading, which for every page but Home is its title - and, via
-# the `/:slug/` permalink, its URL as well.
-page_h1() {
-  tr '\n' ' ' < "$1" | grep -oE '<h1[^>]*>[^<]*</h1>' | head -1 | sed -E 's|<h1[^>]*>||; s|</h1>||'
-}
+# The nav parser, shared with scripts/test-nav.sh so the tests cannot exercise a
+# second copy of it. Resolved next to this script, not next to the caller's
+# working directory: test-nav.sh runs this checker from inside a fixture.
+NAV_LIB="$(dirname "$0")/nav-items.sh"
+if [ ! -f "$NAV_LIB" ]; then
+  echo "check-site.sh cannot find $NAV_LIB" >&2
+  exit 2
+fi
+# shellcheck source=scripts/nav-items.sh
+. "$NAV_LIB"
 
 # Sveltia's own page is copied into the site verbatim out of static/admin/. It
 # is a third-party application, not a page of this website, and carries no site
 # chrome by design - the one HTML file here not expected to have a nav.
 nav_pages=0
+nav_differs=0
 nav_ref=""
 nav_ref_file=""
-old_name=0
 while IFS= read -r f; do
   case "$f" in "$SITE"/admin/*) continue ;; esac
-
-  # The nav says "Sponsors" and the page it points at says "Support Us" on the
-  # site this replaces. "Sponsors" wins in both places, because that is the word
-  # people look for. This is checked over every page rather than over
-  # /sponsors/, because the title is also the slug: reverting the name moves the
-  # page to /support-us/ and takes the nav label with it, so the nav stays
-  # perfectly consistent and perfectly unfindable.
-  if [ "$(page_h1 "$f")" = "Support Us" ]; then
-    fail "$f is headed \"Support Us\""
-    detail "\"Sponsors\" is the word in the nav and it has to be the word on the page"
-    old_name=$((old_name + 1))
-  fi
-
   items=$(nav_items "$f")
   if [ -z "$items" ]; then
     fail "no nav links in $f"
@@ -246,6 +215,7 @@ while IFS= read -r f; do
   elif [ "$items" != "$nav_ref" ]; then
     fail "the nav is not the same on every page"
     detail "$nav_ref_file and $f render different nav items"
+    nav_differs=$((nav_differs + 1))
   fi
 done < <(find "$SITE" -type f -name '*.html' | sort)
 
@@ -255,7 +225,7 @@ done < <(find "$SITE" -type f -name '*.html' | sort)
 if [ "$nav_pages" -lt 1 ]; then
   fail "no page in $SITE has a nav to check"
 else
-  pass "the same nav renders on all $nav_pages page(s)"
+  [ "$nav_differs" -eq 0 ] && pass "the same nav renders on all $nav_pages page(s)"
 
   nav_labels=$(printf '%s\n' "$nav_ref" | sed 's/^[^|]*|//')
 
@@ -274,6 +244,7 @@ else
 
   deferred=""
   wrong=0
+  checked=0
   last_expected=0
   while IFS='|' read -r label target; do
     [ -z "$label" ] && continue
@@ -282,6 +253,7 @@ else
     if [ "${target#@}" != "$target" ]; then
       # External, so it depends on nothing being built and is always required.
       want="${target#@}"
+      checked=$((checked + 1))
       if [ -z "$idx" ]; then
         fail "the nav has no \"$label\" entry"
         wrong=$((wrong + 1))
@@ -297,63 +269,97 @@ else
       if [ ! -f "$page" ]; then
         deferred="$deferred $label"
         if [ -n "$idx" ]; then
+          checked=$((checked + 1))
           fail "the nav links to \"$label\", but $page is not in this build"
           wrong=$((wrong + 1))
         fi
-      elif [ -z "$idx" ]; then
-        # Stranding: the page is published and nothing links to it. The sharpest
-        # usability failure on the site this replaces.
-        fail "$page is in this build but \"$label\" is not in the nav"
-        wrong=$((wrong + 1))
-      elif [ "$(nav_href "$label")" != "$want" ]; then
-        fail "\"$label\" links to $(nav_href "$label"), not to $want where the page is"
-        wrong=$((wrong + 1))
+      else
+        checked=$((checked + 1))
+        if [ -z "$idx" ]; then
+          # Stranding: the page is published and nothing links to it. The
+          # sharpest usability failure on the site this replaces.
+          fail "$page is in this build but \"$label\" is not in the nav"
+          wrong=$((wrong + 1))
+        elif [ "$(nav_href "$label")" != "$want" ]; then
+          fail "\"$label\" links to $(nav_href "$label"), not to $want where the page is"
+          wrong=$((wrong + 1))
+        fi
       fi
     fi
 
     if [ -n "$idx" ]; then
       if [ "$idx" -le "$last_expected" ]; then
         fail "the nav renders \"$label\" out of order"
-        detail "expected: Home, Blog, About, Current Season, History, Merch Store, Sponsors, Contact"
+        detail "expected: $NAV_ORDER"
         wrong=$((wrong + 1))
       fi
       last_expected=$idx
     fi
   done <<< "$NAV_EXPECTED"
 
-  [ "$wrong" -eq 0 ] && pass "every expected nav item this build contains is present, linked and in order"
+  # Counted, not assumed. Every branch above is inside a loop over the expected
+  # items, and a build containing none of them would satisfy all of them.
+  if [ "$checked" -lt 1 ]; then
+    fail "not one expected nav item was checked - nothing this nav should contain is in this build"
+  elif [ "$wrong" -eq 0 ]; then
+    pass "all $checked expected nav item(s) this build contains are present, linked and in order"
+  fi
   [ -n "$deferred" ] && detail "not in this build, so not checked:$deferred"
 
   # Anything else in the nav is a prose page somebody added, which is this
   # design working rather than failing. Such a page carries no weight, so it
   # must have sorted to the END - one turning up among the expected eight means
   # the weights have drifted.
-  stray=0
-  n=0
-  while IFS= read -r label; do
-    n=$((n + 1))
-    [ "$n" -le "$last_expected" ] || continue
-    printf '%s\n' "$NAV_EXPECTED" | cut -d'|' -f1 | grep -qxF "$label" && continue
-    stray=$((stray + 1))
-  done <<< "$nav_labels"
+  #
+  # Only meaningful once something expected has been located: with
+  # last_expected still 0 every item is "after the expected ones" and this would
+  # bless a nav of pure junk.
   total=$(printf '%s\n' "$nav_labels" | grep -c .)
-  if [ "$stray" -gt 0 ]; then
-    fail "$stray added page(s) sorted into the middle of the nav instead of onto the end"
-  elif [ "$total" -gt "$last_expected" ]; then
-    pass "the $((total - last_expected)) added page(s) appended to the end of the nav"
+  if [ "$last_expected" -ge 1 ]; then
+    stray=0
+    n=0
+    while IFS= read -r label; do
+      n=$((n + 1))
+      [ "$n" -le "$last_expected" ] || continue
+      printf '%s\n' "$NAV_EXPECTED" | cut -d'|' -f1 | grep -qxF "$label" && continue
+      stray=$((stray + 1))
+    done <<< "$nav_labels"
+    if [ "$stray" -gt 0 ]; then
+      fail "$stray added page(s) sorted into the middle of the nav instead of onto the end"
+    elif [ "$total" -gt "$last_expected" ]; then
+      pass "the $((total - last_expected)) added page(s) appended to the end of the nav"
+    fi
   fi
 fi
 
-if [ -f "$SITE/sponsors/index.html" ]; then
-  h1=$(page_h1 "$SITE/sponsors/index.html")
-  if [ "$h1" = "Sponsors" ]; then
-    pass "the sponsors page is headed \"Sponsors\", the same word the nav uses"
-  else
-    fail "the sponsors page is headed \"$h1\", not \"Sponsors\""
-    detail "the nav label is the page title, so these two cannot be left to disagree"
+# ── 6. "Sponsors" is the word in both places ──────────────────────────────
+# The nav says "Sponsors" and the page it points at says "Support Us" on the
+# site this replaces. "Sponsors" wins in both places, because that is what
+# people look for.
+#
+# Checked over every page rather than over /sponsors/, and this is the reason:
+# the title is also the slug, so reverting the name moves the page to
+# /support-us/ AND takes the nav label with it. Nothing dangles, nothing is
+# stranded, section 5 stays green - and the page is unfindable. Label drift in
+# the other direction, a page still at /sponsors/ under some other name, is
+# already section 5's stranding case.
+old_name=0
+h1_pages=0
+while IFS= read -r f; do
+  case "$f" in "$SITE"/admin/*) continue ;; esac
+  h1_pages=$((h1_pages + 1))
+  h1=$(tr '\n' ' ' < "$f" | grep -oE '<h1[^>]*>[^<]*</h1>' | head -1 | sed -E 's|<h1[^>]*>||; s|</h1>||')
+  if [ "$h1" = "Support Us" ]; then
+    fail "$f is headed \"Support Us\""
+    detail "\"Sponsors\" is the word in the nav, and it has to be the word on the page"
+    old_name=$((old_name + 1))
   fi
+done < <(find "$SITE" -type f -name '*.html' | sort)
+
+if [ "$h1_pages" -lt 1 ]; then
+  fail "no page in $SITE to check the sponsors naming over"
 elif [ "$old_name" -eq 0 ]; then
-  pass "no page is headed \"Support Us\" - the nav's word for it is \"Sponsors\""
+  pass "no page is headed \"Support Us\" - across $h1_pages page(s), the word is \"Sponsors\""
 fi
 
 echo
