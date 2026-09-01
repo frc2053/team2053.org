@@ -153,15 +153,17 @@ done < <(find "$SITE" -type f -name '*.html' | sort)
 [ "$yearly" -eq 0 ] && pass "no year and no copyright notice in any footer"
 
 # ── 5. No tag or category routes ──────────────────────────────────────────
-# The content model has no tags and no authors. The old site's did, and it had
-# already rotted while its author was still on the team: 12 posts carrying 27
-# distinct tags, 16 used exactly once, two of them curly-quote duplicates that
-# published a second page for the same tag, and one empty string - more tag
-# pages than posts, each listing one thing.
+# The content model has no tags and no authors; why is written out once, in
+# the DELIBERATELY ABSENT block on the posts collection in
+# static/admin/config.yml. The old site's tag routes had rotted into more tag
+# pages than it had posts.
 #
 # hugo.yaml disables the taxonomy and term kinds, so this asserts the outcome
-# rather than the setting: a `tags:` line reintroduced in front matter, or a
-# taxonomy re-enabled in the config, both show up here as a directory.
+# rather than the setting - which makes it fair to ask whether it can fail at
+# all. It was drilled both ways before it was committed: a `tags:` line put
+# back into a post's front matter produces no directory and this still passes,
+# and `disableKinds: []` produces _site/tags and _site/categories and this
+# fails on both. It is the config regression it catches, not the content one.
 taxo=$(find "$SITE" -type d \( -name tags -o -name categories -o -name authors \) | sort)
 if [ -n "$taxo" ]; then
   fail "tag, category or author routes in $SITE"

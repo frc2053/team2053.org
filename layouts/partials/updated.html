@@ -3,8 +3,9 @@
      by the commit that last touched it, via enableGitInfo. Both are recorded
      past dates — never `now`, so a frozen site cannot claim to be fresh.
 
-     `.Date` is tested as well as the field, so a publishDate Hugo could not
-     parse falls back to the commit date rather than dating the post to the
-     year 1. */}}
-{{ if and .Params.publishDate (not .Date.IsZero) }}<span class="updated"><time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "January 2, 2006" }}</time></span>
-{{ else if not .Lastmod.IsZero }}<span class="updated">Updated {{ .Lastmod.Format "January 2006" }}</span>{{ end }}
+     Only the field is tested, never `.Date` alongside it: Hugo treats a
+     publishDate it cannot parse as a fatal build error rather than as a zero
+     date, so there is no unparsable-date case left for this template to catch.
+     What keeps that error out of the repository is the CMS datetime widget,
+     which cannot emit one. */}}
+{{ if .Params.publishDate }}<span class="updated"><time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "January 2, 2006" }}</time></span>{{ else if not .Lastmod.IsZero }}<span class="updated">Updated {{ .Lastmod.Format "January 2006" }}</span>{{ end }}

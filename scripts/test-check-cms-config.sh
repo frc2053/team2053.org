@@ -223,6 +223,9 @@ expect_fail "token sign-in switched off" "$d" "token"
 # - so all a student filling one in would get is the belief that it does
 # something. The control above is what proves the checker reads past the long
 # comment in the config that names both fields while declining them.
+#
+# All four shapes are exercised, because a guard that only catches the way the
+# field is usually typed reads exactly like a guard that catches the field.
 d=$(new_fixture tags_field)
 cat >> "$d/static/admin/config.yml" <<'YAML'
       - name: tags
@@ -238,6 +241,19 @@ cat >> "$d/static/admin/config.yml" <<'YAML'
         widget: list
 YAML
 expect_fail "an authors field added back to a collection" "$d" "tags or authors"
+
+d=$(new_fixture quoted_tags_field)
+cat >> "$d/static/admin/config.yml" <<'YAML'
+      - name: "tags"
+        widget: list
+YAML
+expect_fail "a tags field written with quotes" "$d" "tags or authors"
+
+d=$(new_fixture flow_tags_field)
+cat >> "$d/static/admin/config.yml" <<'YAML'
+      - {name: tags, label: Tags, widget: list}
+YAML
+expect_fail "a tags field written in flow style" "$d" "tags or authors"
 
 echo
 if [ "$failures" -gt 0 ]; then

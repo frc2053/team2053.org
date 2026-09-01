@@ -1,6 +1,6 @@
 ---
 title: 2024 Pre-Season, Welcome!
-summary: Southern Tier Robotics prepares for another FIRST® Robotics Competition (FRC) season.
+summary: Southern Tier Robotics preparses for another FIRST® Robotics Competition (FRC) season.
 publishDate: 2023-10-12
 featuredImage: /images/crescendo.webp
 ---
