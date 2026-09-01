@@ -2,7 +2,7 @@
 title: Southern Tier Robotics
 description: Real world engineering through competitive robotics, from FIRST Robotics Competition team 2053 in Vestal, NY.
 heroImage: /images/teamphoto.webp
-heroImageAlt: The team with our 2025 robot
+heroImageAlt: The team standing together with the robot in the shop
 ---
 
 Real world engineering through competitive robotics.

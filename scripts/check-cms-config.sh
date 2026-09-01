@@ -518,6 +518,37 @@ elif [ "$in_fm" -eq 0 ]; then
   pass "none of the $scanned content file(s) sets its own menus or weight"
 fi
 
+# ── 13. No calendar field and no countdown field ──────────────────────────
+# The Google Calendar embed is hardcoded in
+# layouts/pages/current-season/page.html, and that placement is the whole
+# design: it is the only element on this site that stays current without
+# anyone touching the repository, and a field is precisely the thing that
+# makes an element need touching. A calendar address typed into the CMS is a
+# durable thing turned into a rotting one.
+#
+# The countdown is the sharper half. The old page counted down to kickoff from
+# a `kickoffDate` somebody retyped every autumn, on a site whose whole premise
+# is that it will one day stop being edited - so its guaranteed end state is
+# counting into the past. Both were deleted with a reason, which is the kind of
+# thing a later hand puts back as an obvious improvement.
+#
+# Names AND labels, for the reason section 12 gives: the label is the half a
+# student reads, and "Meeting calendar" over a field named `url2` is the same
+# defect. Read from $BARE, so this file's own comments explaining why these are
+# absent are never mistaken for the fields themselves.
+cal_named=$(sed -E 's/["'"'"'{},]/ /g' "$BARE" \
+  | grep -nEi "(^|[[:space:]])name[[:space:]]*:[[:space:]]*(calendar|calendar_?url|countdown|kickoff|kickoff_?date)([[:space:]]|$)")
+cal_labelled=$(grep -nEi '^[[:space:]]*(label|label_singular):.*(\bcalendar\b|countdown|\bkickoff\b)' "$BARE")
+if [ -n "$cal_named$cal_labelled" ]; then
+  fail "$CONFIG offers a calendar or countdown field"
+  detail "the calendar is hardcoded in the layout because it is the one thing here that stays"
+  detail "current with nobody editing it; a countdown needs a date somebody retypes every year"
+  [ -n "$cal_named" ] && while IFS= read -r l; do detail "line $l"; done <<< "$cal_named"
+  [ -n "$cal_labelled" ] && while IFS= read -r l; do detail "line $l"; done <<< "$cal_labelled"
+else
+  pass "no calendar and no countdown field in any collection"
+fi
+
 echo
 if [ "$failures" -gt 0 ]; then
   echo "$failures check(s) failed. The site still deployed; this is a configuration problem, not an outage."

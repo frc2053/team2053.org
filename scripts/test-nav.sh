@@ -2,7 +2,14 @@
 #
 # Fixture tests for the derived nav: the `menus.main` and `cascade` blocks in
 # hugo.yaml, the `range site.Menus.main` in layouts/partials/header.html, and
-# section 5 of scripts/check-site.sh.
+# section 8 of scripts/check-site.sh.
+#
+# And, since slice 11, for the two sections of that checker that are about the
+# prose pages rather than the nav - 10, the contact channel, and 11, the
+# calendar - because they need exactly the harness this file already has: a
+# throwaway site built from the real config and the real layouts, with the
+# checker run over it. Splitting them into a second file would mean a second
+# copy of that harness.
 #
 # The nav is derived from the set of pages rather than edited - there is no
 # order field and no "show in nav" box anywhere - so the claims worth testing
@@ -14,7 +21,7 @@
 #
 # The mutations after them exist for the reason slice 03 found the hard way: a
 # checker that quietly passes everything looks exactly like a checker that
-# works. Each one breaks a thing section 5 asserts and requires it to notice.
+# works. Each one breaks a thing the checker asserts and requires it to notice.
 #
 # Everything runs against a throwaway tree under $TMPDIR. It never touches the
 # real site.
@@ -174,6 +181,12 @@ expect_pass() {
 
 # $1 label, $2 fixture, $3 a string the failure has to mention - so a mutation
 # cannot be "caught" by an unrelated assertion.
+#
+# $3 is looked for in everything the checker printed EXCEPT its `ok` lines.
+# Several of the checker's assertions word their pass and their failure out of
+# the same phrase - "no form in public" against "form in public" - so a search
+# over the whole report could be satisfied by the very assertion that passed.
+# Detail lines are still searchable; only the passes are excluded.
 expect_fail() {
   if ! build "$2"; then
     fail "$1 (hugo failed, so the checker never ran)"
@@ -183,7 +196,7 @@ expect_fail() {
   if check_in "$2"; then
     fail "$1 (the checker passed)"
     while IFS= read -r l; do detail "$l"; done < "$WORK/out"
-  elif ! grep -qi -- "$3" "$WORK/out"; then
+  elif ! grep -v '^ok ' "$WORK/out" | grep -qi -- "$3"; then
     fail "$1 (failed, but not about \"$3\")"
     while IFS= read -r l; do detail "$l"; done < "$WORK/out"
   else
@@ -403,6 +416,69 @@ SUPPORT=$(all_eight support)
 page "$SUPPORT" pages/sponsors.md "Support Us"
 expect_fail "the sponsors page retitled \"Support Us\" is caught" "$SUPPORT" \
   'Support Us'
+
+# ── Mutations: sections 10 and 11, the two prose-page sections ─────────────
+# The same fixtures reach these, because all_eight builds the Contact and
+# Current Season pages out of the real layouts - so the calendar arrives with
+# layouts/pages/current-season/page.html and needs nothing synthesized. Every
+# one of these was drilled by hand against a copy of the real site first; this
+# is what keeps them drilled after the next person edits a template.
+
+# The form. Nothing on this site posts anywhere - there is no backend and no
+# form provider - so a form is not a channel, it is a channel that silently is
+# not there. That is exactly what the old contact form was.
+#
+# It comes back through a TEMPLATE and not through a page body, because a page
+# body cannot bring one back: hugo.yaml sets no `markup` block, so goldmark's
+# `unsafe` is at its default of false and raw HTML pasted into the CMS is
+# dropped rather than rendered. A form can only return the way the old one
+# arrived - somebody writing a template for the page.
+FORM=$(all_eight form)
+mkdir -p "$FORM/layouts/pages/contact"
+cat > "$FORM/layouts/pages/contact/page.html" <<'HTML'
+{{ define "main" }}
+{{ .Content }}
+<form action="/contact-thank-you" method="post"><button>Send</button></form>
+{{ end }}
+HTML
+expect_fail "a form put back on the contact page is caught" "$FORM" \
+  "form in "
+
+# The address. Email is the only contact channel the site has, and the body of
+# the page has to carry it - the footer's copy is on every page and would mask
+# a Contact page that had lost its own.
+NOMAIL=$(all_eight nomail)
+page "$NOMAIL" pages/contact.md Contact
+expect_fail "a contact page with no email address in it is caught" "$NOMAIL" \
+  "does not offer"
+
+# The calendar, dropped from the template. It takes the page's whole point with
+# it and leaves prose that still says "the calendar above".
+NOCAL=$(all_eight nocal)
+mutate "$NOCAL/layouts/pages/current-season/page.html" \
+  's|calendar\.google\.com/calendar/embed|example.invalid/gone|'
+expect_fail "the calendar embed dropped from the template is caught" "$NOCAL" \
+  "renders no Google Calendar embed"
+
+# The order. The calendar leads because it empties rather than lying; prose
+# about which days we meet cannot do that. Reversing the template is how it
+# would realistically happen.
+BELOW=$(all_eight below)
+edit "$BELOW/layouts/pages/current-season/page.html" '
+  /^{{ define "main" }}$/ { print; print "{{ .Content }}"; next }
+  /^{{ .Content }}$/      { next }
+  { print }'
+expect_fail "prose above the calendar is caught" "$BELOW" \
+  "puts prose above the calendar"
+
+# The year label. `title=2026%20Events` still reads 2026 in 2031, over a
+# calendar showing 2031's meetings - and a template is not somewhere anyone
+# left here would look for it.
+YEARED=$(all_eight yeared)
+mutate "$YEARED/layouts/pages/current-season/page.html" \
+  's|embed?height=600|embed?title=2026%20Events\&amp;height=600|'
+expect_fail "a year label put back in the calendar address is caught" "$YEARED" \
+  "carries a year"
 
 echo
 if [ "$failures" -gt 0 ]; then
