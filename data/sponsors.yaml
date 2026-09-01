@@ -13,12 +13,18 @@
 # why a Sveltia file collection cannot address a file whose root is a list.
 # The template reads hugo.Data.sponsors.sponsors.
 #
-# KNOWN, AND NOT FIXED HERE: Law Family and Canaugh Family both point at
-# sponsor/family.webp, so two distinct sponsors render the same logo. That is
-# carried over verbatim from the Astro corpus. Resolving it needs a second
-# logo that nobody has, which makes it a content decision rather than a
-# migration one; slice 10 owns it. The captions under the cards mean the two
-# are at least told apart on the page today.
+# THE FAMILY MARK is shared on purpose. Law Family and Canaugh Family both
+# pointed at sponsor/family.webp in the Astro corpus, which slice 10 was to
+# resolve - but the duplicate was never the real defect. That raster is black
+# line art on transparency and the plate behind it is #141018, so BOTH
+# families rendered as blank boxes. It is now sponsor/family.svg: the same
+# icon, vectorised and recoloured to the site's foreground, and visible.
+#
+# It carries no name, and that is the point. Neither family has a logo and
+# neither ever will, and the caption under every plate already prints the name
+# and the tier - so the two are told apart there, and a sixteenth family
+# sponsor needs a row here and no new file. A name burnt into the artwork
+# would have meant drawing a new logo for every donor who never had one.
 sponsors:
   - name: Vestal Central School District
     logo: /images/sponsor/vestal-logo.webp
@@ -48,13 +54,13 @@ sponsors:
     logo: /images/sponsor/acr.webp
     tier: Silver
   - name: Law Family
-    logo: /images/sponsor/family.webp
+    logo: /images/sponsor/family.svg
     tier: Silver
   - name: State Line Auto Auction
     logo: /images/sponsor/slaaLogo.svg
     tier: Silver
   - name: Canaugh Family
-    logo: /images/sponsor/family.webp
+    logo: /images/sponsor/family.svg
     tier: Bronze
   - name: Endicott Rotary Club
     logo: /images/sponsor/rotary.webp

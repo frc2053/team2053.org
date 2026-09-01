@@ -1,7 +1,7 @@
 ---
 title: 2024 FRC Kickoff
-summary: Another FRC season has begun.
 publishDate: 2024-01-07
+summary: Another FRC season has begun.
 featuredImage: /images/crescendokickoff.webp
 ---
 
