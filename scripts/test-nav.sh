@@ -6,12 +6,11 @@
 #
 # The nav is derived from the set of pages rather than edited - there is no
 # order field and no "show in nav" box anywhere - so the claims worth testing
-# are the ones nobody can test by looking at today's site, because today's site
-# does not have all eight pages yet: Blog and History arrive with slices 06 and
-# 07, and About, Current Season and Sponsors with slice 11. Every fixture here
-# builds a throwaway site out of the REAL hugo.yaml and the REAL layouts with
-# those pages present, so the eight-item order, the appending of a ninth and a
-# tenth page, and the removal of a deleted one are all proven now.
+# are the ones nobody can test by looking at the real site, which has exactly
+# the eight pages it has. Every fixture here builds a throwaway site out of the
+# REAL hugo.yaml and the REAL layouts, so the eight-item order, the appending
+# of a ninth and a tenth page, and the removal of a deleted one are all proven
+# against page sets this site does not currently have.
 #
 # The mutations after them exist for the reason slice 03 found the hard way: a
 # checker that quietly passes everything looks exactly like a checker that
@@ -33,6 +32,7 @@ set -uo pipefail
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
 CHECKER="$ROOT/scripts/check-site.sh"
 PACKET=$(sed -n 's|^[[:space:]]*sponsorPacket:[[:space:]]*||p' "$ROOT/hugo.yaml" | tr -d '"'"'"'' | head -1)
+EMAIL=$(sed -n 's|^[[:space:]]*contactEmail:[[:space:]]*||p' "$ROOT/hugo.yaml" | tr -d '"'"'"' ' | head -1)
 HUGO=${HUGO:-hugo}
 
 [ -x "$CHECKER" ] || { echo "no executable checker at $CHECKER" >&2; exit 2; }
@@ -104,6 +104,12 @@ all_eight() {
   page "$dir" pages/current-season.md "Current Season"
   page "$dir" pages/sponsors.md Sponsors
   page "$dir" pages/contact.md Contact
+  # The Contact page carries the address, for the same reason the sponsor data
+  # above is not empty: check-site.sh section 10 is deliberately not vacuous -
+  # a contact page whose body has lost the one channel this site has fails it.
+  # Read out of hugo.yaml rather than typed here, so this fixture cannot be the
+  # thing that goes stale when the team's address changes.
+  printf '\n[%s](mailto:%s)\n' "$EMAIL" "$EMAIL" >> "$dir/content/pages/contact.md"
   printf '%s' "$dir"
 }
 

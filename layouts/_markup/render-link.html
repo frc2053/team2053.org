@@ -1,3 +1,11 @@
 {{- /* Same base-path treatment as images. mailto:, tel: and absolute URLs are
        left exactly as written. */ -}}
 <a href="{{ partial "url.html" .Destination }}"{{ with .Title }} title="{{ . }}"{{ end }}>{{ .Text }}</a>
+{{- /* NO TRAILING NEWLINE. A link is an inline element, and everything after
+       the last action in a template is emitted verbatim - so the newline that
+       every text editor puts at the end of this file came out inside the
+       paragraph, where HTML collapses it to a space. Every link in the corpus
+       that is followed by a full stop rendered as "firstinspires.org ." until
+       this was trimmed. The `{{-` eats the newline above and the `-}}` eats
+       the one at the end of the file; the comment between them exists only to
+       carry the two trim markers. */ -}}

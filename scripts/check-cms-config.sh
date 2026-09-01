@@ -206,6 +206,45 @@ else
   detail "the 300 KB ceiling belongs to $OPTIMIZER, which can step quality down to reach it"
 fi
 
+# Prints the block of the comment-stripped config belonging to collection $1:
+# the `- name: $1` line and everything indented further than it.
+#
+# ONLY A TOP-LEVEL COLLECTION CAN OPEN A BLOCK, and that is the whole subtlety
+# here. `- name: sponsors` appears twice in this config - once as the Sponsors
+# collection, and once as the prose page whose intro sits above the grid - and
+# an extractor that simply took the first match would hand section 10 the page
+# entry and check the sponsor form's three fields against a form that has none
+# of them. The collection level is read off the file rather than assumed to be
+# two spaces: it is the indentation of the first `- name:` after `collections:`.
+collection_block() {
+  awk -v want="$1" '
+    !started { if ($0 ~ /^collections:[[:space:]]*$/) started = 1; next }
+    # Any key back at column zero ends the collections block.
+    /^[^[:space:]]/ { exit }
+    /^[[:space:]]*-[[:space:]]*name:/ {
+      indent = match($0, /[^ ]/) - 1
+      if (!have_level) { level = indent; have_level = 1 }
+      # A `- name:` deeper than the collection level is a field or a file
+      # entry: it neither opens a block nor closes the one already open.
+      if (indent == level) {
+        inside = ($0 ~ "^[[:space:]]*-[[:space:]]*name:[[:space:]]*" want "[[:space:]]*$")
+      }
+    }
+    inside { print }
+  ' "$BARE"
+}
+
+# Reads scalar $2 from the fields of the list entry introduced by
+# `- name: $1` - stopping at the next `- name:` so a value belonging to a later
+# field is never read as this one's.
+field_scalar() {
+  awk -v want="$1" -v key="$2" '
+    $0 ~ "^[[:space:]]*-[[:space:]]*name:[[:space:]]*" want "[[:space:]]*$" { f = 1; next }
+    f && /^[[:space:]]*-[[:space:]]*name:/ { f = 0 }
+    f && $0 ~ "^[[:space:]]*" key ":" { sub("^[[:space:]]*" key ":[[:space:]]*", ""); print; exit }
+  '
+}
+
 # ── 6. The prose pages stay undeletable ───────────────────────────────────
 # Pages is a FILE collection, and a file collection has no create button and no
 # delete button - the options do not exist in its shape. The realistic
@@ -214,17 +253,13 @@ fi
 # recovery from a deleted page is retyping it out of the commit list.
 #
 # Scoped to the Pages collection, deliberately. Post, History and the sponsor
-# list are all MEANT to be creatable and deletable - slices 06 and 07 add them
-# as folder collections - so banning these keys config-wide would forbid the
-# next two slices rather than protect this one.
+# list are all MEANT to be creatable and deletable - they are folder
+# collections - so banning these keys config-wide would forbid those content
+# types rather than protect this one.
+#
+# A file rather than a variable, because the greps below report line numbers.
 PAGES_BLOCK=$(mktemp)
-awk '
-  /^[[:space:]]*-[[:space:]]*name:[[:space:]]*pages[[:space:]]*$/ {
-    inside = 1; depth = match($0, /[^ ]/) - 1; print; next
-  }
-  inside && /^[[:space:]]*-[[:space:]]*name:/ && match($0, /[^ ]/) - 1 <= depth { inside = 0 }
-  inside { print }
-' "$BARE" > "$PAGES_BLOCK"
+collection_block pages > "$PAGES_BLOCK"
 
 if [ ! -s "$PAGES_BLOCK" ]; then
   fail "$CONFIG has no collection called \"pages\""
@@ -328,38 +363,10 @@ else
 fi
 
 # ── 10. The two data singletons still have the shape their templates read ──
-# Prints the block of the comment-stripped config belonging to collection $1:
-# the `- name: $1` line and everything indented further than it. The same shape
-# as the pages extraction in section 6, generalized because two more
-# collections now need it, and guarded with `!inside` so a nested field of the
-# same name cannot re-anchor the block partway through - which section 6's copy
-# does not need, having no nested `- name: pages`.
+# Both blocks are read with collection_block, defined above section 6 and
+# shared with it - one extractor, so the two sections cannot come to disagree
+# about what a collection is.
 #
-# SECTION 6 IS NOT FOLDED INTO THIS, deliberately and for now. Three slices are
-# in flight against this file at once and section 6 is not one of their
-# subjects; rewriting it here would be a merge conflict bought for a tidier
-# script. Fold it in once 06, 07 and 09 have landed.
-collection_block() {
-  awk -v want="$1" '
-    !inside && $0 ~ "^[[:space:]]*-[[:space:]]*name:[[:space:]]*" want "[[:space:]]*$" {
-      inside = 1; depth = match($0, /[^ ]/) - 1; print; next
-    }
-    inside && /^[[:space:]]*-[[:space:]]*name:/ && match($0, /[^ ]/) - 1 <= depth { inside = 0 }
-    inside { print }
-  ' "$BARE"
-}
-
-# Reads scalar $2 from the fields of the list entry introduced by
-# `- name: $1` - stopping at the next `- name:` so a value belonging to a later
-# field is never read as this one's.
-field_scalar() {
-  awk -v want="$1" -v key="$2" '
-    $0 ~ "^[[:space:]]*-[[:space:]]*name:[[:space:]]*" want "[[:space:]]*$" { f = 1; next }
-    f && /^[[:space:]]*-[[:space:]]*name:/ { f = 0 }
-    f && $0 ~ "^[[:space:]]*" key ":" { sub("^[[:space:]]*" key ":[[:space:]]*", ""); print; exit }
-  '
-}
-
 # The sponsor form. Two of its properties are load-bearing and both are
 # absences, which is exactly the kind of thing that gets helpfully "fixed" back
 # in later: `url` was empty on all fifteen sponsors and no template read it,

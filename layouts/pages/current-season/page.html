@@ -1,0 +1,40 @@
+{{/* The Current Season page. Bound to content/pages/current-season.md BY ITS
+     PATH, the same way the Sponsors page is bound to its own - so there is no
+     `layout:` key in the front matter for a student to delete, and no way to
+     take the calendar off the page by editing prose.
+
+     THE CALENDAR IS HARDCODED HERE, deliberately, and it is the one thing on
+     this site that is neither a CMS field nor a config param. It is also the
+     only element on the whole site that stays current without anyone touching
+     the repository: the team edits the Google Calendar and this page follows.
+     A field would put the one durable thing here behind the same editing that
+     everything else on the site rots for want of.
+
+     Residual, and accepted: if the team ever replaces that calendar, this
+     embed goes empty and only a code edit fixes it.
+
+     No countdown. The old page counted down to kickoff from a date somebody
+     had to type in every autumn; on a site whose whole premise is that it will
+     one day stop being edited, that widget's guaranteed end state is counting
+     into the past.
+
+     THE CALENDAR LEADS THE PAGE, above the prose, because it empties rather
+     than lying. Prose about which days we meet is a claim that was true when
+     it was typed; the calendar is either right or blank. */}}
+{{ define "main" }}
+{{/* No `title=` in the query string. It said `title=2026%20Events`, and a
+     hardcoded year label frozen into a template is exactly the decay
+     everything else here is arranged to prevent - it would still say 2026 in
+     2031, over a calendar showing 2031's meetings. Google's default heading is
+     the calendar's own name, which the team can change without a code edit.
+     The rest of the address is durable: the calendar ID, the timezone, and the
+     colour. */}}
+<div class="calendar">
+  <iframe src="https://calendar.google.com/calendar/embed?height=600&amp;wkst=1&amp;ctz=America%2FNew_York&amp;showPrint=0&amp;src=M2E1MmE4NzM2Yjk4NjNiNmQ4Njk2NDgyOTFlYWQ0ZTRhNjMxOWI0NWIwMjJmYWE5YzVmZmJkMDVlZjQwODRiZEBncm91cC5jYWxlbmRhci5nb29nbGUuY29t&amp;color=%230b8043"
+          title="Southern Tier Robotics meeting calendar"
+          loading="lazy"
+          referrerpolicy="strict-origin-when-cross-origin"></iframe>
+</div>
+
+{{ .Content }}
+{{ end }}

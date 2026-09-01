@@ -53,8 +53,12 @@ new_fixture() {
   [ "$1" = missing_bundle ] || : > "$dir/static/admin/sveltia-cms.js"
   cp "$ROOT/scripts/optimize-images.sh" "$dir/scripts/optimize-images.sh"
   # Content only has to exist; the checker asserts presence, never contents.
+  # EVERY prose page is copied, by glob rather than by name: the config's
+  # `files:` list names all of them, and one left out here would fail the
+  # control test rather than whatever the mutation was about. A sixth page
+  # added later needs no edit to this line.
   cp "$ROOT/content/_index.md" "$dir/content/_index.md"
-  cp "$ROOT/content/pages/contact.md" "$dir/content/pages/contact.md"
+  cp "$ROOT"/content/pages/*.md "$dir/content/pages/"
   # The two data singletons the config names, and the icon set its platform
   # dropdown is checked against. The icons are copied rather than stubbed
   # because the assertion is about the set of FILENAMES, which is the thing
@@ -312,6 +316,13 @@ awk 'BEGIN { done = 0 }
 cat "$WORK/mutated" > "$d/static/admin/config.yml"
 expect_fail "the sponsor list turned into something undraggable" "$d" "dragged into order"
 
+# Deleting the collection outright, which is also the one test that pins down
+# WHICH `- name: sponsors` the checker reads. There are two in the config - the
+# Sponsors collection, and the prose page whose intro sits above the grid - and
+# an extractor that took the first match would find the page entry here, still
+# report a failure, and report it as a sponsor form missing all three of its
+# fields rather than as the collection being gone. Requiring the message to be
+# about "no collection called" is what makes that distinction stick.
 d=$(new_fixture sponsor_collection_gone)
 awk '/^  - name: sponsors$/ { skip = 1 } /^  - name: socials$/ { skip = 0 } !skip { print }' \
   "$d/static/admin/config.yml" > "$WORK/mutated"

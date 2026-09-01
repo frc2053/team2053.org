@@ -527,6 +527,108 @@ elif [ "$old_name" -eq 0 ]; then
   pass "no page is headed \"Support Us\" - across $h1_pages page(s), the word is \"Sponsors\""
 fi
 
+# ── 10. Contact is an email address, and there is no form anywhere ────────
+# The old site's contact form posted to /contact-thank-you, a route that
+# existed nowhere, with no backend and no form provider behind it. Every
+# message anyone sent through it since it was built went nowhere, and the team
+# never found out. Deleting it cost nothing, and it must not come back: a form
+# on a static site with no form provider is not a channel, it is a channel that
+# silently is not there.
+#
+# The form is checked for site-wide rather than on /contact/, because the one
+# it replaced also appeared on the home page. Drilled before it was committed:
+# a <form> pasted back into the contact page turns this red, and Sveltia's own
+# page under /admin/ is excluded because it is a third-party application whose
+# forms are its own.
+#
+# /admin/ is skipped with the same `case` the other sections use rather than a
+# second grep: $SITE is a path, and a path fed to grep as a pattern has its
+# dots read as wildcards.
+forms=""
+while IFS= read -r f; do
+  case "$f" in "$SITE"/admin/*) continue ;; esac
+  grep -qI -e '<form' "$f" 2>/dev/null && forms="$forms$f
+"
+done < <(find "$SITE" -type f -name '*.html' | sort)
+forms=${forms%$'\n'}
+if [ -n "$forms" ]; then
+  fail "a form in $SITE"
+  detail "this site has no backend and no form provider; anything typed into a form goes nowhere"
+  while IFS= read -r f; do detail "$f"; done <<< "$forms"
+else
+  pass "no form anywhere in $SITE - email is the whole contact channel"
+fi
+
+# ...and the address that replaced it is actually on the page. Read out of
+# hugo.yaml rather than written here twice, so changing the team's address is
+# one edit and this follows it.
+#
+# Scoped to <main>, deliberately: the footer prints the same address on every
+# page of the site, so an unscoped grep would pass over a Contact page that had
+# lost its entire body.
+CONTACT_PAGE="$SITE/contact/index.html"
+contact_email=$(sed -n 's/^[[:space:]]*contactEmail:[[:space:]]*//p' "$CONFIG" | head -1 | sed 's/[[:space:]]*#.*$//' | tr -d "\"' ")
+if [ ! -f "$CONTACT_PAGE" ]; then
+  fail "no contact page at $CONTACT_PAGE"
+elif [ -z "$contact_email" ]; then
+  fail "$CONFIG sets no contactEmail, so there is no address to check the contact page for"
+else
+  contact_main=$(tr '\n' ' ' < "$CONTACT_PAGE" | grep -oE '<main[^>]*>.*</main>' | head -1)
+  if [ -z "$contact_main" ]; then
+    fail "$CONTACT_PAGE has no <main> element"
+  elif ! grep -qF "mailto:$contact_email" <<< "$contact_main"; then
+    fail "$CONTACT_PAGE does not offer $contact_email"
+    detail "email is the only contact channel this site has; without it the page offers nothing"
+  else
+    pass "$CONTACT_PAGE offers $contact_email, and nothing else has to work for it to"
+  fi
+fi
+
+# ── 11. The calendar leads Current Season, and carries no year ────────────
+# The Google Calendar embed is the only element on this site that stays current
+# without anyone touching the repository, which is why it is hardcoded in
+# layouts/pages/current-season/page.html and is not a field. Three ways it goes
+# wrong are silent, and this is the section that is not silent about them. All
+# three were drilled before this was committed: the embed swapped for another
+# address, a paragraph moved above it, and `title=2026%20Events` put back.
+CS_PAGE="$SITE/current-season/index.html"
+if [ ! -f "$CS_PAGE" ]; then
+  fail "no current season page at $CS_PAGE"
+else
+  cs_main=$(tr '\n' ' ' < "$CS_PAGE" | grep -oE '<main[^>]*>.*</main>' | head -1)
+  cal=$(grep -oE 'calendar\.google\.com/calendar/embed[^"'"'"'<> ]*' <<< "$cs_main" | head -1)
+  if [ -z "$cal" ]; then
+    # The embed dropped from the template takes the page's whole point with it
+    # and leaves prose that still says "the calendar above".
+    fail "$CS_PAGE renders no Google Calendar embed"
+  else
+    # The calendar LEADS the page. It empties rather than lying, which prose
+    # about which days we meet cannot do - so it goes above the prose, and a
+    # paragraph before it means that has been reversed.
+    if grep -q '<p' <<< "${cs_main%%calendar.google.com*}"; then
+      fail "$CS_PAGE puts prose above the calendar"
+      detail "the calendar leads: it empties rather than going out of date, and the prose does not"
+    else
+      pass "$CS_PAGE leads with the calendar, above the prose"
+    fi
+
+    # No year in the address. It carried `title=2026%20Events`, and a year
+    # label frozen into a template still reads 2026 in 2031, over a calendar
+    # showing 2031's meetings. The `src` parameter is the opaque calendar ID
+    # and is stripped before the pattern is applied, the same way the team
+    # number is stripped in section 4 - a year inside a base64 blob would be a
+    # coincidence, not a label.
+    cal_labels=$(sed -E 's/src=[^&]*//g' <<< "$cal")
+    if grep -qE '(19|20)[0-9]{2}' <<< "$cal_labels"; then
+      fail "the calendar embed address carries a year"
+      detail "$cal"
+      detail "a hardcoded year label outlives the season it names; the calendar is named in Google"
+    else
+      pass "the calendar embed address carries no year label"
+    fi
+  fi
+fi
+
 echo
 if [ "$failures" -gt 0 ]; then
   echo "$failures check(s) failed. The site still deployed; this is a content problem, not an outage."

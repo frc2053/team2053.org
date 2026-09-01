@@ -2,3 +2,6 @@
        site's base path, so the same content works at
        frc2053.github.io/team2053.org/ and at team2053.org/ after cutover. */ -}}
 <img src="{{ partial "url.html" .Destination }}" alt="{{ .PlainText }}"{{ with .Title }} title="{{ . }}"{{ end }} loading="lazy">
+{{- /* No trailing newline, for the reason written out in render-link.html:
+       an image is an inline element too, and an image inside a sentence would
+       pick up a stray space after it. */ -}}

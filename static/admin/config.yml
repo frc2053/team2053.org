@@ -102,13 +102,19 @@ collections:
     # pages are undeletable by construction rather than by a rule in a document
     # nobody reads.
     #
-    # Three of the five prose pages are missing from this list because they do
-    # not exist yet; slices 09 and 11 write them and add them here. An entry
-    # pointing at a file that is not in the repository shows a student a blank
-    # page and invites them to publish it, so scripts/check-cms-config.sh
-    # reports it when this list and the content tree disagree. It reports,
-    # rather than prevents: checks in this repository never gate the deploy, so
-    # the drift ships and turns the workflow red and emails the team.
+    # All five prose pages are here, listed in the order they appear in the
+    # nav. An entry pointing at a file that is not in the repository shows a
+    # student a blank page and invites them to publish it, so
+    # scripts/check-cms-config.sh reports it when this list and the content
+    # tree disagree. It reports, rather than prevents: checks in this
+    # repository never gate the deploy, so the drift ships and turns the
+    # workflow red and emails the team.
+    #
+    # Home is in this list like any other page, which it has never been before:
+    # on the site this replaces it was the one page nobody could edit, with its
+    # heading, its four value cards and its team photo all written into a
+    # component. It is the most-visited page on the site and it holds the one
+    # picture most worth changing each season.
     files:
       - name: home
         label: Home
@@ -137,6 +143,29 @@ collections:
           - name: body
             label: Page
             widget: markdown
+      - name: about
+        label: About
+        file: content/pages/about.md
+        fields: *page_fields
+      # DELIBERATELY ABSENT from this entry: a calendar field. The Google
+      # Calendar embed is hardcoded in layouts/pages/current-season/page.html,
+      # because it is the only element on this site that stays current without
+      # anyone touching the repository - and a field is the thing that makes an
+      # element need touching. There is also no countdown and no kickoff date:
+      # the old page had both, and a date somebody has to retype every autumn
+      # counts into the past the first year nobody does.
+      - name: current-season
+        label: Current Season
+        file: content/pages/current-season.md
+        fields: *page_fields
+      # The prose above the sponsor grid. The grid itself, its "Our Sponsors"
+      # heading and the packet link all belong to
+      # layouts/pages/sponsors/page.html and are not editable here; the
+      # sponsors themselves are the Sponsors collection further down.
+      - name: sponsors
+        label: Sponsors
+        file: content/pages/sponsors.md
+        fields: *page_fields
       - name: contact
         label: Contact
         file: content/pages/contact.md

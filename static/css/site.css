@@ -171,3 +171,14 @@ a{color:inherit}
 /* The grid's own heading, so prose can never drift away from where the logos
    actually are. Matched to the body's h2 rule, which it sits outside of. */
 .sponsor-head{font-size:1.45rem;line-height:1.2;font-weight:700;margin:3rem 0 1rem;padding-top:1rem;border-top:3px solid var(--red)}
+
+/* ── the meeting calendar ────────────────────────────────────────
+   Google Calendar's embed is a fixed-height application, not a 16:9 video, so
+   this reserves a tall box rather than an aspect ratio - nothing below it
+   jumps when the iframe loads, and nothing below it is pushed off a phone.
+
+   It breaks out of the 68ch measure the same way the sponsor grid does, and
+   for the same reason: a month grid is not prose, and at prose width its day
+   cells are too narrow to read. */
+.calendar{width:min(1100px,calc(100vw - 2rem));position:relative;left:50%;transform:translateX(-50%);height:min(80vh,600px);margin:0 0 3rem;background:var(--panel);border-radius:.6rem;overflow:hidden}
+.calendar iframe{width:100%;height:100%;border:0;display:block}
