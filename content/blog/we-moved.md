@@ -3,6 +3,7 @@ title: We Moved!
 publishDate: 2021-09-09
 summary: Tigertronics moved from Union Endicott High School to Vestal High School, and became Southern Tier Robotics.
 featuredImage: /images/vestal-logo.webp
+bannerFit: whole
 ---
 
 Tigertronics has moved from Union Endicott High School to Vestal High School, just 10 minutes away from the old location! Nothing about the core values of the team have changed, but we are changing our name and brand

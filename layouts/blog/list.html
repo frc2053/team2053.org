@@ -16,7 +16,12 @@
         <a class="card-link" href="{{ .RelPermalink }}">
           {{/* Decorative: the title it sits above is the accessible name of
                this link, so alt text here would only repeat it. */}}
-          {{ with .Params.featuredImage }}<img class="card-img" src="{{ partial "url.html" . }}" alt="" loading="lazy">{{ end }}
+          {{/* Bound before the `with` below, which rebinds the dot to the image path -
+               and NOT written as `$.Params.bannerFit` inside it, because `$` in a
+               range is the page being ranged FROM, so every card would have read
+               this list page's setting instead of its own. */}}
+          {{ $whole := eq (.Params.bannerFit | default "cover") "whole" }}
+          {{ with .Params.featuredImage }}<img class="card-img{{ if $whole }} card-whole{{ end }}" src="{{ partial "url.html" . }}" alt="" loading="lazy">{{ end }}
           <h2 class="card-title">{{ .Title }}</h2>
         </a>
         {{ partial "updated.html" . }}

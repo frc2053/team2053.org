@@ -3,6 +3,7 @@ title: 2024 Pre-Season, Welcome!
 publishDate: 2023-10-12
 summary: Southern Tier Robotics preparses for another FIRST® Robotics Competition (FRC) season.
 featuredImage: /images/crescendo.webp
+bannerFit: whole
 ---
 
 STR is meeting up again and preping for the 2024 FRC season, Crescendo, and for an offseason event taking place on October 21st, 2023. Meetings every Tuesday and Thursday.

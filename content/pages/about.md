@@ -1,8 +1,8 @@
 ---
 title: About
 description: Who Southern Tier Robotics is, what FIRST and the FIRST Robotics Competition are, and where the team came from.
-heroImage: /images/2023PitCrew.webp
-heroImageAlt: Five students standing behind the robot in the pit at a competition, under the team's banner
+heroImage: /images/PitTeam.webp
+heroImageAlt: Students working on the robot in the team's pit at a competition
 ---
 
 Southern Tier Robotics is FIRST® Robotics Competition team 2053, based at

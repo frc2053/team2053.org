@@ -2,7 +2,8 @@
 title: 2025 Robot Reveal Rattlesnake
 publishDate: 2025-03-03
 summary: Meet Rattlesnake, STR's 2025 FIRST® Robotics Competition (FRC) robot.
-featuredImage: /images/rattlesnakeback.webp
+featuredImage: /images/Rattlesnake-1.webp
+bannerFit: whole
 ---
 
 Team 2053 is proud to present our Reefscape robot, Rattlesnake!

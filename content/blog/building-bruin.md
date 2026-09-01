@@ -3,6 +3,7 @@ title: Building Bruin
 publishDate: 2024-05-28
 summary: Our 2024 Robot is complete.
 featuredImage: /images/bruin.webp
+bannerFit: whole
 ---
 
 The robotics team continued with building Bruin, the 2024 competition robot, from January up through the first FRC regional competition at Pittsburgh, PA, on February 28th to March 2nd.

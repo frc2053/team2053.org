@@ -13,7 +13,12 @@
         <a href="{{ .RelPermalink }}">
           {{/* Decorative: the link's own text names the season, so a screen
                reader announcing the photograph as well would say it twice. */}}
-          {{ with .Params.featuredImage }}<img src="{{ partial "url.html" . }}" alt="" loading="lazy">{{ end }}
+          {{/* Bound before the `with` below, which rebinds the dot to the image path -
+               and NOT written as `$.Params.bannerFit` inside it, because `$` in a
+               range is the page being ranged FROM, so every card would have read
+               this list page's setting instead of its own. */}}
+          {{ $whole := eq (.Params.bannerFit | default "cover") "whole" }}
+          {{ with .Params.featuredImage }}<img{{ if $whole }} class="card-whole"{{ end }} src="{{ partial "url.html" . }}" alt="" loading="lazy">{{ end }}
           <span>{{ .Title }}</span>
         </a>
         {{ with .Description }}<p>{{ . }}</p>{{ end }}

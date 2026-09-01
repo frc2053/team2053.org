@@ -50,10 +50,19 @@
 
   --mono:'Space Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
   --measure:68ch;
-  /* Every cropped photo on the site shares one crop bias, toward the upper
-     third where faces sit in a team photo. Defined once so the hero and the
-     blog card cannot drift into two different crops. */
-  --focal:50% 28%;
+  /* Every cropped photo on the site shares one crop bias. Defined once so the
+     hero and the blog card cannot drift into two different crops - which they
+     had: the history thumbnail carried a hand-written `50% 28%` of its own,
+     and would have stayed at 28% while this token moved.
+
+     It WAS 28%, a number picked for a band so shallow that only the top of a
+     photograph could survive it. The bands below are no longer that shallow,
+     and 28% on a 2:1 band cuts the front row off a group shot in order to keep
+     ceiling. 38% is where a standing person's face falls in the team
+     photographs in this repository, and it is near enough to centre that a
+     robot - which is not a face, and is usually framed centrally - still
+     reads. */
+  --focal:50% 38%;
 }
 
 /* ── the violet fields ────────────────────────────────────────────
@@ -119,10 +128,57 @@ a{color:inherit}
 .foot .mark svg{width:180px}                                     /* extended */
 
 /* ── hero: focal band ────────────────────────────────────────────
-   Fixed-height full-bleed band. It crops, but object-position biases the
-   crop to the upper third, where faces sit in every team photo. */
-.hero{position:relative;height:min(52vh,460px);overflow:hidden;background:var(--panel)}
+   The SHAPE of this band is what decides how much of a photograph survives
+   it, and the first version fixed the height and let the width run to the
+   window. 460px tall and full-bleed is 3:1 on a laptop and 7:1 on a wide
+   monitor. Every photograph in this repository is between 0.56:1 and 2.8:1, so
+   on a wide monitor the band was discarding four fifths of the picture and the
+   crop bias was only choosing WHICH fifth - which is how /about/ came to show
+   a band across the middle of five faces, and /history/2018/ a brick wall with
+   no robot anywhere in it.
+
+   So the width is capped and the height follows from it. `aspect-ratio` is the
+   whole of the fix: the band is 2:1 whatever the window is doing, and
+   `max-height` only stops it eating a short viewport whole. The cap is 1400px
+   because past it the band goes back to being a letterbox slot - and because
+   the widest image here is 1920px, so nothing is enlarged to reach it either.
+
+   DO NOT put the fixed height back. A fixed height on a full-bleed element IS
+   the bug: it makes the crop depend on the visitor's monitor, which is exactly
+   the kind of breakage that is invisible on the monitor of whoever wrote it. */
+.hero{position:relative;max-width:1400px;margin:0 auto;aspect-ratio:2/1;max-height:min(64vh,600px);overflow:hidden;background:var(--panel)}
 .hero img{width:100%;height:100%;object-fit:cover;object-position:var(--focal)}
+
+/* ── hero: the whole picture, for the things that must not be cropped ──
+   `cover` is right for a photograph, which has margin to lose, and wrong for
+   anything that has none. Three banners on this site are ARTWORK - a school
+   crest, an event wordmark, a game logo - and cropping artwork slices the
+   thing it is a picture of. Two more are portrait photographs of a robot,
+   where the robot IS the tall dimension.
+
+   This variant shows the whole file, and also refuses to ENLARGE it, which
+   `object-fit:contain` on its own would still happily do: the crest is 238px
+   wide and was being stretched across the window at fourteen times its own
+   size, which is most of why that banner looked wrong rather than merely
+   cropped. Sized `auto` inside a flex box the picture renders at its own
+   pixels and only ever shrinks, so a small file reads as small rather than as
+   broken.
+
+   Set from front matter, `bannerFit: whole`, because nothing in CSS can tell a
+   photograph from a logo - and nothing in the build can either, since these
+   images live in static/, which Hugo does not read. Hence a field on the form:
+   the only image field on this site anyone has to think about, and the default
+   needs no thought, because leaving it alone is `cover`.
+
+   The scrim and the caption are positioned absolutely and so take no part in
+   the flex layout; the picture is the only flex item. `flex-start` puts it at
+   the top of the band, which leaves the caption at the bottom sitting on empty
+   ground instead of over the middle of a logo.
+
+   Ordered AFTER `.hero img` deliberately: the two selectors weigh the same, so
+   source order is the only thing that makes this one win. */
+.hero-whole{display:flex;align-items:flex-start;justify-content:center}
+.hero-whole img{width:auto;height:auto;max-width:100%;max-height:100%;object-fit:contain}
 .hero-scrim{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.92) 0%,rgba(0,0,0,.35) 55%,transparent 100%)}
 .hero-cap{position:absolute;left:0;right:0;bottom:0;padding:2rem 1rem;max-width:var(--measure);margin:0 auto}
 .hero-cap h1,.noimg h1{font-size:clamp(1.9rem,5vw,3rem);line-height:1.15;font-weight:700;margin:0}
@@ -198,13 +254,23 @@ a{color:inherit}
 /* ── blog index cards ────────────────────────────────────────────
    One column at the same 68ch measure as prose, because a card grid would
    need breakpoints to maintain and a blog this size never fills one. The
-   picture is fixed-height and shares the hero's --focal crop, so cards stay
-   the same shape whatever a student uploads. */
+   picture is a fixed SHAPE - not a fixed height - and shares the hero's
+   --focal crop, so cards stay the same shape whatever a student uploads.
+
+   It was `height:min(34vw,220px)`, which inside a 68ch column is a 3:1 slot
+   and cropped every card as hard as the old hero did. 16:9 is the shallowest
+   shape a photograph reads in, and it is the shape the history thumbnails were
+   already using, so the two lists now match. */
 .cards{list-style:none;margin:0;padding:0}
 .card{margin:0 0 3rem;padding:0 0 3rem;border-bottom:1px solid var(--line)}
 .card:last-child{border-bottom:0;padding-bottom:0}
 .card-link{display:block;text-decoration:none}
-.card-img{width:100%;height:min(34vw,220px);object-fit:cover;object-position:var(--focal);background:var(--panel)}
+.card-img{width:100%;aspect-ratio:16/9;object-fit:cover;object-position:var(--focal);background:var(--panel)}
+/* The thumbnail half of `bannerFit: whole`, above. A card is 68ch wide at
+   most, so nothing is enlarged far enough here to need the hero's flex box -
+   plain `contain` is the whole of it. Two classes deep so it outweighs both
+   `.card-img` and `.years a img`, which is why one class serves both lists. */
+.card-img.card-whole,.years a img.card-whole{object-fit:contain;background:var(--panel)}
 .card-title{font-size:1.35rem;line-height:1.2;font-weight:700;margin:1.1rem 0 .6rem}
 .card-link:hover .card-title{text-decoration:underline;text-decoration-color:var(--accent);text-underline-offset:.2em}
 .card-sum{margin:.7rem 0 0;color:var(--dim)}
@@ -238,8 +304,13 @@ a{color:inherit}
 /* Cropped to a fixed band, the same trick the hero uses. Uploads keep their
    own proportions - the CMS caps width, not shape - so a phone photo held
    upright would otherwise render as a column taller than the screen, and the
-   list would stop being a list. */
-.years a img{margin:0 0 .9rem;aspect-ratio:16/9;object-fit:cover;object-position:50% 28%}
+   list would stop being a list.
+
+   The crop bias reads --focal rather than restating it. It used to say
+   `50% 28%` in full, which is the drift the token exists to prevent and which
+   had already happened: moving --focal moved the hero and the blog card and
+   left this line where it was. */
+.years a img{margin:0 0 .9rem;aspect-ratio:16/9;object-fit:cover;object-position:var(--focal)}
 .years a span{font-size:1.2rem;font-weight:700;border-bottom:2px solid transparent}
 .years a:hover span{border-bottom-color:var(--accent)}
 .years p{margin:.6rem 0 0;color:var(--dim);font-size:.9rem}

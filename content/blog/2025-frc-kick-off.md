@@ -3,6 +3,7 @@ title: FRC 2025 Competition Kick-off
 publishDate: 2025-01-12
 summary: Kick-off at BU for the FRC 2025 REEFSCAPE competition.
 featuredImage: /images/reefscape1.webp
+bannerFit: whole
 ---
 
 The 2025 FIRST® Robotics Competition (FRC) kicked off on Saturday, Jan 4th.  REEFSCAPE presented by Haas was released across the world.  This video shows the gameplay for this year’s competition:

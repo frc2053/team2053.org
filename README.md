@@ -18,6 +18,15 @@ Actions and is live about a minute later.
 
 That is the whole loop. No GitHub account, no approval step, nothing to install.
 
+### If a banner picture looks wrong
+
+The wide picture across the top of a page is cropped to fit, which is right for
+an ordinary photograph and wrong for a logo or for a photo taller than it is
+wide — those get cut in half. Every form that takes a banner has a **Banner
+shape** box under it. Switch it to **Show the whole picture** and nothing is
+cut off. That is the only image setting on this site, and leaving it alone is
+the right answer nearly every time.
+
 ## Your edits aren't showing
 
 The one thing that can go wrong quietly is a **failed build**: your edit is

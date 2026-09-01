@@ -140,6 +140,30 @@ collections:
             widget: string
             required: false
             hint: What is in the picture, for people using a screen reader.
+          # HOW the picture is fitted to the banner, and the one image decision
+          # on this site that cannot be derived. `cover` fills the band and
+          # crops what does not fit, which is right for a photograph and wrong
+          # for a logo: artwork has no spare margin, so cropping it slices the
+          # thing it is a picture of. Nothing in CSS can tell the two apart,
+          # and neither can the build - these images live in static/, which
+          # Hugo does not read - so it is asked here.
+          #
+          # It defaults to the answer that suits almost every banner, so a
+          # student who never notices this field is a student whose page looks
+          # right. That is the test any field added here has to pass.
+          - name: bannerFit
+            label: Banner shape
+            widget: select
+            default: cover
+            options:
+              - label: Fill the banner, cropping the edges
+                value: cover
+              - label: Show the whole picture, nothing cut off
+                value: whole
+            hint: >-
+              Leave this alone for an ordinary photograph. Change it if the
+              banner is a logo, or a photo that is taller than it is wide -
+              those get cut in half by the first setting.
           - name: body
             label: Page
             widget: markdown
@@ -226,6 +250,30 @@ collections:
         widget: image
         required: false
         hint: The wide picture across the top of the post and on its card. Leave empty for no picture.
+      # HOW the picture is fitted to the banner, and the one image decision
+      # on this site that cannot be derived. `cover` fills the band and
+      # crops what does not fit, which is right for a photograph and wrong
+      # for a logo: artwork has no spare margin, so cropping it slices the
+      # thing it is a picture of. Nothing in CSS can tell the two apart,
+      # and neither can the build - these images live in static/, which
+      # Hugo does not read - so it is asked here.
+      #
+      # It defaults to the answer that suits almost every banner, so a
+      # student who never notices this field is a student whose page looks
+      # right. That is the test any field added here has to pass.
+      - name: bannerFit
+        label: Banner shape
+        widget: select
+        default: cover
+        options:
+          - label: Fill the banner, cropping the edges
+            value: cover
+          - label: Show the whole picture, nothing cut off
+            value: whole
+        hint: >-
+          Leave this alone for an ordinary photograph. Change it if the
+          banner is a logo, or a photo that is taller than it is wide -
+          those get cut in half by the first setting.
       - name: body
         label: Post
         widget: markdown
@@ -311,6 +359,30 @@ collections:
         label: Robot photo
         widget: image
         required: false
+      # HOW the picture is fitted to the banner, and the one image decision
+      # on this site that cannot be derived. `cover` fills the band and
+      # crops what does not fit, which is right for a photograph and wrong
+      # for a logo: artwork has no spare margin, so cropping it slices the
+      # thing it is a picture of. Nothing in CSS can tell the two apart,
+      # and neither can the build - these images live in static/, which
+      # Hugo does not read - so it is asked here.
+      #
+      # It defaults to the answer that suits almost every banner, so a
+      # student who never notices this field is a student whose page looks
+      # right. That is the test any field added here has to pass.
+      - name: bannerFit
+        label: Banner shape
+        widget: select
+        default: cover
+        options:
+          - label: Fill the banner, cropping the edges
+            value: cover
+          - label: Show the whole picture, nothing cut off
+            value: whole
+        hint: >-
+          Leave this alone for an ordinary photograph. Change it if the
+          banner is a logo, or a photo that is taller than it is wide -
+          those get cut in half by the first setting.
       # A bare video ID, never a web address. The site builds the address, so
       # nobody here has to know which of YouTube's several link shapes works -
       # and the pattern refuses a pasted link rather than letting one through
