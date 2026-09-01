@@ -140,7 +140,7 @@ done < <(find "$SITE" -type f \( -name '*.html' -o -name '*.css' \) | sort)
 #
 # Until slice 08 this rejected the notice outright, on the reasoning that the
 # whole line was rot. The design says otherwise: the footer carries "Copyright
-# (c) Southern Tier Robotics", hardcoded, with nothing in it that can go out of
+# © Southern Tier Robotics", hardcoded, with nothing in it that can go out of
 # date. So the assertion is now two-sided - the notice must be there, and the
 # year must not - which also means the line cannot quietly disappear.
 #
