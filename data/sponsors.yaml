@@ -1,0 +1,67 @@
+# The sponsor grid. Edited in the CMS under "Sponsors".
+#
+# ORDER IS FILE ORDER. Sveltia's list widget is drag-to-reorder, and the
+# template groups by tier while preserving the order within each tier. There is
+# deliberately no order-number field: the old `sortOrder` was a global 1-15
+# permutation that only ever tracked tier, and a student adding a sixteenth
+# sponsor would type `16` and land last in Bronze whatever tier they picked.
+#
+# There is deliberately no `url` field either. It was empty on all fifteen
+# sponsors and no template ever read it.
+#
+# The wrapping `sponsors:` key is not decoration - see data/socials.yaml for
+# why a Sveltia file collection cannot address a file whose root is a list.
+# The template reads hugo.Data.sponsors.sponsors.
+#
+# KNOWN, AND NOT FIXED HERE: Law Family and Canaugh Family both point at
+# sponsor/family.webp, so two distinct sponsors render the same logo. That is
+# carried over verbatim from the Astro corpus. Resolving it needs a second
+# logo that nobody has, which makes it a content decision rather than a
+# migration one; slice 10 owns it. The captions under the cards mean the two
+# are at least told apart on the page today.
+sponsors:
+  - name: Vestal Central School District
+    logo: /images/sponsor/vestal-logo.webp
+    tier: Platinum
+  - name: Gene Haas Foundation
+    logo: /images/sponsor/haas.webp
+    tier: Platinum
+  - name: BAE Systems
+    logo: /images/sponsor/BAEsystem.sponsor.webp
+    tier: Gold
+  - name: CMP Advanced Mechanical Solutions
+    logo: /images/sponsor/CMP-white-red.webp
+    tier: Gold
+  - name: IEEE Binghamton
+    logo: /images/sponsor/ieee.svg
+    tier: Gold
+  - name: Lockheed Martin
+    logo: /images/sponsor/LM-logo.svg
+    tier: Gold
+  - name: Williams Auto
+    logo: /images/sponsor/williamsauto.webp
+    tier: Gold
+  - name: Endicott Precision
+    logo: /images/sponsor/EpINC.logo.webp
+    tier: Gold
+  - name: Binghamton University Athletic Robotics Club
+    logo: /images/sponsor/acr.webp
+    tier: Silver
+  - name: Law Family
+    logo: /images/sponsor/family.webp
+    tier: Silver
+  - name: State Line Auto Auction
+    logo: /images/sponsor/slaaLogo.svg
+    tier: Silver
+  - name: Canaugh Family
+    logo: /images/sponsor/family.webp
+    tier: Bronze
+  - name: Endicott Rotary Club
+    logo: /images/sponsor/rotary.webp
+    tier: Bronze
+  - name: iA
+    logo: /images/sponsor/ia.svg
+    tier: Bronze
+  - name: The Cat Doctor
+    logo: /images/sponsor/catdoc.webp
+    tier: Bronze

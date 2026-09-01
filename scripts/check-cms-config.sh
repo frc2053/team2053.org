@@ -327,6 +327,122 @@ else
   fi
 fi
 
+# ── 10. The two data singletons still have the shape their templates read ──
+# Prints the block of the comment-stripped config belonging to collection $1:
+# the `- name: $1` line and everything indented further than it. The same shape
+# as the pages extraction in section 6, generalized because two more
+# collections now need it, and guarded with `!inside` so a nested field of the
+# same name cannot re-anchor the block partway through - which section 6's copy
+# does not need, having no nested `- name: pages`.
+#
+# SECTION 6 IS NOT FOLDED INTO THIS, deliberately and for now. Three slices are
+# in flight against this file at once and section 6 is not one of their
+# subjects; rewriting it here would be a merge conflict bought for a tidier
+# script. Fold it in once 06, 07 and 09 have landed.
+collection_block() {
+  awk -v want="$1" '
+    !inside && $0 ~ "^[[:space:]]*-[[:space:]]*name:[[:space:]]*" want "[[:space:]]*$" {
+      inside = 1; depth = match($0, /[^ ]/) - 1; print; next
+    }
+    inside && /^[[:space:]]*-[[:space:]]*name:/ && match($0, /[^ ]/) - 1 <= depth { inside = 0 }
+    inside { print }
+  ' "$BARE"
+}
+
+# Reads scalar $2 from the fields of the list entry introduced by
+# `- name: $1` - stopping at the next `- name:` so a value belonging to a later
+# field is never read as this one's.
+field_scalar() {
+  awk -v want="$1" -v key="$2" '
+    $0 ~ "^[[:space:]]*-[[:space:]]*name:[[:space:]]*" want "[[:space:]]*$" { f = 1; next }
+    f && /^[[:space:]]*-[[:space:]]*name:/ { f = 0 }
+    f && $0 ~ "^[[:space:]]*" key ":" { sub("^[[:space:]]*" key ":[[:space:]]*", ""); print; exit }
+  '
+}
+
+# The sponsor form. Two of its properties are load-bearing and both are
+# absences, which is exactly the kind of thing that gets helpfully "fixed" back
+# in later: `url` was empty on all fifteen sponsors and no template read it,
+# and an order number cannot express anything the drag-to-reorder does not -
+# rendering groups by tier first, so a student typing `16` lands last in Bronze
+# whatever tier they picked.
+sponsors_block=$(collection_block sponsors)
+if [ -z "$sponsors_block" ]; then
+  fail "$CONFIG has no collection called \"sponsors\""
+  detail "the sponsor grid renders from data/sponsors.yaml; with no collection nobody can edit it"
+else
+  shape=0
+  for f in name logo tier; do
+    if ! grep -qE "^[[:space:]]*-[[:space:]]*name:[[:space:]]*$f[[:space:]]*$" <<< "$sponsors_block"; then
+      fail "the sponsor form has no \"$f\" field, which the grid template renders"
+      shape=$((shape + 1))
+    fi
+  done
+
+  revived=$(grep -nE '^[[:space:]]*-[[:space:]]*name:[[:space:]]*(url|sortOrder|sort_order|order|weight)[[:space:]]*$' <<< "$sponsors_block")
+  if [ -n "$revived" ]; then
+    fail "the sponsor form has a url or ordering field again"
+    detail "url was empty on every sponsor and no template reads it; order is what dragging a row does"
+    while IFS= read -r l; do detail "line $l"; done <<< "$revived"
+    shape=$((shape + 1))
+  fi
+
+  if [ "$(field_scalar sponsors widget <<< "$sponsors_block" | tr -d "\"' ")" != list ]; then
+    fail "the sponsor collection's field is not a list widget, so sponsors cannot be dragged into order"
+    detail "order is file order; a folder collection or any other widget has no manual ordering at all"
+    shape=$((shape + 1))
+  fi
+
+  [ "$shape" -eq 0 ] && pass "the sponsor form is a drag-to-reorder list of name, logo and tier - no url, no order number"
+fi
+
+# ── 11. The platform dropdown and the committed icons agree ────────────────
+# This is the seam that makes "a student cannot produce a missing glyph" true.
+# The footer looks its icon up as assets/social-icons/<platform lowercased>.svg,
+# so an option with no file behind it renders a lettered circle instead of a
+# brand mark - visible to a visitor, invisible to whoever added the option. The
+# reverse drift is quieter still: an icon committed and never offered is simply
+# a platform nobody can pick.
+ICON_DIR=assets/social-icons
+socials_block=$(collection_block socials)
+platform_widget=$(field_scalar platform widget <<< "$socials_block" | tr -d "\"' ")
+platform_options=$(field_scalar platform options <<< "$socials_block")
+
+if [ -z "$socials_block" ]; then
+  fail "$CONFIG has no collection called \"socials\""
+  detail "the footer renders from data/socials.yaml; with no collection a dead platform can never be removed"
+elif [ "$platform_widget" != select ]; then
+  fail "the social platform field is a \"$platform_widget\", not a select"
+  detail "a text box lets a student type a platform with no icon behind it"
+elif [ ! -d "$ICON_DIR" ]; then
+  fail "no $ICON_DIR, so no option in the platform dropdown has an icon behind it"
+else
+  # Both sides reduced to a sorted list of lowercase names, which is the form
+  # the template's lookup actually uses.
+  offered=$(tr -d '[]"'"'" <<< "$platform_options" | tr ',' '\n' \
+    | sed 's/^[[:space:]]*//; s/[[:space:]]*$//' | grep -v '^$' \
+    | tr '[:upper:]' '[:lower:]' | sort)
+  committed=$(find "$ICON_DIR" -maxdepth 1 -name '*.svg' | sed 's|.*/||; s|\.svg$||' \
+    | tr '[:upper:]' '[:lower:]' | sort)
+
+  if [ -z "$offered" ]; then
+    # Nothing to compare is not the same as nothing wrong.
+    fail "the platform dropdown offers no options at all"
+  elif [ "$offered" = "$committed" ]; then
+    pass "the platform dropdown offers exactly the $(grep -c . <<< "$committed") icon(s) committed in $ICON_DIR"
+  else
+    fail "the platform dropdown and $ICON_DIR disagree"
+    while IFS= read -r p; do
+      [ -z "$p" ] && continue
+      detail "offered with no icon behind it: $p"
+    done <<< "$(comm -23 <(printf '%s\n' "$offered") <(printf '%s\n' "$committed"))"
+    while IFS= read -r p; do
+      [ -z "$p" ] && continue
+      detail "committed but not offered: $p"
+    done <<< "$(comm -13 <(printf '%s\n' "$offered") <(printf '%s\n' "$committed"))"
+  fi
+fi
+
 echo
 if [ "$failures" -gt 0 ]; then
   echo "$failures check(s) failed. The site still deployed; this is a configuration problem, not an outage."

@@ -42,7 +42,8 @@ trap 'rm -rf "$WORK"' EXIT
 new_fixture() {
   local dir="$WORK/$1"
   rm -rf "$dir"
-  mkdir -p "$dir/static/admin" "$dir/static/images" "$dir/scripts" "$dir/content/pages"
+  mkdir -p "$dir/static/admin" "$dir/static/images" "$dir/scripts" "$dir/content/pages" \
+           "$dir/data" "$dir/assets/social-icons"
   cp "$ROOT/static/admin/config.yml" "$dir/static/admin/config.yml"
   cp "$ROOT/static/admin/index.html" "$dir/static/admin/index.html"
   # A placeholder, not the real 2 MB bundle: every assertion here is about the
@@ -54,6 +55,13 @@ new_fixture() {
   # Content only has to exist; the checker asserts presence, never contents.
   cp "$ROOT/content/_index.md" "$dir/content/_index.md"
   cp "$ROOT/content/pages/contact.md" "$dir/content/pages/contact.md"
+  # The two data singletons the config names, and the icon set its platform
+  # dropdown is checked against. The icons are copied rather than stubbed
+  # because the assertion is about the set of FILENAMES, which is the thing
+  # that can drift away from the dropdown.
+  cp "$ROOT/data/sponsors.yaml" "$dir/data/sponsors.yaml"
+  cp "$ROOT/data/socials.yaml" "$dir/data/socials.yaml"
+  cp "$ROOT"/assets/social-icons/*.svg "$dir/assets/social-icons/"
   printf '%s' "$dir"
 }
 
@@ -278,6 +286,69 @@ awk '/^  - name: history$/ { skip = 1 } skip && /^  - name: / && !/^  - name: hi
      !skip { print }' "$d/static/admin/config.yml" > "$WORK/mutated"
 cat "$WORK/mutated" > "$d/static/admin/config.yml"
 expect_fail "the history collection removed entirely" "$d" "no collection called"
+# ── The sponsor form keeps its two deliberate absences ────────────────────
+# Both are fields that were REMOVED with a reason, which is the kind of thing a
+# later hand puts back as an obvious improvement. `url` was empty on all
+# fifteen sponsors and no template reads it; an order number cannot express
+# anything dragging a row does not, because rendering groups by tier first.
+d=$(new_fixture sponsor_url_revived)
+sed -i.bak 's|^              - name: logo$|              - name: url\n                widget: string\n              - name: logo|' \
+  "$d/static/admin/config.yml"
+rm -f "$d/static/admin/config.yml.bak"
+expect_fail "a url field put back on the sponsor form" "$d" "url or ordering field"
+
+d=$(new_fixture sponsor_order_revived)
+sed -i.bak 's|^              - name: logo$|              - name: sortOrder\n                widget: number\n              - name: logo|' \
+  "$d/static/admin/config.yml"
+rm -f "$d/static/admin/config.yml.bak"
+expect_fail "an order-number field put back on the sponsor form" "$d" "url or ordering field"
+
+# Only a list widget can be dragged into order. The first `widget: list` in the
+# file is the sponsor one; the socials list follows it.
+d=$(new_fixture sponsor_not_a_list)
+awk 'BEGIN { done = 0 }
+     !done && /^            widget: list$/ { print "            widget: object"; done = 1; next }
+     { print }' "$d/static/admin/config.yml" > "$WORK/mutated"
+cat "$WORK/mutated" > "$d/static/admin/config.yml"
+expect_fail "the sponsor list turned into something undraggable" "$d" "dragged into order"
+
+d=$(new_fixture sponsor_collection_gone)
+awk '/^  - name: sponsors$/ { skip = 1 } /^  - name: socials$/ { skip = 0 } !skip { print }' \
+  "$d/static/admin/config.yml" > "$WORK/mutated"
+cat "$WORK/mutated" > "$d/static/admin/config.yml"
+expect_fail "the sponsor collection deleted outright" "$d" "no collection called"
+
+# ── The platform dropdown and the committed icons agree ───────────────────
+# This seam is what makes "a student cannot produce a missing glyph" true, and
+# it can drift from either side.
+d=$(new_fixture platform_free_text)
+awk '/^              - name: platform$/ { f = 1 }
+     f && /^                widget: select$/ { print "                widget: string"; f = 0; next }
+     { print }' "$d/static/admin/config.yml" > "$WORK/mutated"
+cat "$WORK/mutated" > "$d/static/admin/config.yml"
+expect_fail "the platform field turned into a text box" "$d" "not a select"
+
+d=$(new_fixture platform_without_icon)
+sed -i.bak 's|options: \[X, TikTok|options: [X, Bluesky, TikTok|' "$d/static/admin/config.yml"
+rm -f "$d/static/admin/config.yml.bak"
+expect_fail "a platform offered with no icon behind it" "$d" "offered with no icon behind it: bluesky"
+
+d=$(new_fixture icon_never_offered)
+cp "$d/assets/social-icons/x.svg" "$d/assets/social-icons/mastodon.svg"
+expect_fail "an icon committed but never offered" "$d" "committed but not offered: mastodon"
+
+d=$(new_fixture icons_gone)
+rm -rf "$d/assets/social-icons"
+expect_fail "the icon set deleted, as a teardown might" "$d" "no assets/social-icons"
+
+# The same shape as the empty-tree and no-script-tag holes: an assertion that
+# compares two sets is satisfied by both being empty.
+d=$(new_fixture no_platform_options)
+sed -i.bak 's|options: \[X, TikTok, Instagram, YouTube, GitHub, Discord, Facebook, LinkedIn\]|options: []|' \
+  "$d/static/admin/config.yml"
+rm -f "$d/static/admin/config.yml.bak"
+rm -f "$d"/assets/social-icons/*.svg
+expect_fail "a dropdown with no options and no icons at all" "$d" "no options at all"
 
 echo
 if [ "$failures" -gt 0 ]; then
