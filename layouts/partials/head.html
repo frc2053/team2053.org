@@ -3,7 +3,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 {{/* The SEO suffix is appended here so nobody ever types it into a title field. */}}
 <title>{{ if .IsHome }}{{ site.Title }}{{ else }}{{ .Title }} | {{ site.Title }}{{ end }}</title>
-{{ with .Description }}<meta name="description" content="{{ . }}">{{ end }}
+{{/* A prose page types a `description`; a post types one `summary` that serves
+     both this tag and its card on the blog index. Two fields asking for the
+     same sentence is one field a student can leave empty by accident. */}}
+{{ with or .Description .Params.summary }}<meta name="description" content="{{ . }}">{{ end }}
 <link rel="canonical" href="{{ .Permalink }}">
 <link rel="icon" href="{{ "favicon.png" | relURL }}">
 <link rel="stylesheet" href="{{ "css/site.css" | relURL }}">

@@ -16,6 +16,10 @@
   --bg:#000; --fg:#fff; --dim:#a9a3b5; --line:#2a2432; --panel:#0d0a12;
   --mono:'Space Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
   --measure:68ch;
+  /* Every cropped photo on the site shares one crop bias, toward the upper
+     third where faces sit in a team photo. Defined once so the hero and the
+     blog card cannot drift into two different crops. */
+  --focal:50% 28%;
 }
 *{box-sizing:border-box}
 html,body{margin:0;padding:0}
@@ -37,7 +41,7 @@ a{color:inherit}
    Fixed-height full-bleed band. It crops, but object-position biases the
    crop to the upper third, where faces sit in every team photo. */
 .hero{position:relative;height:min(52vh,460px);overflow:hidden;background:var(--panel)}
-.hero img{width:100%;height:100%;object-fit:cover;object-position:50% 28%}
+.hero img{width:100%;height:100%;object-fit:cover;object-position:var(--focal)}
 .hero-scrim{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.92) 0%,rgba(0,0,0,.35) 55%,transparent 100%)}
 .hero-cap{position:absolute;left:0;right:0;bottom:0;padding:2rem 1rem;max-width:var(--measure);margin:0 auto}
 .hero-cap h1,.noimg h1{font-size:clamp(1.9rem,5vw,3rem);line-height:1.15;font-weight:700;margin:0}
@@ -82,3 +86,17 @@ a{color:inherit}
 /* ── footer ──────────────────────────────────────────────────── */
 .foot{max-width:var(--measure);margin:6rem auto 0;padding:2rem 1rem 3rem;border-top:1px solid var(--line);text-align:center}
 .foot small{display:block;margin-top:1.2rem;color:var(--dim);font-size:.72rem;line-height:1.8}
+
+/* ── blog index cards ────────────────────────────────────────────
+   One column at the same 68ch measure as prose, because a card grid would
+   need breakpoints to maintain and a blog this size never fills one. The
+   picture is fixed-height and shares the hero's --focal crop, so cards stay
+   the same shape whatever a student uploads. */
+.cards{list-style:none;margin:0;padding:0}
+.card{margin:0 0 3rem;padding:0 0 3rem;border-bottom:1px solid var(--line)}
+.card:last-child{border-bottom:0;padding-bottom:0}
+.card-link{display:block;text-decoration:none}
+.card-img{width:100%;height:min(34vw,220px);object-fit:cover;object-position:var(--focal);border-radius:.6rem;background:var(--panel)}
+.card-title{font-size:1.35rem;line-height:1.2;font-weight:700;margin:1.1rem 0 .6rem}
+.card-link:hover .card-title{text-decoration:underline;text-decoration-color:var(--red);text-underline-offset:.2em}
+.card-sum{margin:.7rem 0 0;color:var(--dim)}

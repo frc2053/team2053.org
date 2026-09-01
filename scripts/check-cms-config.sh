@@ -254,6 +254,36 @@ case "$auth" in
            detail "the token is the only sign-in this site has - students hold no login" ;;
 esac
 
+# ── 8. No tag and no author field, in any collection ──────────────────────
+# Why this site has neither is written out once, where the field would be
+# added back: the DELIBERATELY ABSENT block on the posts collection in
+# $CONFIG. The short version is that the old vocabulary published more tag
+# pages than the site had posts, and nobody remaining will maintain one.
+#
+# The realistic regression is somebody adding a field back to be helpful. It
+# would not even produce pages - hugo.yaml disables the taxonomy and term kinds
+# - so all a student filling one in would get is the belief that it does
+# something. Asserted config-wide rather than per collection, because the
+# reason applies to every content type this site will ever have.
+#
+# Quotes, braces and commas are flattened to spaces first, so the three ways
+# the same field can be written - `- name: tags`, `- name: "tags"`, and the
+# flow style `- {name: tags, widget: list}` - are one shape by the time the
+# pattern sees them. Line numbers survive, because sed edits in place per line.
+#
+# Fed from $BARE, so the config's own comment explaining why these two are
+# absent is never mistaken for the fields themselves.
+banned=$(sed -E 's/["'"'"'{},]/ /g' "$BARE" \
+  | grep -nE "(^|[[:space:]])name[[:space:]]*:[[:space:]]*(tags|authors)([[:space:]]|$)|^[[:space:]]*(-[[:space:]]*)?(tags|authors)[[:space:]]*:")
+if [ -n "$banned" ]; then
+  fail "$CONFIG offers a tags or authors field"
+  detail "the content model has neither, and hugo.yaml disables the taxonomy and term kinds:"
+  detail "a student filling either field would be typing into something that produces no page"
+  while IFS= read -r l; do detail "line $l"; done <<< "$banned"
+else
+  pass "no tags and no authors field in any collection"
+fi
+
 echo
 if [ "$failures" -gt 0 ]; then
   echo "$failures check(s) failed. The site still deployed; this is a configuration problem, not an outage."
