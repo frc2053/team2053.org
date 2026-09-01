@@ -1,10 +1,26 @@
 <header class="head">
   <a class="mark" href="{{ "" | relURL }}">{{ partial "wordmark.html" }}</a>
   {{/* The row wraps rather than reorders: a 9th and 10th item make the header
-       one line taller, with no hamburger and no breakpoint to maintain. */}}
+       one line taller, with no hamburger and no breakpoint to maintain.
+
+       The whole nav is this one range. Config entries and cascaded page
+       entries are already merged and sorted together by weight before they get
+       here, so the interleaved order needs no template code at all. */}}
   <nav class="nav" aria-label="Main">
     {{ range site.Menus.main }}
+      {{/* A config entry in hugo.yaml whose pageRef names a page that is not in
+           the site resolves to an EMPTY URL, and Hugo neither warns nor fails.
+           Rendered anyway, that is <a href=""> on every page of the site: a nav
+           link that goes nowhere, which is the failure this design exists to
+           make impossible. Skipped, the cost is one absent item and no broken
+           link, and scripts/check-site.sh turns the run red naming it.
+
+           A cascaded entry can never arrive here empty - a page that is not in
+           the site has no menu entry at all - so this only ever guards the four
+           structural entries. */}}
+      {{ if .URL }}
       <a href="{{ .URL }}"{{ if or ($.IsMenuCurrent "main" .) ($.HasMenuCurrent "main" .) }} aria-current="page"{{ end }}>{{ .Name }}</a>
+      {{ end }}
     {{ end }}
   </nav>
 </header>

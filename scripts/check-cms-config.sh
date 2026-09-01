@@ -443,6 +443,74 @@ else
   fi
 fi
 
+# ── 12. There is no nav control anywhere ───────────────────────────────────
+# The nav is derived from the set of pages and never edited: four structural
+# entries in hugo.yaml's `menus.main`, and every page under content/pages/
+# joining through the `cascade` block. Creating a page links it and deleting a
+# page unlinks it, which is what makes stranding and dangling impossible rather
+# than merely unlikely - and that only holds while there is nothing to get
+# wrong. An order box is the one nav act a student can type a wrong answer
+# into; a "show in nav" checkbox is the one they can forget to tick, which is
+# exactly how a page ends up published and unreachable.
+#
+# There are two places the control could come back, and this is the script that
+# reads the source tree, so both are checked here.
+
+# One: a field or a collection in the CMS. A field is caught by its `name`, and
+# also by its `label`, because the label is the half a student reads - "Nav
+# order" over a field named `position` is the same defect.
+#
+# `hint` is deliberately NOT read. A hint is prose, and prose about a menu -
+# "the calendar menu", "the menu on the school site" - is a sentence somebody
+# may legitimately write. A label is a two-word noun phrase over an input box,
+# and there is no innocent reason for one here to say "nav" or "menu".
+nav_named=$(grep -nEi '^[[:space:]]*(-[[:space:]]*)?name:[[:space:]]*"?(weight|menu|menus|nav|navigation|nav_?order|sort_?order|show_?in_?nav)"?[[:space:]]*$' "$BARE")
+nav_labelled=$(grep -nEi '^[[:space:]]*(label|label_singular):.*(\bnav\b|navigation|\bmenu\b)' "$BARE")
+if [ -n "$nav_named$nav_labelled" ]; then
+  fail "$CONFIG puts a nav control in front of a student"
+  detail "the nav is derived from the page set; there is nothing about it to edit"
+  [ -n "$nav_named" ] && while IFS= read -r l; do detail "line $l"; done <<< "$nav_named"
+  [ -n "$nav_labelled" ] && while IFS= read -r l; do detail "line $l"; done <<< "$nav_labelled"
+else
+  pass "no nav collection, field or label anywhere in $CONFIG"
+fi
+
+# Two: nav membership written straight into a page's front matter, which would
+# put that one page somewhere other than site config and quietly exempt it from
+# the rule the cascade enforces for every other page.
+#
+# `menus` is forbidden in any content file - that is the design's actual claim.
+# `weight` only in content/pages/, where it IS the nav order. Everywhere else it
+# is Hugo's ordinary list-ordering field, on pages that are not in a menu at
+# all, and a post or a history year is welcome to carry one.
+scanned=0
+in_fm=0
+while IFS= read -r f; do
+  scanned=$((scanned + 1))
+  case "$f" in
+    content/pages/*) keys='^(menus?|weight):' ;;
+    *)               keys='^menus?:' ;;
+  esac
+  hit=$(awk -v keys="$keys" '
+    NR == 1 { if ($0 !~ /^---[[:space:]]*$/) exit; next }
+    /^---[[:space:]]*$/ { exit }
+    $0 ~ keys { print FILENAME ":" NR ": " $0 }
+  ' "$f")
+  if [ -n "$hit" ]; then
+    fail "a content file carries its own nav membership"
+    while IFS= read -r l; do detail "$l"; done <<< "$hit"
+    in_fm=$((in_fm + 1))
+  fi
+done < <(find content -type f -name '*.md' 2>/dev/null | sort)
+
+# Counted, for the same reason every other iteration here is counted: a content
+# tree that could not be found would satisfy this assertion perfectly.
+if [ "$scanned" -lt 1 ]; then
+  fail "no content files found to check for hand-written nav membership"
+elif [ "$in_fm" -eq 0 ]; then
+  pass "none of the $scanned content file(s) sets its own menus or weight"
+fi
+
 echo
 if [ "$failures" -gt 0 ]; then
   echo "$failures check(s) failed. The site still deployed; this is a configuration problem, not an outage."

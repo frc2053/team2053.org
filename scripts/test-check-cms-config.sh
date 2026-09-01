@@ -349,6 +349,57 @@ sed -i.bak 's|options: \[X, TikTok, Instagram, YouTube, GitHub, Discord, Faceboo
 rm -f "$d/static/admin/config.yml.bak"
 rm -f "$d"/assets/social-icons/*.svg
 expect_fail "a dropdown with no options and no icons at all" "$d" "no options at all"
+# ── No nav control anywhere ───────────────────────────────────────────────
+# The nav is derived from the set of pages, so there is nothing about it to
+# edit. These are the shapes the control would come back in.
+d=$(new_fixture nav_field)
+awk '!done && /^          - name: title$/ {
+       print "          - name: weight"
+       print "            label: Nav order"
+       print "            widget: number"
+       done = 1
+     } { print }' "$d/static/admin/config.yml" > "$WORK/mutated"
+cat "$WORK/mutated" > "$d/static/admin/config.yml"
+expect_fail "an order box added to the page form" "$d" "nav control"
+
+# A field named innocently and LABELLED as the nav control, which is the half a
+# student actually reads.
+d=$(new_fixture nav_label)
+awk '!done && /^          - name: description$/ {
+       print "          - name: position"
+       print "            label: Nav order"
+       print "            widget: number"
+       done = 1
+     } { print }' "$d/static/admin/config.yml" > "$WORK/mutated"
+cat "$WORK/mutated" > "$d/static/admin/config.yml"
+expect_fail "a field named innocently but labelled as the nav order" "$d" "nav control"
+
+# ...but a HINT is prose, and prose is allowed to mention a menu. This is the
+# false positive the label rule is deliberately scoped to avoid.
+d=$(new_fixture menu_in_a_hint)
+awk '!done && /hint: One sentence/ {
+       print "            hint: Shown under the page title, not in any menu."
+       done = 1; next
+     } { print }' "$d/static/admin/config.yml" > "$WORK/mutated"
+cat "$WORK/mutated" > "$d/static/admin/config.yml"
+expect_pass "a hint that merely mentions a menu" "$d"
+
+# Membership written into one page's front matter, which would take that page
+# out of the rule the cascade enforces for all the others.
+d=$(new_fixture nav_frontmatter)
+awk 'NR == 1 { print; print "menus: main"; print "weight: 15"; next } { print }' \
+  "$d/content/pages/contact.md" > "$WORK/mutated"
+cat "$WORK/mutated" > "$d/content/pages/contact.md"
+expect_fail "a page carrying its own menus key" "$d" "its own nav membership"
+
+# ...but `weight` outside content/pages/ is Hugo's ordinary list-ordering field,
+# on a page that is in no menu at all. Slices 06 and 07 are welcome to it, so
+# the rule is scoped to where weight means nav order rather than banned by the
+# word - the same shape as the file-collection guard above.
+d=$(new_fixture weight_outside_pages)
+mkdir -p "$d/content/blog"
+printf -- '---\ntitle: A post\nweight: 3\n---\n\nProse.\n' > "$d/content/blog/a-post.md"
+expect_pass "a weight on a post, which orders a list and no menu" "$d"
 
 echo
 if [ "$failures" -gt 0 ]; then
