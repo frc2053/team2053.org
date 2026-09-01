@@ -217,6 +217,37 @@ sed -i.bak 's|^  auth_methods: \[token\]|  auth_methods: [oauth]|' "$d/static/ad
 rm -f "$d/static/admin/config.yml.bak"
 expect_fail "token sign-in switched off" "$d" "token"
 
+# ── No nav control anywhere ───────────────────────────────────────────────
+# The nav is derived from the set of pages, so there is nothing about it to
+# edit. These are the shapes the control would come back in.
+d=$(new_fixture nav_field)
+awk '!done && /^          - name: title$/ {
+       print "          - name: weight"
+       print "            label: Nav order"
+       print "            widget: number"
+       done = 1
+     } { print }' "$d/static/admin/config.yml" > "$WORK/mutated"
+cat "$WORK/mutated" > "$d/static/admin/config.yml"
+expect_fail "an order box added to the page form" "$d" "nav control"
+
+# A field named innocently and LABELLED as the nav control, which is the half a
+# student actually reads.
+d=$(new_fixture nav_label)
+awk '!done && /hint: One sentence/ {
+       print "            hint: Where this page sits in the menu."
+       done = 1; next
+     } { print }' "$d/static/admin/config.yml" > "$WORK/mutated"
+cat "$WORK/mutated" > "$d/static/admin/config.yml"
+expect_fail "a field whose hint offers to move a page in the menu" "$d" "nav control"
+
+# Membership written into one page's front matter, which would take that page
+# out of the rule the cascade enforces for all the others.
+d=$(new_fixture nav_frontmatter)
+awk 'NR == 1 { print; print "menus: main"; print "weight: 15"; next } { print }' \
+  "$d/content/pages/contact.md" > "$WORK/mutated"
+cat "$WORK/mutated" > "$d/content/pages/contact.md"
+expect_fail "a page carrying its own menus key" "$d" "its own nav membership"
+
 echo
 if [ "$failures" -gt 0 ]; then
   echo "$failures test(s) failed."

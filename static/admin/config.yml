@@ -78,6 +78,20 @@ slug:
   encoding: ascii
   clean_accents: true
 
+# DELIBERATELY ABSENT: anything at all to do with the navigation. No nav
+# collection, no "show in nav" checkbox, no order number - not on the Page form
+# and not anywhere else in this file. The nav is derived from the set of pages
+# by hugo.yaml's `menus.main` and `cascade` blocks: creating a page links it and
+# deleting a page unlinks it, so a page cannot be published and unreachable and
+# a nav entry cannot point at a page that is gone.
+#
+# The cost, taken deliberately: reordering the nav is a code edit, and a page
+# cannot be left out of it. An order box would buy back the reordering at the
+# price of the one nav act a student can type a wrong answer into, and a "show
+# in nav" checkbox at the price of the one they can forget. Zero pages want to
+# be unlisted. scripts/check-cms-config.sh turns the run red if either comes
+# back, here or in a page's front matter.
+
 collections:
   - name: pages
     label: Pages

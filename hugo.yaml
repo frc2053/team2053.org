@@ -25,18 +25,63 @@ permalinks:
   page:
     pages: /:slug/
 
+# The four structural entries, the ones that are not prose pages and so cannot
+# arrive by cascade: Home is the site root, Blog and History are section
+# indexes, and Merch Store is a shop on another host. Their weights interleave
+# with the cascaded ones below - 10/20/50/60 against 30/40/70/80 - because Hugo
+# merges config entries and page entries into ONE menu and sorts the whole thing
+# together by weight. That is what reproduces the interleaved order from a plain
+# `range site.Menus.main` with no template code.
+#
+# Reordering the nav is therefore a code edit. That is the accepted cost, taken
+# deliberately: an order box is the one nav act a student can type a wrong
+# answer into, and none of these four change from one season to the next.
 menus:
   main:
     - name: Home
       pageRef: /
       weight: 10
+    - name: Blog
+      pageRef: /blog
+      weight: 20
+    - name: History
+      pageRef: /history
+      weight: 50
+    # The only external entry, and so the only one carrying a literal URL.
+    - name: Merch Store
+      url: https://shop.team2053.org/
+      weight: 60
 
 # Menu membership is supplied here, never by a field in a content file, so no
-# student can strand or dangle a page. An unweighted page sorts to the end.
+# student can strand or dangle a page. Creating a page under content/pages/
+# links it. Deleting one unlinks it. There is no "show in nav" checkbox to
+# forget and no order number to get wrong - the whole nav has no student-facing
+# control anywhere, in Sveltia or in front matter.
+#
+# The FIRST entry is the entire rule: every prose page is in the nav. The four
+# after it only place the four that exist today, and carry no `menus` key
+# because they do not need one - Hugo applies every cascade entry that matches
+# and the most specific one wins per key, whatever order they are written in
+# (verified on 0.165.0, both orderings).
+#
+# A page none of the four names gets no weight, and an unweighted entry sorts to
+# the END of the menu, tiebroken alphabetically by name. So a sixth prose page
+# appends itself to the nav, linked, with no field for anyone to fill in.
 cascade:
   - target:
-      path: /pages/contact
+      path: /pages/**
     menus: main
+  - target:
+      path: /pages/about
+    weight: 30
+  - target:
+      path: /pages/current-season
+    weight: 40
+  - target:
+      path: /pages/sponsors
+    weight: 70
+  - target:
+      path: /pages/contact
     weight: 80
 
 params:

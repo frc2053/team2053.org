@@ -172,3 +172,12 @@ jobs:
       - name: Test the CMS configuration checker
         if: always()
         run: ./scripts/test-check-cms-config.sh
+
+      # The nav is derived from the set of pages, so the claims worth testing
+      # are about page sets this site does not have yet - a ninth page
+      # appending itself, a deleted page unlinking itself. These build
+      # throwaway sites out of the real config and the real templates under
+      # $TMPDIR, using the Hugo installed above.
+      - name: Test the nav
+        if: always()
+        run: ./scripts/test-nav.sh
