@@ -162,12 +162,20 @@ done < <(find "$SITE" -type f -name '*.html' | sort)
 #
 # Zero embeds is a legitimate state here, unlike the empty tree in check 0: no
 # history year is obliged to have a video, and neither is any other page.
+#
+# The query string is stripped first, the same way check 3 strips one. Hugo's
+# OWN {{< youtube >}} shortcode - which slice 10 uses for the one embed that
+# lives inside a post body - emits
+# `/embed/wv1_1sGGmfQ?autoplay=0&controls=1&...`, and a check that rejected
+# that would turn the workflow red over correct output.
 embeds=0
 bad_embeds=0
 while IFS= read -r src; do
   [ -z "$src" ] && continue
   embeds=$((embeds + 1))
   id=${src##*/embed/}
+  id=${id%%\?*}
+  id=${id%%#*}
   if ! printf '%s' "$id" | grep -qE '^[A-Za-z0-9_-]{11}$'; then
     fail "video embed is not a bare 11-character YouTube ID: $id"
     bad_embeds=$((bad_embeds + 1))
