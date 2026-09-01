@@ -75,6 +75,22 @@ menus:
 # A page none of the four names gets no weight, and an unweighted entry sorts to
 # the END of the menu, tiebroken alphabetically by name. So a sixth prose page
 # appends itself to the nav, linked, with no field for anyone to fill in.
+#
+# The four also pin `slug` and `linkTitle`, and this is why. `permalinks` above
+# builds the URL from `:slug`, which Hugo derives from the TITLE when no slug is
+# set - and the menu entry takes its name from the title too. So retitling a
+# page in Sveltia silently moved its URL and its nav label together, which is
+# what happened on 2026-09-01: a student put the season's game name into the
+# Current Season title, /current-season/ started returning 404 to every bookmark
+# and printed flyer, and the nav grew a label no check expected. Naming the
+# season on the season's page is a reasonable thing for a student to do; a 404
+# is not a reasonable thing for it to cost. The title still renders as the
+# page's heading, so the edit shows up where it was meant to - it just no longer
+# reaches the address bar or the nav.
+#
+# This applies only to the four pages named here, the ones whose addresses are
+# in the wild. A sixth prose page still takes its URL from its title, which is
+# the behaviour that makes creating a page a one-field act.
 cascade:
   - target:
       path: /pages/**
@@ -82,15 +98,23 @@ cascade:
   - target:
       path: /pages/about
     weight: 30
+    slug: about
+    linkTitle: About
   - target:
       path: /pages/current-season
     weight: 40
+    slug: current-season
+    linkTitle: Current Season
   - target:
       path: /pages/sponsors
     weight: 70
+    slug: sponsors
+    linkTitle: Sponsors
   - target:
       path: /pages/contact
     weight: 80
+    slug: contact
+    linkTitle: Contact
 
 params:
   contactEmail: southerntierrobotics@gmail.com
