@@ -127,3 +127,111 @@ collections:
         label: Contact
         file: content/pages/contact.md
         fields: *page_fields
+
+  # A FOLDER collection, unlike Pages above. The team keeps having seasons, so
+  # a new year is authored every season, indefinitely - and this is the only
+  # content type that ages perfectly, since a 2025 entry is still correct in
+  # 2031. Creating and deleting are both on, with Sveltia's own confirm as the
+  # only guardrail; there is no undo, and recovery is retyping from the public
+  # commit list.
+  - name: history
+    label: Robot Years
+    label_singular: Robot Year
+    folder: content/history
+    format: yaml-frontmatter
+    create: true
+    # The file name, and therefore the address, is the year:
+    # content/history/2025.md serves at /history/2025/. Left to the default
+    # the slug would be built from the title and the address would read
+    # /history/2025-game-reefscape/.
+    slug: '{{fields.robotYear}}'
+    summary: '{{fields.robotYear}} - {{fields.robotName}}'
+    sortable_fields:
+      fields: [robotYear, title]
+      default:
+        field: robotYear
+        direction: descending
+    # content/history/_index.md is the section's own page, and it sits in this
+    # folder, so Sveltia lists it either way. Named here, it is presented as
+    # the index file with its own three fields; left unnamed it would appear
+    # as a robot year with no year, opening a robot-year form over a page that
+    # has none of those fields.
+    index_file:
+      label: History intro page
+      fields:
+        - name: title
+          label: Title
+          widget: string
+        - name: description
+          label: Search description
+          widget: string
+          required: false
+          hint: One sentence, shown by Google under the page's title.
+        - name: body
+          label: Page
+          widget: markdown
+    fields:
+      - name: title
+        label: Title
+        widget: string
+        hint: 'Like: 2025 Game: Reefscape'
+      - name: description
+        label: Summary
+        widget: string
+        required: false
+        hint: One or two sentences, shown at the top of the page and by Google.
+      - name: robotYear
+        label: Season
+        widget: number
+        # This is also the file name and the web address, via `slug` above, so
+        # it has to save as a whole number rather than 2025.0.
+        value_type: int
+        hint: The year, like 2025.
+      - name: robotName
+        label: Robot name
+        widget: string
+        required: false
+      - name: wins
+        label: Wins
+        widget: number
+        min: 0
+      - name: losses
+        label: Losses
+        widget: number
+        min: 0
+      - name: events
+        label: Events
+        widget: list
+        hint: One competition per line.
+      # Optional, and the page prints no "Awards" heading at all when it is
+      # empty. Nine of the twelve seasons have none, and the page this
+      # replaces printed the heading over an empty list on every one of them.
+      - name: awards
+        label: Awards
+        widget: list
+        required: false
+        hint: Leave empty if we did not win one. Nothing is shown either way.
+      - name: featuredImage
+        label: Robot photo
+        widget: image
+        required: false
+      # A bare video ID, never a web address. The site builds the address, so
+      # nobody here has to know which of YouTube's several link shapes works -
+      # and the pattern refuses a pasted link rather than letting one through
+      # to render an error inside the page. Required because every season has
+      # a game reveal video, and because Sveltia applies a pattern to an empty
+      # field too: an optional field with a pattern can never be left empty.
+      - name: gameVidUrl
+        label: Game video code
+        widget: string
+        pattern:
+          - '^[A-Za-z0-9_-]{11}$'
+          - Paste only the 11-character code, like YWbxcjlY9JY - not the whole web address.
+        hint: On YouTube, press Share. The link ends with 11 characters. Paste just those.
+      - name: gameLogo
+        label: Game logo
+        widget: image
+        required: false
+      - name: body
+        label: Page
+        widget: markdown

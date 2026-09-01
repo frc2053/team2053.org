@@ -1,0 +1,23 @@
+{{/* /history/ - every season, newest first.
+
+     Sorted on robotYear rather than on the title, because the title is typed
+     prose and the year is a number field. Verified on 0.165.0: a page with no
+     robotYear at all sorts last ascending and therefore FIRST here - which is
+     loud rather than quiet, and is the right way round for an entry that is
+     missing the one field the CMS marks required. */}}
+{{ define "main" }}
+  {{ .Content }}
+  <ul class="years">
+    {{ range (.Pages.ByParam "robotYear").Reverse }}
+      <li>
+        <a href="{{ .RelPermalink }}">
+          {{/* Decorative: the link's own text names the season, so a screen
+               reader announcing the photograph as well would say it twice. */}}
+          {{ with .Params.featuredImage }}<img src="{{ partial "url.html" . }}" alt="" loading="lazy">{{ end }}
+          <span>{{ .Title }}</span>
+        </a>
+        {{ with .Description }}<p>{{ . }}</p>{{ end }}
+      </li>
+    {{ end }}
+  </ul>
+{{ end }}

@@ -152,6 +152,34 @@ done < <(find "$SITE" -type f -name '*.html' | sort)
 
 [ "$yearly" -eq 0 ] && pass "no year and no copyright notice in any footer"
 
+# ── 5. Every video embed carries a bare 11-character YouTube ID ───────────
+# A history year stores the video ID and layouts/history/page.html builds the
+# address, so the one way this goes wrong is a value that is not an ID: a link
+# pasted into the field, or an ID that lost a character on its way through a
+# migration. Either produces an iframe that renders a YouTube error inside an
+# otherwise perfectly fine page - invisible to the build, and to anyone who
+# does not scroll down and press play.
+#
+# Zero embeds is a legitimate state here, unlike the empty tree in check 0: no
+# history year is obliged to have a video, and neither is any other page.
+embeds=0
+bad_embeds=0
+while IFS= read -r src; do
+  [ -z "$src" ] && continue
+  embeds=$((embeds + 1))
+  id=${src##*/embed/}
+  if ! printf '%s' "$id" | grep -qE '^[A-Za-z0-9_-]{11}$'; then
+    fail "video embed is not a bare 11-character YouTube ID: $id"
+    bad_embeds=$((bad_embeds + 1))
+  fi
+done < <(grep -rhoE "youtube(-nocookie)?\.com/embed/[^\"'<> ]*" "$SITE" --include='*.html' | sort -u)
+
+if [ "$embeds" -eq 0 ]; then
+  pass "no video embed in $SITE to check"
+elif [ "$bad_embeds" -eq 0 ]; then
+  pass "all $embeds video embed(s) carry a bare 11-character YouTube ID"
+fi
+
 echo
 if [ "$failures" -gt 0 ]; then
   echo "$failures check(s) failed. The site still deployed; this is a content problem, not an outage."
