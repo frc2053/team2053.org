@@ -1,0 +1,74 @@
+{{/* One history year: the robot, the season's record, and the game.
+
+     Every field is reached through `with`, even the ones the CMS marks
+     required, because content files also arrive by migration and by hand. A
+     missing field renders nothing instead of failing the build.
+
+     `awards` is the field this type was rebuilt for. The page this replaces
+     printed an "Awards:" heading unconditionally over an empty list, on the
+     nine years out of twelve that have never won one. */}}
+{{ define "main" }}
+  {{ with .Description }}<p>{{ . }}</p>{{ end }}
+
+  {{ with .Params.featuredImage }}
+    <img src="{{ partial "url.html" . }}"
+         alt="{{ with $.Params.robotYear }}Team 2053's {{ . }} robot{{ else }}{{ $.Title }}{{ end }}"
+         loading="lazy">
+  {{ end }}
+
+  {{/* Guarded as a whole, in the same spirit as the hero: a year carrying none
+       of these renders no panel rather than an empty bordered box. */}}
+  {{ if or .Params.robotName (isset .Params "wins") (isset .Params "losses") .Params.events .Params.awards }}
+  <dl class="facts">
+    {{ with .Params.robotName }}<dt>Robot</dt><dd>{{ . }}</dd>{{ end }}
+
+    {{/* Deliberately `isset` and not `with`: Hugo treats 0 as empty, and a
+         season with zero wins is a real record that still has to print. */}}
+    {{ if or (isset .Params "wins") (isset .Params "losses") }}
+      <dt>Record</dt>
+      <dd>{{ .Params.wins | default 0 }}&ndash;{{ .Params.losses | default 0 }}</dd>
+    {{ end }}
+
+    {{ with .Params.events }}
+      <dt>Events</dt>
+      <dd><ul>{{ range . }}<li>{{ . }}</li>{{ end }}</ul></dd>
+    {{ end }}
+
+    {{ with .Params.awards }}
+      <dt>Awards</dt>
+      <dd><ul>{{ range . }}<li>{{ . }}</li>{{ end }}</ul></dd>
+    {{ end }}
+  </dl>
+  {{ end }}
+
+  {{ .Content }}
+
+  {{/* Decorative, on the same reasoning as the thumbnails in section.html:
+       this is the logo of the game the page is titled after, so a described
+       alt could only repeat the h1 back to a screen reader. The robot photo
+       above is different - it is a photograph nothing else on the page
+       describes - and it keeps a real alt. */}}
+  {{ with .Params.gameLogo }}
+    <img class="gamelogo" src="{{ partial "url.html" . }}" alt="" loading="lazy">
+  {{ end }}
+
+  {{/* The embed lives in the template rather than in the content: all twelve
+       years need it, and it is template code either way.
+
+       gameVidUrl holds a bare 11-character YouTube video ID, never a web
+       address, so this line builds the one URL shape that works instead of
+       parsing the several shapes people paste. The CMS refuses anything that
+       is not an ID, and scripts/check-site.sh asserts that what came out the
+       other end really is one. */}}
+  {{ with .Params.gameVidUrl }}
+    <h2>Game video</h2>
+    <div class="video">
+      <iframe src="https://www.youtube.com/embed/{{ . }}"
+              title="{{ $.Title }}"
+              loading="lazy"
+              referrerpolicy="strict-origin-when-cross-origin"
+              allow="encrypted-media; picture-in-picture; web-share"
+              allowfullscreen></iframe>
+    </div>
+  {{ end }}
+{{ end }}

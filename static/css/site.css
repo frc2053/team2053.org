@@ -100,3 +100,34 @@ a{color:inherit}
 .card-title{font-size:1.35rem;line-height:1.2;font-weight:700;margin:1.1rem 0 .6rem}
 .card-link:hover .card-title{text-decoration:underline;text-decoration-color:var(--red);text-underline-offset:.2em}
 .card-sum{margin:.7rem 0 0;color:var(--dim)}
+/* ── history year ────────────────────────────────────────────────
+   Everything here is emitted by layouts/history/, never typed into a page. */
+.facts{margin:2rem 0;padding:1.2rem 1.4rem;background:var(--panel);border:1px solid var(--line);border-radius:.6rem}
+.facts dt{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin-top:1.2rem}
+.facts dt:first-child{margin-top:0}
+.facts dd{margin:.25rem 0 0}
+.facts ul{margin:0;padding-left:1.2em}
+.facts li{margin:.2em 0}
+
+/* Game logos are dark artwork on a transparent background: on this site's
+   black they would be very nearly invisible. The white is a literal and not a
+   palette token on purpose - it is not one of this site's colours, it is the
+   paper the artwork was drawn for, and theming it would hide the logos. */
+.gamelogo{background:#fff;padding:1rem}
+
+/* Reserves the 16:9 box before the iframe loads, so nothing below it jumps. */
+.video{position:relative;aspect-ratio:16/9;margin:1.6rem 0;background:var(--panel);border-radius:.6rem;overflow:hidden}
+.video iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+
+/* ── history index ───────────────────────────────────────────── */
+.years{list-style:none;margin:2.5rem 0 0;padding:0}
+.years li{margin:0 0 3rem}
+.years a{display:block;text-decoration:none}
+/* Cropped to a fixed band, the same trick the hero uses. Uploads keep their
+   own proportions - the CMS caps width, not shape - so a phone photo held
+   upright would otherwise render as a column taller than the screen, and the
+   list would stop being a list. */
+.years a img{border-radius:.6rem;margin:0 0 .9rem;aspect-ratio:16/9;object-fit:cover;object-position:50% 28%}
+.years a span{font-size:1.2rem;font-weight:700;border-bottom:2px solid transparent}
+.years a:hover span{border-bottom-color:var(--red)}
+.years p{margin:.6rem 0 0;color:var(--dim);font-size:.9rem}

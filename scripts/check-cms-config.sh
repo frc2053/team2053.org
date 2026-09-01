@@ -284,6 +284,49 @@ else
   pass "no tags and no authors field in any collection"
 fi
 
+# ── 9. Next season is still addable, at the right address ─────────────────
+# History is the one OPEN type: the team keeps having seasons, so a new year
+# is authored every year for as long as the site is up. Two settings carry
+# that, and both fail silently.
+#
+# `create: true` is what puts the button there at all. Without it a student
+# has no way to add next season and no way to find out why.
+#
+# `slug` is what puts the new year at /history/2026/. Left out, Sveltia builds
+# the slug from the title instead and the year lands at
+# /history/2026-game-whatever/ - a page that works, looks right, and quietly
+# breaks the one URL shape the migration committed the other twelve years to.
+#
+# Captured into a variable rather than a temp file so this block owns no
+# cleanup; assertion 6 above needs a file because it greps with line numbers.
+history_block=$(awk '
+  /^[[:space:]]*-[[:space:]]*name:[[:space:]]*history[[:space:]]*$/ {
+    inside = 1; depth = match($0, /[^ ]/) - 1; print; next
+  }
+  inside && /^[[:space:]]*-[[:space:]]*name:/ && match($0, /[^ ]/) - 1 <= depth { inside = 0 }
+  inside { print }
+' "$BARE")
+
+if [ -z "$history_block" ]; then
+  fail "$CONFIG has no collection called \"history\""
+  detail "without it there is no way to add a season through the CMS at all"
+elif ! printf '%s' "$history_block" | grep -qE '^[[:space:]]*folder[[:space:]]*:'; then
+  fail "the history collection has no folder:, so it is not a folder collection"
+  detail "an open, recurring type has to be a folder collection; a file collection cannot grow"
+else
+  history_create=$(printf '%s' "$history_block" | sed -n 's/^[[:space:]]*create:[[:space:]]*//p' | head -1 | tr -d "\"' ")
+  history_slug=$(printf '%s' "$history_block" | sed -n 's/^[[:space:]]*slug:[[:space:]]*//p' | head -1 | tr -d "\"' ")
+  if [ "$history_create" != true ]; then
+    fail "the history collection does not set create: true"
+    detail "there would be no way to add next season, and no sign of why"
+  elif [ "$history_slug" != '{{fields.robotYear}}' ]; then
+    fail "the history slug is \"$history_slug\", not {{fields.robotYear}}"
+    detail "a new season would publish at /history/2026-game-whatever/ instead of /history/2026/"
+  else
+    pass "a new season can be created, and lands at /history/<year>/"
+  fi
+fi
+
 echo
 if [ "$failures" -gt 0 ]; then
   echo "$failures check(s) failed. The site still deployed; this is a configuration problem, not an outage."
