@@ -257,9 +257,15 @@ esac
 # ── 8. The two data singletons still have the shape their templates read ──
 # Prints the block of the comment-stripped config belonging to collection $1:
 # the `- name: $1` line and everything indented further than it. The same shape
-# as the pages extraction above, generalized because two more collections now
-# need it, and guarded with `!inside` so a nested field of the same name cannot
-# re-anchor the block partway through.
+# as the pages extraction in section 6, generalized because two more
+# collections now need it, and guarded with `!inside` so a nested field of the
+# same name cannot re-anchor the block partway through - which section 6's copy
+# does not need, having no nested `- name: pages`.
+#
+# SECTION 6 IS NOT FOLDED INTO THIS, deliberately and for now. Three slices are
+# in flight against this file at once and section 6 is not one of their
+# subjects; rewriting it here would be a merge conflict bought for a tidier
+# script. Fold it in once 06, 07 and 09 have landed.
 collection_block() {
   awk -v want="$1" '
     !inside && $0 ~ "^[[:space:]]*-[[:space:]]*name:[[:space:]]*" want "[[:space:]]*$" {

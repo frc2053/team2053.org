@@ -16,8 +16,16 @@
      failed build. scripts/check-cms-config.sh asserts the dropdown and the
      committed icon set agree, so that degradation should never be reached. */}}
 {{/* hugo.Data, not site.Data: the latter is deprecated as of Hugo 0.156 and
-     warns on every build. */}}
-{{ with hugo.Data.socials.socials }}
+     warns on every build.
+
+     The walk is nested rather than written `hugo.Data.socials.socials`, per the
+     rule that every optional value is reached through `with`. Hugo 0.165 in
+     fact returns nil for a missing key and tolerates the bare chain - verified
+     by deleting data/socials.yaml and by renaming its root key, both of which
+     build clean - but this partial is in the FOOTER, so if that ever stopped
+     being true the failure would be every page at once. Not worth relying on. */}}
+{{ with hugo.Data.socials }}
+{{ with .socials }}
 <ul class="socials">
   {{ range . }}
     {{ $platform := .platform | default "" }}
@@ -32,4 +40,5 @@
     {{ end }}
   {{ end }}
 </ul>
+{{ end }}
 {{ end }}

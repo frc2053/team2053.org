@@ -119,3 +119,7 @@ a{color:inherit}
 .socials a{width:36px;height:36px;border:1px solid var(--line);border-radius:50%;display:grid;place-items:center;color:var(--dim);text-decoration:none;font-size:.8rem;transition:.15s}
 .socials a svg{width:19px;height:19px;fill:currentColor;display:block}
 .socials a:hover{border-color:var(--fg);color:var(--fg)}
+
+/* The grid's own heading, so prose can never drift away from where the logos
+   actually are. Matched to the body's h2 rule, which it sits outside of. */
+.sponsor-head{font-size:1.45rem;line-height:1.2;font-weight:700;margin:3rem 0 1rem;padding-top:1rem;border-top:3px solid var(--red)}

@@ -17,8 +17,11 @@
 {{ end }}
 
 {{/* hugo.Data, not site.Data: the latter is deprecated as of Hugo 0.156 and
-     warns on every build. */}}
-{{ $sponsors := hugo.Data.sponsors.sponsors }}
+     warns on every build. The walk is nested rather than written
+     `hugo.Data.sponsors.sponsors`, per the rule that every optional value is
+     reached through `with` - see layouts/partials/socials.html. */}}
+{{ $sponsors := "" }}
+{{ with hugo.Data.sponsors }}{{ $sponsors = .sponsors }}{{ end }}
 {{ with $sponsors }}
   {{/* Grouped by tier in the template; ORDERED BY FILE ORDER within each tier,
        which is what Sveltia's drag-to-reorder writes. Rendering filters by
@@ -38,6 +41,13 @@
     {{ $groups = $groups | append (dict "label" "Other" "items" .) }}
   {{ end }}
 
+  {{/* "Our Sponsors", never "Current Sponsors" - a present-tense claim above
+       fifteen logos that will lapse is exactly the content-ageing this rebuild
+       exists to remove. It is the template's heading rather than the
+       document's for two reasons: it names a block the document does not own,
+       so prose can never drift away from where the logos actually appear; and
+       a wording decided as an anti-rot measure should not be retypeable. */}}
+  <h2 class="sponsor-head">Our Sponsors</h2>
   <div class="sponsorwrap">
     {{ range $groups }}
       <h3 class="sponsor-tier">{{ .label }}</h3>

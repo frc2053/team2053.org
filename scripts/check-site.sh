@@ -195,7 +195,7 @@ else
     END { if (name != "") print name "\t" }
   ' "$SPONSOR_DATA")
 
-  expected=$(printf '%s\n' "$sponsor_rows" | grep -c .)
+  expected=$(grep -c . <<< "$sponsor_rows")
   if [ "$expected" -lt 1 ]; then
     # Nothing to iterate is not the same as nothing wrong - the lesson slice 03
     # learned when an empty site satisfied every assertion in this file.
