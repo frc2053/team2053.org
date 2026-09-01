@@ -1,7 +1,7 @@
 ---
 title: Contact
 description: How to reach Southern Tier Robotics.
-heroImage: ''
+heroImage: /images/oversized.webp
 heroImageAlt: ''
 ---
 
