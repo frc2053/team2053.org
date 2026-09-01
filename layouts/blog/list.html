@@ -1,0 +1,32 @@
+{{/* The blog index.
+
+     Reverse chronological is the only navigation a few-posts-a-season blog
+     needs. There is no tag list, no author filter, no archive and no
+     pagination: every post the team has written since 2021 fits on one page
+     with room to spare, and each of those would be another route to rot.
+
+     A post needs no single-page template at all — layouts/all.html renders its
+     body, the hero partial reads its featuredImage, and the dateline partial
+     reads its publishDate. This file exists only because the index is a
+     different shape from a page. */}}
+{{ define "main" }}
+  <ul class="cards">
+    {{ range .Pages.ByDate.Reverse }}
+      <li class="card">
+        <a class="card-link" href="{{ .RelPermalink }}">
+          {{/* Decorative: the title it sits above is the accessible name of
+               this link, so alt text here would only repeat it. */}}
+          {{ with .Params.featuredImage }}<img class="card-img" src="{{ partial "url.html" . }}" alt="" loading="lazy">{{ end }}
+          <h2 class="card-title">{{ .Title }}</h2>
+        </a>
+        {{ partial "updated.html" . }}
+        {{ with .Params.summary }}<p class="card-sum">{{ . }}</p>{{ end }}
+      </li>
+    {{/* No `else` branch, because it could never run. content/blog/ has no
+         _index.md - deliberately, so the CMS cannot list one as a post - and
+         a section with no pages in it is a section Hugo does not publish at
+         all. Empty the folder and /blog/ stops existing rather than rendering
+         empty, which is why there is no empty state to write. */}}
+    {{ end }}
+  </ul>
+{{ end }}

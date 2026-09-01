@@ -152,6 +152,25 @@ done < <(find "$SITE" -type f -name '*.html' | sort)
 
 [ "$yearly" -eq 0 ] && pass "no year and no copyright notice in any footer"
 
+# ── 5. No tag or category routes ──────────────────────────────────────────
+# The content model has no tags and no authors. The old site's did, and it had
+# already rotted while its author was still on the team: 12 posts carrying 27
+# distinct tags, 16 used exactly once, two of them curly-quote duplicates that
+# published a second page for the same tag, and one empty string - more tag
+# pages than posts, each listing one thing.
+#
+# hugo.yaml disables the taxonomy and term kinds, so this asserts the outcome
+# rather than the setting: a `tags:` line reintroduced in front matter, or a
+# taxonomy re-enabled in the config, both show up here as a directory.
+taxo=$(find "$SITE" -type d \( -name tags -o -name categories -o -name authors \) | sort)
+if [ -n "$taxo" ]; then
+  fail "tag, category or author routes in $SITE"
+  detail "the content model has none of these; hugo.yaml disables the taxonomy and term kinds"
+  while IFS= read -r d; do detail "$d"; done <<< "$taxo"
+else
+  pass "no tag, category or author route anywhere in $SITE"
+fi
+
 echo
 if [ "$failures" -gt 0 ]; then
   echo "$failures check(s) failed. The site still deployed; this is a content problem, not an outage."

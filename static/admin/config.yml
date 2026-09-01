@@ -127,3 +127,62 @@ collections:
         label: Contact
         file: content/pages/contact.md
         fields: *page_fields
+
+  # Blog posts. A FOLDER collection, which is the whole difference from Pages
+  # above: students create these and students delete them. Deletion has
+  # Sveltia's own confirm dialog and nothing else behind it - there is no undo,
+  # and recovery from a deletion is retyping the post out of the public commit
+  # list. That is accepted rather than guarded, because every guard available
+  # here (a review gate, an archive folder, a trash collection) needs somebody
+  # to attend to it, and there is nobody.
+  #
+  # DELIBERATELY ABSENT: `tags` and `authors`.
+  #
+  # Tags had already rotted while the person who added them was still on the
+  # team: 12 posts carrying 27 distinct tags, 16 of them used exactly once,
+  # including curly-quote duplicates that publish two separate pages for the
+  # same tag, and one empty string - so the old site published more tag pages
+  # than it had posts. A controlled vocabulary nobody maintains is worse than
+  # no vocabulary at all: it splits one topic across two pages that each list
+  # one post. `authors` was set on none of the 12. hugo.yaml turns the taxonomy
+  # off to match, so a tag typed here would not produce a page anyway.
+  #
+  # Reverse chronological is the only navigation a few-posts-a-season blog
+  # needs, and scripts/check-cms-config.sh fails if either field reappears.
+  - name: posts
+    label: Blog posts
+    label_singular: Blog post
+    folder: content/blog
+    extension: md
+    format: yaml-frontmatter
+    create: true
+    delete: true
+    sortable_fields: [publishDate, title]
+    fields:
+      - name: title
+        label: Title
+        widget: string
+      - name: publishDate
+        label: Date
+        widget: datetime
+        # Date only, no clock: the post is dated to the day everywhere it is
+        # shown, and a time of day is one more thing to get wrong. `format` is
+        # what gets written to the file; `date_format` is only what the picker
+        # shows. Left without a default, the picker opens on today.
+        format: 'YYYY-MM-DD'
+        date_format: 'MMMM D, YYYY'
+        time_format: false
+        hint: The date on the post, and the order it appears in on the blog page. Newest first.
+      - name: summary
+        label: Summary
+        widget: string
+        required: false
+        hint: One sentence. It is the card on the blog page and the line Google shows under the title.
+      - name: featuredImage
+        label: Banner image
+        widget: image
+        required: false
+        hint: The wide picture across the top of the post and on its card. Leave empty for no picture.
+      - name: body
+        label: Post
+        widget: markdown

@@ -254,6 +254,31 @@ case "$auth" in
            detail "the token is the only sign-in this site has - students hold no login" ;;
 esac
 
+# ── 8. No tag and no author field, in any collection ──────────────────────
+# The old site's tags had already rotted while the person who added them was
+# still on the team: 12 posts carrying 27 distinct tags, 16 used exactly once,
+# two of them curly-quote duplicates that published a second page for the same
+# tag, and one empty string - more tag pages than posts. `authors` was set on
+# none of the 12.
+#
+# The realistic regression is somebody adding the field back to be helpful. It
+# would not even produce pages - hugo.yaml disables the taxonomy and term kinds
+# - so the only thing a student typing tags would get is the belief that
+# tagging does something. Asserted config-wide rather than per collection,
+# because the reason applies to every content type this site will ever have.
+#
+# Read from $BARE, so the long comment in the config explaining why these two
+# are absent is not mistaken for the fields themselves.
+banned=$(grep -nE '^[[:space:]]*(-[[:space:]]*name:[[:space:]]*)?(tags|authors)[[:space:]]*:?[[:space:]]*$' "$BARE")
+if [ -n "$banned" ]; then
+  fail "$CONFIG offers a tags or authors field"
+  detail "the content model has neither, and hugo.yaml disables the taxonomy and term kinds:"
+  detail "a student filling either field would be typing into something that produces no page"
+  while IFS= read -r l; do detail "line $l"; done <<< "$banned"
+else
+  pass "no tags and no authors field in any collection"
+fi
+
 echo
 if [ "$failures" -gt 0 ]; then
   echo "$failures check(s) failed. The site still deployed; this is a configuration problem, not an outage."

@@ -217,6 +217,28 @@ sed -i.bak 's|^  auth_methods: \[token\]|  auth_methods: [oauth]|' "$d/static/ad
 rm -f "$d/static/admin/config.yml.bak"
 expect_fail "token sign-in switched off" "$d" "token"
 
+# ── Tags and authors stay gone ────────────────────────────────────────────
+# The realistic regression is somebody adding either field back to be helpful.
+# Neither would produce a page - hugo.yaml disables the taxonomy and term kinds
+# - so all a student filling one in would get is the belief that it does
+# something. The control above is what proves the checker reads past the long
+# comment in the config that names both fields while declining them.
+d=$(new_fixture tags_field)
+cat >> "$d/static/admin/config.yml" <<'YAML'
+      - name: tags
+        label: Tags
+        widget: list
+YAML
+expect_fail "a tags field added back to a collection" "$d" "tags or authors"
+
+d=$(new_fixture authors_field)
+cat >> "$d/static/admin/config.yml" <<'YAML'
+      - name: authors
+        label: Authors
+        widget: list
+YAML
+expect_fail "an authors field added back to a collection" "$d" "tags or authors"
+
 echo
 if [ "$failures" -gt 0 ]; then
   echo "$failures test(s) failed."

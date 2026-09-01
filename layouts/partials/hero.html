@@ -1,5 +1,10 @@
-{{/* No hero image renders a plain title block, never an empty 460px band. */}}
-{{ with .Params.heroImage }}
+{{/* No hero image renders a plain title block, never an empty 460px band.
+
+     A prose page calls its banner `heroImage`; a post and a history year call
+     theirs `featuredImage`, the name the old corpus used and the name the
+     migration keeps. One hero, both names, resolved once here — so neither
+     content type needs a layout of its own just to put a picture at the top. */}}
+{{ with or .Params.heroImage .Params.featuredImage }}
 <div class="hero">
   <img src="{{ partial "url.html" . }}" alt="{{ $.Params.heroImageAlt | default "" }}">
   <div class="hero-scrim"></div>

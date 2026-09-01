@@ -19,6 +19,18 @@ enableRobotsTXT: true
 # The content model has no tags and no categories, so their pages should not exist.
 disableKinds: [taxonomy, term]
 
+# A section's own index page is titled from the directory name, and Hugo
+# pluralizes it by default: content/blog/ would head its index "Blogs". The
+# section directories here are already named the way their page should read.
+pluralizeListTitles: false
+
+# A post's publishDate is a field a student types, and Hugo hides content dated
+# in the future. Left at its default, a post dated for next Friday would publish
+# from the CMS, report success, and simply not be on the site - with nothing
+# anywhere to say why, and nobody left here able to work it out. The date labels
+# the post; it does not gate it.
+buildFuture: true
+
 # The five prose pages live under content/pages/ so the CMS can address them as
 # a fixed file collection, but they serve at the top level: /about/, /contact/.
 permalinks:

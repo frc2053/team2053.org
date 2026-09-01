@@ -1,3 +1,10 @@
-{{/* Derived from the commit date via enableGitInfo. Never a typed field, and
-     never `now` — a frozen site must not claim to be fresh. */}}
-{{ if not .Lastmod.IsZero }}<span class="updated">Updated {{ .Lastmod.Format "January 2006" }}</span>{{ end }}
+{{/* The dateline, in both the hero and the blog index card. A post is
+     self-dated by the publishDate a student typed; every other page is dated
+     by the commit that last touched it, via enableGitInfo. Both are recorded
+     past dates — never `now`, so a frozen site cannot claim to be fresh.
+
+     `.Date` is tested as well as the field, so a publishDate Hugo could not
+     parse falls back to the commit date rather than dating the post to the
+     year 1. */}}
+{{ if and .Params.publishDate (not .Date.IsZero) }}<span class="updated"><time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "January 2, 2006" }}</time></span>
+{{ else if not .Lastmod.IsZero }}<span class="updated">Updated {{ .Lastmod.Format "January 2006" }}</span>{{ end }}
