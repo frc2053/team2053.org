@@ -1,5 +1,5 @@
 ---
-title: Current Season
+title: Current Season - Coming January 9, 2027
 description: When Southern Tier Robotics meets, where to find the schedule, and what to read before you turn up.
 heroImage: /images/pasted-image-1788314546365.webp
 heroImageAlt: Students working around a bench in the shop during a build meeting
