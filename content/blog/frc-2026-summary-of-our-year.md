@@ -327,3 +327,19 @@ We have done several Outreach Events in our community.  We spread the word abou
 We do an annual presentation and demonstration at the Kopernik Science Center in Vestal, NY.   A team of students provided a presentation after which we demonstrated Li’l Sebastian and invite the audience to view Li’l Sebastian up close and ask questions.
 
 ![](/images/20261004-151714.webp)
+
+![](/images/20261004-152631.webp)
+
+![](/images/20261004-152648.webp)
+
+##### Vestal African Road Middle School FIRST® Lego League Challenge Team Visit
+
+The Vestal African Road Middle School (Grades 6-8) has a FIRST® Lego League Challenge Team.  Students and parents came to our high school classroom.  We talked about our club, demonstrated Li’l Sebastian, and had the students inspect Li’l Sebastian and ask questions.  We hope that many of the eighth graders that graduate into ninth grade will join us and continue their interest in robotics.
+
+![](/images/20261004-152923.webp)
+
+![](/images/20261004-152933.webp)
+
+Sam is explaining and demonstrating the Haas mill to the Middle School students.  We hope that some of the incoming Middle School students will take an interest in learning how to use the CNCs.  Sam has graduated and will be studying mechanical engineering and nuclear engineering at university.  We will sorely miss Sam’s work on our CNCs manufacturing parts for our robots.
+
+![](/images/20261004-152956.webp)
