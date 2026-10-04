@@ -357,3 +357,7 @@ Kids and parents stop by to see a demonstration of Li’l Sebastian.  We even l
 ![](/images/20261004-174844.webp)
 
 ![](/images/20261004-174910.webp)
+
+The parent is showing his children our poster board.  The parent was a member of the Union-Endicott FRC team Tigertronics.  Perhaps we will see his children at a FIRST® Robotics Competition someday.
+
+![](/images/20261004-180018.webp)
