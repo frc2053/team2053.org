@@ -179,3 +179,143 @@ More testing of the software to fine tune the shooter.
 The shooter coming at ya!
 
 ![](/images/20261004-135504.webp)
+
+We soon moved into the cafeteria where we had more space to test Li’l Sebastian.  We are testing the speed and accuracy of Li’l Sebastian to score the fuel into the hub.
+
+![](/images/20261004-141501.webp)
+
+![](/images/20261004-141511.webp)
+
+We were also able to do more extensive testing in our Pool Gym.
+
+![](/images/20261004-141545.webp)
+
+![](/images/20261004-141554.webp)
+
+Li’l Sebastian complete and ready for competition!
+
+![](/images/20261004-141621.webp)
+
+If you are wondering why our robot is called “Li’l Sebastian” it’s because two of the components that support the intake look like a horse’s head.  And the reference is to the horse in the sitcom “Parks and Recreation”.
+
+![](/images/20261004-141646.webp)
+
+   Looking forward!
+
+![](/images/20261004-141656.webp)
+
+**Hudson Valley Regional Competition March 18th – 21st**
+
+Our first competition of the 2026 season.  Our cheering section.
+
+![](/images/20261004-142028.webp)
+
+Students working on Li’l Sebastian in the pit.
+
+![](/images/20261004-142102.webp)
+
+The drive team is ready to take the field.
+
+![](/images/20261004-142125.webp)
+
+Li’l Sebastian on the game field scoring fuel into the hub.
+
+![](/images/20261004-142153.webp)
+
+At the Hudson Valley Regional we had an outstanding performance.
+
+We won the Quality Engineering Award and were one of the two teams in the finals.  Ultimately, we won second place in the overall regional competition.  On the strength of our performance, we were invited to the 2026 FRC Championship in Houston, Tx.
+
+![](/images/20261004-142222.webp)
+
+![](/images/20261004-142239.webp)
+
+**Tech Valley Regional April 15th – April 18th**
+
+![](/images/20261004-142319.webp)
+
+After our performance at the Hudson Valley Regional Competition the team believed we could improve the performance of Li’l Sebastion.  We identified and implemented 5 improvements to Li’l Sebastion prior to attending the Tech Valley Regional.
+
+Li’l Sebastion (2053) on the mid-field gathering the fuel and sending it to our alliance in preparation for scoring into the hub.
+
+![](/images/20261004-142353.webp)
+
+Sam and Kyle reviewing Li’l Sebastian’s performance.  Not all the modifications improved Sebastian’s performance. 
+
+![](/images/20261004-142447.webp)
+
+Between matches we went to the practice field to assess the modifications and determine what changes can be made.
+
+![](/images/20261004-142522.webp)
+
+Li’l Sebastion back in the pit for more modifications.
+
+![](/images/20261004-142548.webp)
+
+At the Tech Valley Regional we did not do as well as we expected.  When we returned from the competition we immediately got to work to determine what we needed to do to prepare for our trip to the 2026 FRC Championship at Houston, Tx. After evaluating our performance at the Tech Valley Regional, we determined that the modification to the shooter did not work as expected.  So, we set to restoring the original shooter configuration.
+
+![](/images/20261004-142619.webp)
+
+![](/images/20261004-142631.webp)
+
+Reassembling the shooter for testing.
+
+![](/images/20261004-142704.webp)
+
+![](/images/20261004-142713.webp)
+
+Reassembling Li’l Sebastian and performing final testing.
+
+![](/images/20261004-142746.webp)
+
+![](/images/20261004-142755.webp)
+
+Ultimately, it was time to button up and pack Li’l Sebastion for shipping to Houston.
+
+![](/images/20261004-142833.webp)
+
+![](/images/20261004-142842.webp)
+
+![](/images/20261004-142851.webp)
+
+**FIRST® Robotics Competition World Championship April 28th – May 3rd**
+
+We’re on our way to Houston, Tx!  We’re all excited to compete at such a high level and see other championship teams.
+
+![](/images/20261004-143039.webp)
+
+Arriving at our assigned pit at the George R. Brown Convention Center in Houston we set up and prepare Li’l Sebastian for competition.
+
+![](/images/20261004-143123.webp)
+
+Drive crew getting ready for their first match of the competition.
+
+![](/images/20261004-143211.webp)
+
+Placing Li’l Sebastian on the playing field.
+
+![](/images/20261004-143247.webp)
+
+Drive Team at the driver’s station preparing for the match to start.
+
+![](/images/20261004-143340.webp)
+
+Li’l Sebastion scoring fuel into the hub.
+
+![](/images/20261004-143439.webp)
+
+Enjoying our time at Championship.
+
+![](/images/20261004-143524.webp)
+
+![](/images/20261004-143542.webp)
+
+![](/images/20261004-143554.webp)
+
+![](/images/20261004-143604.webp)
+
+![](/images/20261004-143638.webp)
+
+Participating in the 2026 FRC Championship was an amazing experience for everyone. We learned a lot about the robots and strategies from teams all over the world.  Just watching the myriads of other teams was fun.  We were a little disappointed in our ranking.  But this was our first time at championship.  The experience we gained at participating in the championship and seeing how other teams performed will better prepare us for the upcoming 2027 FRC competition season!
+
+**Outreach Events**
