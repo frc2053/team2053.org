@@ -1,5 +1,5 @@
 ---
-title: 'FRC 2026: Summary Of Our Year'
+title: 'Rebuilt 2026: Summary Of Our Year'
 publishDate: 2026-10-04
 summary: (UNDER CONSTRUCTION) A summary of the team's efforts for the FRC 2026 competition year
 featuredImage: /images/pasted-image-1791133610189.svg
@@ -93,3 +93,89 @@ Getting ready for a mock game ...
 In play!
 
 ![](/images/20261004-133210.webp)
+
+Once we were back at the classroom, we continued to discuss what the robot needed to do, what strategies we should use to maximize scoring, and what the design should be for the various parts of the robot.  “Chalk talk” was a common activity amongst the students and mentors.
+
+![](/images/20261004-133311.webp)
+
+![](/images/20261004-133639.webp)
+
+As the design and components of the design come into focus, we begin creating and assembling prototypes to test our ideas.
+
+Discussing aspects of the design.
+
+![](/images/20261004-133738.webp)
+
+Examining the state of software development.
+
+![](/images/20261004-133846.webp)
+
+Building and assembling prototype intake and hopper for testing.
+
+![](/images/20261004-133928.webp)
+
+Building and testing a field element for future testing.
+
+![](/images/20261004-134048.webp)
+
+For the hardware design we used the CAD tool OnShape.  OnShape is taught in the technology class at school, so the students are familiar with it.  Here we are working on developing the CAD drawings for the various parts and visualizing how the components fit together.  Approved parts designs are sent to the workshop area where we use the mill, lathe, router, power and hand tools to fabricate the parts.
+
+![](/images/20261004-134156.webp)
+
+As we move through prototype testing and freeze parts of the design we manufacture and assemble components for the competition robot.
+
+Our CNC lath and mill are used to manufacture more complicated metal components.
+
+![](/images/20261004-134250.webp)
+
+Flat components are manufactured on our router.
+
+![](/images/20261004-134316.webp)
+
+Starting assembly of the shooter.
+
+![](/images/20261004-134340.webp)
+
+Integration of major components of the robot.
+
+![](/images/20261004-134416.webp)
+
+Assembly of the spindexer.
+
+![](/images/20261004-134637.webp)
+
+Spindexer prototype.
+
+![](/images/20261004-134659.webp)
+
+Additional work needed on the robot belly pan.
+
+![](/images/20261004-134726.webp)
+
+A major milestone has been achieved with the assembly of the shooter and spindexer onto the base.  Our robot Li’l Sebastian is now taking shape.
+
+![](/images/20261004-135059.webp)
+
+![](/images/20261004-134903.webp)
+
+![](/images/pasted-image-1791136181166.svg)
+
+Programming and calibrating Li’l Sebastian are just as important as the manufacture and assembly of the hardware components.
+
+![](/images/20261004-135235.webp)
+
+Calibrating the camera.
+
+![](/images/20261004-135300.webp)
+
+With everything in place, the team starts testing the spindexer and shooter mechanisms integrated together.  These are the first tests of the “fuel” being shot from Li’l Sebastian.
+
+![](/images/20261004-135347.webp)
+
+More testing of the software to fine tune the shooter.
+
+![](/images/20261004-135435.webp)
+
+The shooter coming at ya!
+
+![](/images/20261004-135504.webp)
