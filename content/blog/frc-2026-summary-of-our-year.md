@@ -77,3 +77,19 @@ The team gathers after reviewing the just released FRC game manual.  Game rules
 ![](/images/20261004-132453.webp)
 
 We broke into smaller groups to continue with the discussions.  And of course we had our discussions over pizza, chips, and soda.
+
+![](/images/20261004-132759.webp)
+
+As part of the kick-off activities, we held multiple mock game plays to better understand game nuances.
+
+Explaining the rules and objectives of the human mock game exercise.
+
+![](/images/20261004-132923.webp)
+
+Getting ready for a mock game ...
+
+![](/images/20261004-133144.webp)
+
+In play!
+
+![](/images/20261004-133210.webp)
