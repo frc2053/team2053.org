@@ -343,3 +343,17 @@ The Vestal African Road Middle School (Grades 6-8) has a FIRST® Lego League Cha
 Sam is explaining and demonstrating the Haas mill to the Middle School students.  We hope that some of the incoming Middle School students will take an interest in learning how to use the CNCs.  Sam has graduated and will be studying mechanical engineering and nuclear engineering at university.  We will sorely miss Sam’s work on our CNCs manufacturing parts for our robots.
 
 ![](/images/20261004-152956.webp)
+
+##### Berkshire Blueberry and Book Festival
+
+The Berkshire Blueberry and Book Festival is an annual event held at the town of Berkshire, NY.
+
+There was an off and on rain that day but luckily, we were set up in the Berkshire Fire Station.
+
+![](/images/20261004-174748.webp)
+
+Kids and parents stop by to see a demonstration of Li’l Sebastian.  We even let the kids operate Li’l Sebastian (under Kayla’s watchful eye).  Lucas and Mason are making sure Sebastian is OK.
+
+![](/images/20261004-174844.webp)
+
+![](/images/20261004-174910.webp)
