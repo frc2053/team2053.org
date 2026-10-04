@@ -318,4 +318,12 @@ Enjoying our time at Championship.
 
 Participating in the 2026 FRC Championship was an amazing experience for everyone. We learned a lot about the robots and strategies from teams all over the world.  Just watching the myriads of other teams was fun.  We were a little disappointed in our ranking.  But this was our first time at championship.  The experience we gained at participating in the championship and seeing how other teams performed will better prepare us for the upcoming 2027 FRC competition season!
 
-**Outreach Events**
+#### **Outreach Events**
+
+We have done several Outreach Events in our community.  We spread the word about our focus on STEAM (Science, Technology, Engineering, Arts, Mathematics).  We want our community to know that we provide an environment where mentors experienced and working in STEAM are dedicated to helping students gain the knowledge and experience to help in their academic work and provide insight into what the future can be.
+
+##### Kopernik Science Center
+
+We do an annual presentation and demonstration at the Kopernik Science Center in Vestal, NY.   A team of students provided a presentation after which we demonstrated Li’l Sebastian and invite the audience to view Li’l Sebastian up close and ask questions.
+
+![](/images/20261004-151714.webp)
