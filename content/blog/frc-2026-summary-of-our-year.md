@@ -1,5 +1,5 @@
 ---
-title: 'FRC 2026: Summary Of OUr Year'
+title: 'FRC 2026: Summary Of Our Year'
 publishDate: 2026-10-04
 summary: (UNDER CONSTRUCTION) A summary of the team's efforts for the FRC 2026 competition year
 featuredImage: /images/pasted-image-1791133610189.svg
@@ -55,3 +55,25 @@ In the Fall, 2025, there were many preparatory activities for the upcoming 2026 
 In October 2025, we welcomed prospective new members to the club.  We described what FRC is and how our team participates in the yearly competition.  We explained how Southern Tier Robotics helps students gain valuable skills and experiences that prepare them for academic and career opportunities.  Here we are demonstrating the 2025 robot for the FRC Reefscape competition season.
 
 ![Demonstrating our Reefscape robot to prospective new members](/images/20261004-131458.webp)
+
+During the Fall we did preparatory work to prepare for the 2026 season.
+
+Sam experimenting with machining parts on the CNC mill under the tutelage of mentor Kyle.
+
+![](/images/pasted-image-1791134503978.svg)
+
+We decided that we needed a new battery cart.  Douglas and Andrew are assembling the parts that were cut out on our router.
+
+![](/images/20261004-132241.webp)
+
+We disassembled the 2025 Reefscape robot to salvage components for the 2026 robot.  We’re testing the base and drive motors to determine their status and repair/replace if necessary.
+
+![](/images/20261004-132343.webp)
+
+With the FRC January 2026 release of the Rebuilt game our team immediately kicked off the race to build a competitive robot. 
+
+The team gathers after reviewing the just released FRC game manual.  Game rules and strategy are debated.  Plans for how to proceed are drafted to meet the very tight schedule.
+
+![](/images/20261004-132453.webp)
+
+We broke into smaller groups to continue with the discussions.  And of course we had our discussions over pizza, chips, and soda.
