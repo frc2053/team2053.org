@@ -48,7 +48,7 @@ We had many highs and a few lows for the 2026 FIRST® Robotics Competition seaso
 
 • And numerous individual personal donations
 
-![](/images/20261004-131351.webp "“Li’L Sebastian”")
+![](/images/sebastian.webp "“Li’L Sebastian”")
 
 In the Fall, 2025, there were many preparatory activities for the upcoming 2026 season, including welcoming new students to the club, making repairs and preparing the shop.  However, we got some very disappointing news.  Drew Williams, our lead mentor since 2022, and Renee Williams announced that they were moving to California for new careers.  Drew was the lead mentor since 2022 when the club transitioned from Union-Endicott High School to Vestal High School.  We were very happy for Drew in his new career but very sad about his leaving.  But luckily, during this transition period Andrew Beck stepped up as lead mentor.  Andrew had been a student member of FRC at his high school and had been with us as a mentor for two years.  Drew continued to support the team remotely, which helped immensely.
 
@@ -194,7 +194,7 @@ We were also able to do more extensive testing in our Pool Gym.
 
 Li’l Sebastian complete and ready for competition!
 
-![](/images/20261004-141621.webp)
+![](/images/sebastian.webp)
 
 If you are wondering why our robot is called “Li’l Sebastian” it’s because two of the components that support the intake look like a horse’s head.  And the reference is to the horse in the sitcom “Parks and Recreation”.
 
