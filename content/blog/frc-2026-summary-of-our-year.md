@@ -18,13 +18,13 @@ We had many highs and a few lows for the 2026 FIRST® Robotics Competition seaso
 
 • Corning Inc
 
+• NYSEG
+
 • IEEE Binghamton Section
 
 • IEEE Electronics Packaging Society
 
 • Williams Auto Group
-
-• NYSEG
 
 • Lockheed Martin Corporation
 
